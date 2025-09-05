@@ -8,6 +8,14 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+
 
 export default function ResetPassword() {
   const [step, setStep] = useState("reset"); 
@@ -179,15 +187,24 @@ export default function ResetPassword() {
       <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
         {step === "reset" && (
           <>
+          <div className="">
             <h2 className="text-2xl font-bold text-gray-800 text-center">
               Reset Password
             </h2>
             <p className="text-gray-500 text-center mt-2">
               Enter your email to receive an OTP.
-            </p>
+            </p> 
+            </div>
+
+             {/* <CardHeader>
+          <CardTitle>Reset Password</CardTitle>
+          <CardDescription className="whitespace-nowrap">
+           Enter your email to receive an OTP.
+          </CardDescription>
+        </CardHeader> */}
 
             <form onSubmit={handleResetSubmit} className="mt-6">
-              <input
+              {/* <input
                 type="text"
                 placeholder="Enter email"
                 value={email}
@@ -197,21 +214,76 @@ export default function ResetPassword() {
                     ? "border-red-500 focus:ring-red-500"
                     : "focus:ring-blue-500"
                 }`}
-              />
+              /> */}
+
+
+               {/* <input 
+                                id="email" 
+                                type="email" 
+                                placeholder="Enter email"
+                                 value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                  emailError
+                    ? "border-red-500 focus:ring-red-500"
+                    : "focus:ring-blue-500"
+                }`}
+                                required 
+                              /> */}
+
+
+                              <div>
+          {/* <label htmlFor="email" className="block text-sm font-medium mb-2">
+            Email
+          </label> */}
+          <input
+            id="email"
+            type="email"
+            placeholder="m@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+
+
 
               {emailError && (
                 <p className="text-red-500 text-sm mt-2">{emailError}</p>
               )}
 
-              <button
+              <Button
                 type="submit"
-                className="w-full mt-4 cursor-pointer bg-[#308BF9] text-white py-2 rounded-lg font-semibold border border-transparent hover:bg-white hover:text-black hover:border-[#308BF9] transition"
+                className="w-full mt-4 cursor-pointer bg-[#308BF9] text-white py-2 rounded-lg  border border-transparent hover:bg-white hover:text-black hover:border-[#308BF9] transition"
               >
+                
                 Send OTP
-              </button>
+              </Button>
+              
             </form>
+ <div className="flex justify-center mt-4">
+              <Link
+                href="/"
+                className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                prefetch={false}
+              >
+                Back to login
+              </Link>
+            </div>
+
           </>
         )}
+
+
+
+
+
+
+
+
+
 
         {step === "otp" && (
           <>
@@ -265,6 +337,16 @@ export default function ResetPassword() {
                 </>
               )}
             </p>
+
+             <div className="flex justify-center mt-4">
+              <Link
+                href="/"
+                className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                prefetch={false}
+              >
+                Back to login
+              </Link>
+            </div>
           </>
         )}
 
@@ -282,7 +364,7 @@ export default function ResetPassword() {
                 <Label htmlFor="password" className="block text-sm font-medium mb-2">
                   New Password
                 </Label>
-                <Input
+                <input
                   id="password"
                   name="password"
                   type="password"
@@ -290,7 +372,7 @@ export default function ResetPassword() {
                   placeholder="Enter new password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -298,7 +380,7 @@ export default function ResetPassword() {
                 <Label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
                   Confirm Password
                 </Label>
-                <Input
+                <input
                   id="confirmPassword"
                   name="confirmPassword"
                   type="password"
@@ -306,7 +388,7 @@ export default function ResetPassword() {
                   placeholder="Confirm your password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {passwordError && (
                   <p className="mt-1 text-sm text-red-600">{passwordError}</p>
@@ -337,3 +419,4 @@ export default function ResetPassword() {
     </div>
   );
 }
+

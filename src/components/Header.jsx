@@ -1,78 +1,70 @@
+"use client";
+import React, { useState } from "react";
 
-import React from 'react';
-import Image from 'next/image';
+const MonoIcon = ({ src, size = 20, color = "#A1A1A1", alt = "" }) => (
+  <span
+    role="img"
+    aria-label={alt}
+    style={{
+      width: size,
+      height: size,
+      display: "inline-block",
+      backgroundColor: color,
+      WebkitMaskImage: `url(${src})`,
+      maskImage: `url(${src})`,
+      WebkitMaskRepeat: "no-repeat",
+      maskRepeat: "no-repeat",
+      WebkitMaskSize: "contain",
+      maskSize: "contain",
+      WebkitMaskPosition: "center",
+      maskPosition: "center",
+    }}
+  />
+);
 
-const Header = () => {
+export default function Header() {
+  const [active, setActive] = useState("Dashboard");
+
+  const menu = [
+    { name: "Dashboard", icon: "/icons/hugeicons_home-05.svg" },
+    { name: "Client", icon: "/icons/hugeicons_user-group.png" },
+    { name: "Messages", icon: "/icons/hugeicons_message-02.svg" },
+    { name: "Settings", icon: "/icons/hugeicons_settings-03.svg" },
+  ];
+
   return (
-    <>
-      <div className='flex justify-between mx-[25px] mt-[30px]  bg-[#F5F7FA]'>
-        <div className='flex '>
-<Image
-src="/icons/logorespyr.png"
-alt='logo'
-width={50}
-height={50}
-/>
-        </div>
-        <div className='flex gap-[15px]'>
-        <div className='flex gap-1.5 px-5 py-[15px] cursor-pointer  rounded-[15px]'>
-    <Image
-    src="/icons/hugeicons_home-05.svg"
-    alt='icons'
-    width={20}
-    height={20}
-    />
-    <span className='font-semibold text-[12px] text-[#308BF9]'>Dashboard</span>
-</div>
-
-<div  className='flex gap-1.5 px-5 py-[15px] cursor-pointer'>
-    <Image
-    src="/icons/hugeicons_user-group.png"
-    alt='icons'
-    width={20}
-    height={20}
-    />
-    <span className='font-semibold text-[12px] text-[#A1A1A1]'>Client</span>
-</div>
-
-<div  className='flex gap-1.5 px-5 py-[15px] cursor-pointer' >
-    <Image
-    src="/icons/hugeicons_message-02.svg"
-    alt='icons'
-    width={20}
-    height={20}
-    />
-    <span className='font-semibold text-[12px] text-[#A1A1A1]'>Messages</span>
-</div>
-
-<div  className='flex gap-1.5 px-5 py-[15px] cursor-pointer'>
-    <Image
-    src="/icons/hugeicons_settings-03.svg"
-    alt='icons'
-    width={20}
-    height={20}
-    />
-    <span className='font-semibold text-[12px] text-[#A1A1A1]'>Settings</span>
-</div>
-
-        </div>
-        <div className="flex items-center gap-5">
-  <Image
-    src="/icons/hugeicons_notification-01.svg"
-    alt="notification"
-    width={20}
-    height={20}
-  />
-  <Image
-    src="/icons/hugeicons_user.svg"
-    alt="user"
-    width={20}
-    height={20}
-  />
-</div>
+    <div className="flex justify-between bg-[#F5F7FA]">
+      <div className="flex">
+        {/* keep your logo <Image /> here */}
+        <img src="/icons/logorespyr.png" alt="logo" width={50} height={50} />
       </div>
-    </>
-  )
-}
 
-export default Header
+      <div className="flex gap-[15px]">
+        {menu.map((m) => {
+          const isActive = active === m.name;
+          const color = isActive ? "#308BF9" : "#A1A1A1";
+          return (
+            <button
+              key={m.name}
+              onClick={() => setActive(m.name)}
+              className="flex items-center gap-1.5 cursor-pointer rounded-[15px] px-[20px] py-[15px] bg-white"
+            >
+              <MonoIcon src={m.icon} color={color} alt={m.name} />
+              <span
+                className={`font-semibold text-[12px]`}
+                style={{ color }}
+              >
+                {m.name}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="flex items-center gap-5">
+        <MonoIcon src="/icons/hugeicons_notification-01.svg" color="#A1A1A1" alt="notification" />
+        <MonoIcon src="/icons/hugeicons_user.svg" color="#A1A1A1" alt="user" />
+      </div>
+    </div>
+  );
+}
