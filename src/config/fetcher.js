@@ -15,6 +15,7 @@ export async function apiFetcher(endpoint, options = {}) {
       const error = new Error(errorMessage);
       error.status = res.status;
       error.data = data;
+      error.isApiError = true; 
       throw error;
     }
 

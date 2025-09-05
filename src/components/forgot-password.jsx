@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,14 +9,31 @@ import { resetPasswordService } from "@/services/authService";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-export default function ForgotPassword() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState(""); // required for API
+export default function ForgotPassword({ email }) {
+console.log("Email received in ForgotPassword component:", email); 
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Validate passwords match
+  useEffect(() => {
+    if (password && confirmPassword && password !== confirmPassword) {
+      setPasswordError("Passwords do not match");
+    } else {
+      setPasswordError("");
+    }
+  }, [password, confirmPassword]);
+
   const handleReset = async (e) => {
     e.preventDefault();
+    
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    
     setLoading(true);
     
     try {
@@ -33,38 +50,34 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 py-12 px-4 dark:bg-gray-950">
+    <div className="flex flex-col items-center justify-center">
       <div className="mx-auto w-full max-w-md space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-50">
-            Reset your password?
+            Reset your password
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Enter the email address associated with your account and your new password.
+            Enter your new password for
           </p>
         </div>
 
-        {/* ✅ API integration here */}
         <form className="space-y-6" onSubmit={handleReset}>
           <div>
-            <Label htmlFor="email" className="sr-only">
+            <Label htmlFor="email" className="block text-sm font-medium mb-2">
               Email address
             </Label>
             <Input
               id="email"
               name="email"
               type="email"
-              autoComplete="email"
-              required
-              placeholder="Email address"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              className="w-full"
+              disabled
             />
           </div>
 
-          {/* New password input (needed for API) */}
           <div>
-            <Label htmlFor="password" className="sr-only">
+            <Label htmlFor="password" className="block text-sm font-medium mb-2">
               New Password
             </Label>
             <Input
@@ -72,18 +85,40 @@ export default function ForgotPassword() {
               name="password"
               type="password"
               required
-              placeholder="New password"
-              value={password || ""}
+              placeholder="Enter new password"
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="w-full"
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <div>
+            <Label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
+              Confirm Password
+            </Label>
+            <Input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              required
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full"
+            />
+            {passwordError && (
+              <p className="mt-1 text-sm text-red-600">{passwordError}</p>
+            )}
+          </div>
+
+          <Button 
+            type="submit" 
+            className="w-full cursor-pointer border border-transparent hover:bg-white hover:text-black hover:border-[#308BF9] transition" 
+            disabled={loading || password !== confirmPassword || !password || !confirmPassword}
+          >
             {loading ? "Resetting..." : "Reset password"}
           </Button>
         </form>
-
-       
 
         <div className="flex justify-center">
           <Link
