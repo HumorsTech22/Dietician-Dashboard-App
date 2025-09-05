@@ -15,7 +15,7 @@ height={50}
 />
         </div>
         <div className='flex gap-[15px]'>
-        <div className='flex gap-1.5 px-5 py-[15px] cursor-pointer bg-red-500 rounded-[15px]'>
+        <div className='flex gap-1.5 px-5 py-[15px] cursor-pointer  rounded-[15px]'>
     <Image
     src="/icons/hugeicons_home-05.svg"
     alt='icons'
