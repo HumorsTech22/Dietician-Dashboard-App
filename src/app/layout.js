@@ -1,6 +1,8 @@
+
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -15,12 +17,16 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+ 
   return (
     <html lang="en">
       <body
         className={`${poppins.className} antialiased`}
       >
+       
+       
          <div className="mx-[25px] mt-[30px] mb-[37px]">
+          
           {children}
         </div>
         <Toaster />
