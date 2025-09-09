@@ -4,8 +4,8 @@ import Image from "next/image";
 export default function ClientTable() {
   return (
     <>
-      <div className="">
-        <div className="rounded-[10px] overflow-hidden">
+      <div >
+        <div className="rounded-[10px] overflow-hidden ">
           <table className="w-full bg-[#FFFFFF]">
             <thead className="bg-[#F0F0F0]">
               <tr>
@@ -57,7 +57,7 @@ export default function ClientTable() {
                   </div>
                 </th>
                 <th className="px-[15px] pt-5 pb-[5px] text-left" scope="col">
-                  <p className="text-[#535359] not-italic font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins'] [leading-trim:both] [text-edge:cap]">
+                  <p className="text-[#535359] text-center not-italic font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins'] [leading-trim:both] [text-edge:cap]">
                     Plans completed
                   </p>
                 </th>
@@ -140,7 +140,7 @@ export default function ClientTable() {
                 </td>
 
                 {/* Plans completed */}
-                <td className="text-start px-[15px] py-5 ">
+                <td className="text-center px-[15px] py-5 ">
                   
                     <span className="text-[#252525] text-center text-[12px] font-semibold leading-[1.26px]">0</span>
                
