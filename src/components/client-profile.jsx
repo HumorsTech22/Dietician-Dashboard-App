@@ -1,0 +1,202 @@
+"use client"
+
+import React from 'react'
+import Image from 'next/image'
+import { MdOutlineKeyboardBackspace } from "react-icons/md";
+import { IoChevronBackSharp } from "react-icons/io5";
+
+export const ClientProfile = () => {
+    return (
+        <>
+
+
+<div className='flex flex-col gap-[5px]'>
+            <div className='flex gap-2.5 pl-[15px]  py-[14px] bg-white rounded-[15px]'>
+                <div className='flex gap-[15px] items-center'>
+                    <MdOutlineKeyboardBackspace className='w-8 h-8 cursor-pointer' />
+                    <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Clients</span>
+                </div>
+
+                <div className='flex gap-[5px] items-center'>
+                    <IoChevronBackSharp className='w-[26px] h-[26px] cursor-pointer' />
+                    <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Sagar Hosur</span>
+                </div>
+            </div>
+
+            <div className='flex flex-col gap-5 bg-[#FFFFFF] rounded-[15px]'>
+                <div className="flex flex-col items-center gap-5 mt-[55px]">
+                    {/* Avatar */}
+                    <div className="bg-[#F0F0F0] rounded-full p-2.5 flex items-center justify-center">
+                        <Image
+                            src="/icons/hugeicons_user-circle-02.svg"
+                            alt="hugeicons_user-circle-02"
+                            height={80}
+                            width={80}
+                        />
+                    </div>
+
+                    {/* Text section */}
+                    <div className="flex flex-col items-center gap-5">
+                        <span className="text-[#252525] text-[25px] font-semibold leading-[110%] tracking-[-1px]">
+                            Sagar Hosur
+                        </span>
+
+                        <div className="flex items-center gap-5">
+                            <span className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
+                                25 years
+                            </span>
+                            <div className="w-1 h-1 rounded-full bg-[#252525]"></div>
+                            <span className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
+                                Male
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div className='flex justify-center gap-[44px] px-5 py-[17px] mx-[13px] bg-[#F5F7FA] rounded-[15px]'>
+                    <div className='flex flex-col gap-3 '>
+                        <span className="text-[#252525] text-center text-[12px] font-semibold leading-[110%] tracking-[-0.24px]">Height</span>
+                        <span className="text-[#535359] text-center text-[12px] font-normal leading-[110%] tracking-[-0.24px]">180 cm</span>
+                    </div>
+                    <div className=' border-[#D9D9D9] border-[1px]'></div>
+                    <div className='flex flex-col gap-3 items-center'>
+                        <span className="text-[#252525] text-center text-[12px] font-semibold leading-[110%] tracking-[-0.24px]">Weight</span>
+                        <span className="text-[#535359] text-center text-[12px] font-normal leading-[110%] tracking-[-0.24px]">65kg</span>
+                    </div>
+
+                </div>
+
+                <div className='mx-2.5 pt-5  rounded-[15px] mt-[17px] bg-[#F5F7FA]'>
+                    <div className='flex items-center justify-between ml-[30px] mr-[17px] '>
+                        <span className="text-[#3FAF58] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">Active</span>
+                        <Image
+                            src="/icons/hugeicons_pencil-edit-02.svg"
+                            alt='hugeicons_pencil'
+                            height={24}
+                            width={24}
+                        />
+
+                    </div>
+
+                    <div className='my-5 mx-[5px] border border-[#E1E6ED]'></div>
+
+                    <div className='flex justify-between mx-6 my-5'>
+                        <div className='flex flex-col gap-2.5'>
+                            <p className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>1-Month Plan</p>
+                            <p className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]'>Updated 05 Jul, 12:30px</p>
+                        </div>
+
+                        <div className='flex items-start'>
+                            <p className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]'>05 July-05 Aug</p>
+                        </div>
+                    </div>
+
+                    {/* <div className='border border-[#E1E6ED]'></div> */}
+                    <div className='my-5 mx-[5px] border border-[#E1E6ED]'></div>
+
+
+
+
+                    <div className='flex items-center gap-[5px] mt-5 mb-[25px] ml-[10px]'>
+                        <div className='p-0.5'>
+                            <Image
+                                src="/icons/hugeicons_award-01.svg"
+                                alt='hugeicons_award'
+                                width={15}
+                                height={15}
+                            />
+                        </div>
+                        <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>Goal</span>
+                    </div>
+
+
+                    <div className='flex flex-col gap-5 mx-5'>
+                        <div>
+                            <span className='text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] capitalize'>Weight Loss</span>
+                        </div>
+
+                        <div className='flex  gap-5'>
+                            <div className='flex flex-col items-start gap-2.5'>
+                                <span className='text-[#252525] text-[15px] font-semibold leading-[126%] tracking-[-0.3px]'>75Kg</span>
+                                <span className='text-[#252525] text-center text-[10px] font-normal leading-normal tracking-[-0.2px]'>Current sat</span>
+                            </div>
+
+
+                            <div className="mt-[7px] w-[122px] h-px border border-[#A1A1A1]"></div>
+
+                            <div className='flex flex-col items-start gap-2.5'>
+                                <span className='text-[#252525] text-[15px] font-semibold leading-[126%] tracking-[-0.3px]'>70Kg</span>
+                                <span className='text-[#252525] text-center text-[10px] font-normal leading-normal tracking-[-0.2px]'>Target sat</span>
+                            </div>
+                        </div>
+
+
+
+                        <div>
+                            <span className='text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] capitalize'>PCOS Management</span>
+                        </div>
+
+
+                        <div className='flex  gap-5'>
+                            <div className='flex flex-col items-start gap-2.5'>
+                                <span className='text-[#252525] text-[15px] font-semibold leading-[126%] tracking-[-0.3px]'>100</span>
+                                <span className='text-[#252525] text-center text-[10px] font-normal leading-normal tracking-[-0.2px]'>Current sat</span>
+                            </div>
+
+                            <div className="mt-[7px] w-[122px] h-px border border-[#A1A1A1]"></div>
+                            <div className='flex flex-col items-start gap-2.5'>
+                                <span className='text-[#252525] text-[15px] font-semibold leading-[126%] tracking-[-0.3px]'>50</span>
+                                <span className='text-[#252525] text-center text-[10px] font-normal leading-normal tracking-[-0.2px]'>Target sat</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div className='flex flex-col gap-5 mt-10'>
+                        <div className='flex items-center gap-[5px] ml-[10px]'>
+                            <div className='p-0.5'>
+                                <Image
+                                    src="/icons/hugeicons_sparkles.svg"
+                                    alt='hugeicons_sparkles'
+                                    width={15}
+                                    height={15}
+                                />
+                            </div>
+
+                            <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>Approach</span>
+                        </div>
+
+
+
+                        <div className='flex flex-col gap-[5px] mx-5 mb-[30px]'>
+                            <div className='flex gap-[5px]'>
+                                <div className='bg-[#FFFFFF] px-[20px] p-[5px] rounded-[20px]'>
+                                    <span className='text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]'>Low GI</span>
+                                </div>
+                                <div className='bg-[#FFFFFF] px-[20px] p-[5px] rounded-[20px]'>
+                                    <span className='text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]'>High Protein</span>
+                                </div>
+
+                            </div>
+
+                            <div className='flex gap-[5px]'>
+                                <div className='bg-[#FFFFFF] px-[20px] p-[5px] rounded-[20px]'>
+                                    <span className='text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]'>Balanced Fiber</span>
+                                </div>
+                                <div className='bg-[#FFFFFF] px-[20px] p-[5px] rounded-[20px]'>
+                                    <span className='text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]'>Calorie Deficit</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            </div>
+        </>
+    )
+}
