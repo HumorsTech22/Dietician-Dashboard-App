@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from "react";
@@ -10,9 +11,8 @@ export const UserProfile = () => {
   const pathname = usePathname();
   const isClientPage = pathname?.startsWith("/client") || pathname?.startsWith("/clients");
   const isMessagesPage = pathname?.startsWith("/messages");
+
   
-  console.log("isClientPage61:-", isClientPage);
-  console.log("isMessagesPage:-", isMessagesPage);
 
   return (
     <div className={`flex w-full flex-wrap items-center justify-between gap-10 ${
@@ -34,6 +34,21 @@ export const UserProfile = () => {
               </p>
             </div>
 
+            {/* Rounded search bar: hidden on /client */}
+            {!isClientPage && (
+              <div className="flex pr-[227px] gap-[15px] pl-[14px] py-[10px] items-center border border-[#D9D9D9] rounded-3xl bg-[#F0F0F0]">
+                <Image
+                  src="/icons/hugeicons_search-02.svg"
+                  alt="hugeicons_search"
+                  width={20}
+                  height={20}
+                />
+                <p className="text-[#A1A1A1] font-normal text-[12px] leading-[110%] tracking-[-0.24px]">
+                  Search....
+                </p>
+              </div>
+            )}
+
             <div className="w-fit flex items-center">
               <div className="rounded-l-[10px] border border-[#D9D9D9] pl-4 py-2 pr-2.5 bg-[#F0F0F0] text-center">
                 <p className="text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
@@ -49,8 +64,8 @@ export const UserProfile = () => {
             </div>
           </div>
         ) : isMessagesPage ? (
-          <div className="flex gap-[22px] mt-[46px] mb-[32px]">
-            <div className="flex pr-[271px] gap-2.5 pl-2.5 py-[5px] items-center border border-[#D9D9D9] rounded-[10px] bg-[#FFFFFF]">
+          <div className="flex gap-[22px] mt-[46px] mb-[12px] mx-[10px]">
+            <div className="flex pr-[227px] gap-[15px] pl-[14px] py-[10px] items-center border border-[#D9D9D9] rounded-3xl bg-[#F0F0F0]">
               <Image
                 src="/icons/hugeicons_search-02.svg"
                 alt="hugeicons_search"
