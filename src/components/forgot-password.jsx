@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 export default function ForgotPassword({ email }) {
-console.log("Email received in ForgotPassword component:", email); 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");

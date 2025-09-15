@@ -174,7 +174,7 @@ export default function ChatProfile() {
                 </div>
 
 
-                <div className="flex justify-between items-center bg-[#F0F0F0] rounded-[30px] px-[25px] py-4 mt-9 mb-2">
+                {/* <div className="flex justify-between items-center bg-[#F0F0F0] rounded-[30px] px-[25px] py-4 mt-9 mb-2">
                     <p className="text-[#A1A1A1] font-[Poppins] text-[12px] font-normal leading-[110%] tracking-[-0.24px] ">Type your meassage....</p>
                     <Image
                         src="/icons/hugeicons_sent.svg"
@@ -182,7 +182,22 @@ export default function ChatProfile() {
                         width={24}
                         height={24}
                     />
-                </div>
+                </div> */}
+                <div className="flex justify-between items-center bg-[#F0F0F0] rounded-[30px] px-[25px] py-4 mt-9 mb-2">
+  <input
+    type="text"
+    placeholder="Type your message...."
+    className="flex-1 bg-transparent outline-none text-[#252525] font-[Poppins] text-[12px] font-normal leading-[110%] tracking-[-0.24px] mr-3"
+  />
+  <Image
+    src="/icons/hugeicons_sent.svg"
+    alt="send-icon"
+    width={24}
+    height={24}
+    className="cursor-pointer"
+  />
+</div>
+
             </div>
         </>
     );

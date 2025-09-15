@@ -3,10 +3,9 @@
 "use client"
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+
 
 export default function ClientTable() {
-  const router = useRouter();
   const clients = [
     {
       name: "Sagar Hosur",
@@ -43,9 +42,6 @@ export default function ClientTable() {
   ];
 
 
-const handleRowClick = () =>{
-  router.push("/profile");
-}
 
 
   return (
