@@ -5,7 +5,7 @@ export default function TestEvaluation() {
     return (
         <>
             <div className="flex justify-between">
-                <div className="flex flex-col bg-[#F5F7FA] rounded-[15px] pb-[15px]">
+                <div className="flex flex-col bg-[#F5F7FA] rounded-[15px]">
                     <div className="flex flex-col gap-2.5 ml-[30px] mt-5">
                         <span className="text-[#252525] text-[20px] font-semibold leading-[110%] tracking-[-0.4px]">Test Evaluation</span>
                         <span className="text-[#535359] text-[10px] font-normal leading-[-0.2px] tracking-[-0.2px]">Tracked at 05 Jul, 12:30pm</span>
