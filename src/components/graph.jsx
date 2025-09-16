@@ -72,14 +72,14 @@ export default function Graph({
             fill: true,
 
             backgroundColor: (ctx) => {
-  const { chartArea, ctx: c } = ctx.chart;
-  if (!chartArea) return "rgba(218,87,71,0.3)"; // fallback
+                const { chartArea, ctx: c } = ctx.chart;
+                if (!chartArea) return "rgba(218,87,71,0.3)"; // fallback
 
-  const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-  g.addColorStop(0, "rgba(218,87,71,0.3)"); // top color ~ from-[#DA5747] with opacity
-  g.addColorStop(1, "rgba(218,87,71,0)");   // bottom color transparent
-  return g;
-}
+                const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                g.addColorStop(0, "rgba(218,87,71,0.3)"); // top color ~ from-[#DA5747] with opacity
+                g.addColorStop(1, "rgba(218,87,71,0)");   // bottom color transparent
+                return g;
+            }
 
         }],
     }), [labels, values, color]);
@@ -87,13 +87,23 @@ export default function Graph({
     const options = {
         responsive: true,
         maintainAspectRatio: false,
+        animation: false,
+         animations: {
+    colors: false,
+    x: { duration: 0 },
+    y: { duration: 0 },
+    tension: { duration: 0 },
+  },
+  transitions: {
+    active: { animation: { duration: 0 } },
+  },
         plugins: {
             legend: { display: false },
             title: { display: false },
             tooltip: { intersect: false, mode: "index" },
             tooltip: {
-      enabled: false,  
-    },
+                enabled: false,
+            },
             softShadow: { color: "rgba(218,87,71,0.45)", blur: 0 },
         },
         elements: {
@@ -143,8 +153,8 @@ export default function Graph({
 
             <div className="w-full">
                 <Line data={data} options={options}
-                    // width={400}   
-                    // height={180}  
+                // width={400}   
+                // height={180}  
                 />
             </div>
         </div>
