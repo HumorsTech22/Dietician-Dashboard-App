@@ -4,6 +4,8 @@ import { IoChevronBackSharp } from "react-icons/io5";
 import { IoIosArrowForward } from "react-icons/io";
 import TestEvaluation from "./test-evaluation";
 import Trends from "./trends";
+import FoodEvaluation from "./food-evaluation";
+import MealLogged from "./meal-logged";
 
 function pad2(n) {
   return n.toString().padStart(2, "0");
@@ -119,6 +121,8 @@ export const ResultEvaluation = () => {
         <TestEvaluation />
         <Trends />
       </div>
+      <FoodEvaluation/>
+      <MealLogged/>
     </div>
   );
 };

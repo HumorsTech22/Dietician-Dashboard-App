@@ -12,12 +12,11 @@ export const UserProfile = () => {
   const isClientPage = pathname?.startsWith("/client") || pathname?.startsWith("/clients");
   const isMessagesPage = pathname?.startsWith("/messages");
 
-  
+
 
   return (
-    <div className={`flex w-full flex-wrap items-center justify-between gap-10 ${
-      isClientPage || isMessagesPage ? "" : "mt-[130px] mb-[102px]"
-    }`}>
+    <div className={`flex w-full flex-wrap items-center justify-between gap-10 ${isClientPage || isMessagesPage ? "" : "mt-[130px] mb-[102px]"
+      }`}>
       {/* LEFT: Greeting OR Search/Sort */}
       <div className="flex-1">
         {isClientPage ? (
@@ -35,18 +34,18 @@ export const UserProfile = () => {
             </div> */}
 
             <div className="flex gap-2.5 pl-2.5 pr-2.5 py-[5px] items-center border border-[#D9D9D9] rounded-[10px] bg-[#FFFFFF] w-[300px]">
-  <Image
-    src="/icons/hugeicons_search-02.svg"
-    alt="hugeicons_search"
-    width={20}
-    height={20}
-  />
-  <input
-    type="text"
-    placeholder="Search...."
-    className="flex-1 text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px] outline-none bg-transparent"
-  />
-</div>
+              <Image
+                src="/icons/hugeicons_search-02.svg"
+                alt="hugeicons_search"
+                width={20}
+                height={20}
+              />
+              <input
+                type="text"
+                placeholder="Search...."
+                className="flex-1 text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px] outline-none bg-transparent"
+              />
+            </div>
 
 
             {/* Rounded search bar: hidden on /client */}
@@ -64,18 +63,18 @@ export const UserProfile = () => {
               // </div>
 
               <div className="flex gap-[15px] pl-[14px] pr-[14px] py-[10px] items-center border border-[#D9D9D9] rounded-3xl bg-[#F0F0F0] w-[300px]">
-  <Image
-    src="/icons/hugeicons_search-02.svg"
-    alt="hugeicons_search"
-    width={20}
-    height={20}
-  />
-  <input
-    type="text"
-    placeholder="Search...."
-    className="flex-1 bg-transparent outline-none text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]"
-  />
-</div>
+                <Image
+                  src="/icons/hugeicons_search-02.svg"
+                  alt="hugeicons_search"
+                  width={20}
+                  height={20}
+                />
+                <input
+                  type="text"
+                  placeholder="Search...."
+                  className="flex-1 bg-transparent outline-none text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]"
+                />
+              </div>
 
             )}
 
@@ -109,20 +108,20 @@ export const UserProfile = () => {
           // </div>
 
           <div className="flex gap-[22px] mt-[46px] mb-[12px] mx-[10px]">
-  <div className="flex gap-[15px] pl-[14px] pr-[14px] py-[10px] items-center border border-[#D9D9D9] rounded-3xl bg-[#F0F0F0] w-[300px]">
-    <Image
-      src="/icons/hugeicons_search-02.svg"
-      alt="hugeicons_search"
-      width={20}
-      height={20}
-    />
-    <input
-      type="text"
-      placeholder="Search...."
-      className="flex-1 bg-transparent outline-none text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]"
-    />
-  </div>
-</div>
+            <div className="flex gap-[15px] pl-[14px] pr-[14px] py-[10px] items-center border border-[#D9D9D9] rounded-3xl bg-[#F0F0F0] w-[300px]">
+              <Image
+                src="/icons/hugeicons_search-02.svg"
+                alt="hugeicons_search"
+                width={20}
+                height={20}
+              />
+              <input
+                type="text"
+                placeholder="Search...."
+                className="flex-1 bg-transparent outline-none text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]"
+              />
+            </div>
+          </div>
 
         ) : (
           <div className="flex flex-col gap-[15px]">
