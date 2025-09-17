@@ -5,7 +5,7 @@ import MealTracked from "./meal-tracked";
 export default function MealLogged() {
     return (
         <>
-            <div className="flex flex-col gap-[25px] mt-[42px] bg-[#F5F7FA] rounded-[15px] pt-[25px] pl-[30px] pr-7">
+            <div className="flex flex-col gap-[25px] mt-[42px] bg-[#F5F7FA] rounded-[15px] pt-[25px] pl-[30px] pr-7 pb-2.5">
                 <div className="flex justify-between">
                     <div className="flex flex-col gap-2.5">
                         <span className="text-[#252525] text-[15px] font-semibold tracking-[-0.3] leading-[110%">Meal Logged</span>
