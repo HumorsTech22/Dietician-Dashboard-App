@@ -78,7 +78,7 @@ export const UserProfile = () => {
 
             )}
 
-            <div className="w-fit flex items-center">
+            <div className="w-fit flex justify-center">
               <div className="rounded-l-[10px] border border-[#D9D9D9] pl-4 py-2 pr-2.5 bg-[#F0F0F0] text-center">
                 <p className="text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
                   Sort By
