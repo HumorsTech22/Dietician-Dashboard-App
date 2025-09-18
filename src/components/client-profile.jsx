@@ -4,6 +4,7 @@ import React from 'react'
 import Image from 'next/image'
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { IoChevronBackSharp } from "react-icons/io5";
+import { GoPlus } from "react-icons/go";
 
 export const ClientProfile = () => {
     return (
@@ -30,7 +31,7 @@ export const ClientProfile = () => {
                     </div>
                 </div>
 
-                <div className='flex flex-col pb-[48px] gap-5 bg-[#FFFFFF] rounded-[15px]'>
+                <div className='flex flex-col pb-[48px] gap-5 bg-[#FFFFFF] rounded-[15px] overflow-y-auto max-h-[calc(16.75*64px)] hide-scrollbar'>
                     <div className="flex flex-col items-center gap-5 mt-[55px]">
                         {/* Avatar */}
                         <div className="bg-[#F0F0F0] rounded-full p-2.5 flex items-center justify-center">
@@ -74,7 +75,7 @@ export const ClientProfile = () => {
                         </div>
 
                     </div>
-
+ 
                     <div className='mx-2.5 pt-5  rounded-[15px] mt-[17px] bg-[#F5F7FA]'>
                         <div className='flex items-center justify-between ml-[30px] mr-[17px] '>
                             <span className="text-[#3FAF58] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">Active</span>
@@ -83,9 +84,12 @@ export const ClientProfile = () => {
                                 alt='hugeicons_pencil'
                                 height={24}
                                 width={24}
+                                className='cursor-pointer'
                             />
 
                         </div>
+
+                     
 
                         <div className='my-5 mx-[5px] border border-[#E1E6ED]'></div>
 
@@ -100,7 +104,7 @@ export const ClientProfile = () => {
                             </div>
                         </div>
 
-                        {/* <div className='border border-[#E1E6ED]'></div> */}
+                    
                         <div className='my-5 mx-[5px] border border-[#E1E6ED]'></div>
 
 
@@ -200,7 +204,17 @@ export const ClientProfile = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> 
+
+
+
+                       <div className='flex mx-2.5 bg-[#F5F7FA] rounded-[15px] whitespace-nowrap py-[13px] pl-[30px] pr-[15px] gap-[80px] items-center'>
+                             <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">No plan</span>
+                             <div className='flex gap-[15px] px-[18px] py-[9px] bg-[#308BF9] rounded-[5px]'>
+                                <GoPlus className='text-white w-[15px] h-[15px]'/>
+                                <span className='text-white text-[12px] font-semibold leading-[110%] tracking-[-0.24px]'>Create Plan</span>
+                             </div>
+                        </div>
 
 
                     <div className='flex flex-col gap-10 mt-[30px]'>

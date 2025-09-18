@@ -1,6 +1,4 @@
-
-
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { UserProfile } from "./user-profile";
 import Image from "next/image";
 
@@ -11,23 +9,30 @@ export default function AllChats() {
     { name: "lorem", message: "Another sample message that is too long and needs trimming...", isRead: true },
     { name: "Manoranjan", message: "Another sample message that is too long and needs trimming...", isRead: true },
     { name: "Manoranjan", message: "Another sample message that is too long and needs trimming...", badgeCount: 2, isRead: false },
-
-        { name: "Manoranjan", message: "Another sample message that is too long and needs trimming...",isRead: true },
+    { name: "Manoranjan", message: "Another sample message that is too long and needs trimming...", isRead: true },
     { name: "Manoranjan", message: "Another sample message that is too long and needs trimming...", badgeCount: 2, isRead: false },
     { name: "Manoranjan", message: "Another sample message that is too long and needs trimming...", badgeCount: 2, isRead: false },
     { name: "Manoranjan", message: "Another sample message that is too long and needs trimming...", badgeCount: 2, isRead: false },
     { name: "Manoranjan", message: "Another sample message that is too long and needs trimming...", badgeCount: 2, isRead: false },
     { name: "Manoranjan", message: "Another sample message that is too long and needs trimming...", badgeCount: 2, isRead: false },
     { name: "Manoranjan", message: "Another sample message that is too long and needs trimming...", badgeCount: 2, isRead: false },
-     { name: "Manoranjan", message: "Another sample message that is too long and needs trimming...", badgeCount: 2, isRead: false },
+    { name: "Manoranjan", message: "Another sample message that is too long and needs trimming...", badgeCount: 2, isRead: false },
     { name: "Manoranjan", message: "Another sample message that is too long and needs trimming...", badgeCount: 2, isRead: false },
     { name: "Manoranjan", message: "Another sample message that is too long and needs trimming...", badgeCount: 2, isRead: false },
     { name: "Manoranjan", message: "Another sample message that is too long and needs trimming...", badgeCount: 2, isRead: false },
   ]);
 
+  const [search, setSearch] = useState("");
+
+  const filteredChats = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return chats;
+    return chats.filter((c) => c.name.toLowerCase().includes(q));
+  }, [search, chats]);
+
   const markAsRead = (index) => {
-    setChats((prevChats) =>
-      prevChats.map((chat, i) =>
+    setChats((prev) =>
+      prev.map((chat, i) =>
         i === index ? { ...chat, isRead: true, badgeCount: 0 } : chat
       )
     );
@@ -38,18 +43,21 @@ export default function AllChats() {
       <div className="h-[80vh] flex flex-col">
         <div className="rounded-t-[15px] bg-white">
           <div className="ml-[15px] mt-[25px]">
-            <p className="text-[#252525] text-[15px] font-semibold tracking-[-0.3px] leading-[110%]">All Chats</p>
+            <p className="text-[#252525] text-[15px] font-semibold tracking-[-0.3px] leading-[110%]">
+              All Chats
+            </p>
           </div>
           <div>
-            <UserProfile />
+            {/* Pass search + handler so the messages search bar controls filtering */}
+            <UserProfile searchQuery={search} onSearchChange={setSearch} />
           </div>
         </div>
 
         {/* Chats list with scroll */}
         <div className="flex-1 overflow-y-auto max-h-[calc(19*64px)] hide-scrollbar">
-          {chats.map((chat, index) => (
+          {filteredChats.map((chat, index) => (
             <div
-              key={index}
+              key={`${chat.name}-${index}`}
               onClick={() => markAsRead(index)}
               className={`flex items-center gap-2 px-[15px] py-3.5 cursor-pointer ${
                 chat.isRead ? "bg-white" : "bg-[#EAF3FF]"
@@ -64,7 +72,6 @@ export default function AllChats() {
                 />
               </div>
 
-              {/* text block grows but won't push badge */}
               <div className="flex-1 min-w-0">
                 <p className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">
                   {chat.name}
