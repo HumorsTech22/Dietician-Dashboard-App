@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from "react";
@@ -7,32 +6,25 @@ import { usePathname } from "next/navigation";
 import { UserPlus } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
 
-export const UserProfile = () => {
+export const UserProfile = ({
+  searchQuery = "",
+  onSearchChange = () => {},
+}) => {
   const pathname = usePathname();
-  const isClientPage = pathname?.startsWith("/client") || pathname?.startsWith("/clients");
+  const isClientPage =
+    pathname?.startsWith("/client") || pathname?.startsWith("/clients");
   const isMessagesPage = pathname?.startsWith("/messages");
 
-
-
   return (
-    <div className={`flex w-full flex-wrap items-center justify-between gap-10 ${isClientPage || isMessagesPage ? "" : "mt-[130px] mb-[102px]"
-      }`}>
+    <div
+      className={`flex w-full flex-wrap items-center justify-between gap-10 ${
+        isClientPage || isMessagesPage ? "" : "mt-[130px] mb-[102px]"
+      }`}
+    >
       {/* LEFT: Greeting OR Search/Sort */}
       <div className="flex-1">
         {isClientPage ? (
           <div className="flex gap-[22px] mt-[46px] mb-[32px]">
-            {/* <div className="flex pr-[271px] gap-2.5 pl-2.5 py-[5px] items-center border border-[#D9D9D9] rounded-[10px] bg-[#FFFFFF]">
-              <Image
-                src="/icons/hugeicons_search-02.svg"
-                alt="hugeicons_search"
-                width={20}
-                height={20}
-              />
-              <p className="text-[#A1A1A1] font-normal text-[12px] leading-[110%] tracking-[-0.24px]">
-                Search....
-              </p>
-            </div> */}
-
             <div className="flex gap-2.5 pl-2.5 pr-2.5 py-[5px] items-center border border-[#D9D9D9] rounded-[10px] bg-[#FFFFFF] w-[300px]">
               <Image
                 src="/icons/hugeicons_search-02.svg"
@@ -44,40 +36,12 @@ export const UserProfile = () => {
                 type="text"
                 placeholder="Search...."
                 className="flex-1 text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px] outline-none bg-transparent"
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
               />
             </div>
 
-
-            {/* Rounded search bar: hidden on /client */}
-            {!isClientPage && (
-              // <div className="flex pr-[227px] gap-[15px] pl-[14px] py-[10px] items-center border border-[#D9D9D9] rounded-3xl bg-[#F0F0F0]">
-              //   <Image
-              //     src="/icons/hugeicons_search-02.svg"
-              //     alt="hugeicons_search"
-              //     width={20}
-              //     height={20}
-              //   />
-              //   <p className="text-[#A1A1A1] font-normal text-[12px] leading-[110%] tracking-[-0.24px]">
-              //     Search....
-              //   </p>
-              // </div>
-
-              <div className="flex gap-[15px] pl-[14px] pr-[14px] py-[10px] items-center border border-[#D9D9D9] rounded-3xl bg-[#F0F0F0] w-[300px]">
-                <Image
-                  src="/icons/hugeicons_search-02.svg"
-                  alt="hugeicons_search"
-                  width={20}
-                  height={20}
-                />
-                <input
-                  type="text"
-                  placeholder="Search...."
-                  className="flex-1 bg-transparent outline-none text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]"
-                />
-              </div>
-
-            )}
-
+            {/* Sort */}
             <div className="w-fit flex justify-center">
               <div className="rounded-l-[10px] border border-[#D9D9D9] pl-4 py-2 pr-2.5 bg-[#F0F0F0] text-center">
                 <p className="text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
@@ -93,20 +57,6 @@ export const UserProfile = () => {
             </div>
           </div>
         ) : isMessagesPage ? (
-          // <div className="flex gap-[22px] mt-[46px] mb-[12px] mx-[10px]">
-          //   <div className="flex pr-[227px] gap-[15px] pl-[14px] py-[10px] items-center border border-[#D9D9D9] rounded-3xl bg-[#F0F0F0]">
-          //     <Image
-          //       src="/icons/hugeicons_search-02.svg"
-          //       alt="hugeicons_search"
-          //       width={20}
-          //       height={20}
-          //     />
-          //     <p className="text-[#A1A1A1] font-normal text-[12px] leading-[110%] tracking-[-0.24px]">
-          //       Search....
-          //     </p>
-          //   </div>
-          // </div>
-
           <div className="flex gap-[22px] mt-[46px] mb-[12px] mx-[10px]">
             <div className="flex gap-[15px] pl-[14px] pr-[14px] py-[10px] items-center border border-[#D9D9D9] rounded-3xl bg-[#F0F0F0] w-[300px]">
               <Image
@@ -117,12 +67,13 @@ export const UserProfile = () => {
               />
               <input
                 type="text"
-                placeholder="Search...."
+                placeholder="Search by name…"
                 className="flex-1 bg-transparent outline-none text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]"
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
               />
             </div>
           </div>
-
         ) : (
           <div className="flex flex-col gap-[15px]">
             <p className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">

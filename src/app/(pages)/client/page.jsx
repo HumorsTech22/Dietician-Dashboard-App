@@ -87,7 +87,7 @@ export default function Client() {
 
         {/* Content wrapper: NO top border so white is continuous under tabs */}
         <div className="border border-[#D9D9D9] border-t-0 rounded-b-[10px] rounded-tr-[10px] bg-white p-5">
-          <UserProfile />
+          {/* <UserProfile /> */}
           <ClientTable activeTab={activeTab} />
         </div>
       </div>

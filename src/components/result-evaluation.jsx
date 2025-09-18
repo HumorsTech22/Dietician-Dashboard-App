@@ -27,21 +27,33 @@ export const ResultEvaluation = () => {
   const today = startOfDay(new Date());
   const [selectedDate, setSelectedDate] = useState(today);
 
-  // calendar strip window (DON’T change design — still 16 boxes)
+  // config: allow only 7 days beyond today
+  const MAX_FUTURE_DAYS = 7;
+  const maxDate = startOfDay(addDays(today, MAX_FUTURE_DAYS));
+
+  // calendar strip window (16 boxes)
   const VISIBLE_COUNT = 16;
+
+  // initial window puts today inside range; this already caps the right edge at today+7
   const [windowStart, setWindowStart] = useState(
-    // start the strip so that today sits inside your initial range look/feel
-    addDays(today, - (VISIBLE_COUNT / 2))
+    addDays(today, -(VISIBLE_COUNT / 2))
   );
 
-  // build dates for the strip
+  // the latest allowed windowStart such that the last box (index VISIBLE_COUNT-1) is <= maxDate
+  const maxWindowStart = startOfDay(
+    addDays(maxDate, 1 - VISIBLE_COUNT)
+  );
+
+  const canGoNext =
+    startOfDay(windowStart).getTime() < maxWindowStart.getTime();
+
   const dates = useMemo(() => {
     return Array.from({ length: VISIBLE_COUNT }, (_, i) => {
       const d = startOfDay(addDays(windowStart, i));
       return {
         date: d,
-        day: pad2(d.getDate()),          // "06"
-        week: WEEK[d.getDay()],          // "Tue"
+        day: pad2(d.getDate()),
+        week: WEEK[d.getDay()],
       };
     });
   }, [windowStart]);
@@ -63,35 +75,53 @@ export const ResultEvaluation = () => {
           </span>
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex items-center justify-between">
+          {/* Prev */}
           <IoChevronBackSharp
             className="w-[52px] h-[52px] cursor-pointer py-[13px] pl-2.5"
             onClick={() => setWindowStart(addDays(windowStart, -VISIBLE_COUNT))}
             title="Previous"
           />
 
+          {/* Dates */}
           {dates.map((item, idx) => {
-            const isToday = startOfDay(item.date).getTime() === today.getTime();
-            const isFuture = startOfDay(item.date).getTime() > today.getTime();
+            const isToday =
+              startOfDay(item.date).getTime() === today.getTime();
+            const isFuture =
+              startOfDay(item.date).getTime() > today.getTime();
             const isSelected =
-              startOfDay(item.date).getTime() === startOfDay(selectedDate).getTime();
+              startOfDay(item.date).getTime() ===
+              startOfDay(selectedDate).getTime();
+            const isBeyondMax =
+              startOfDay(item.date).getTime() > maxDate.getTime();
+
+            // disabled if beyond +7
+            const disabled = isBeyondMax;
 
             return (
               <div
                 key={idx}
                 onClick={() => {
+                  if (disabled) return; // block selection
                   setSelectedDate(item.date);
                   console.log(
-                    `Selected -> Date: ${item.date.toISOString().slice(0,10)}, Day: ${item.day}, Week: ${item.week}`
+                    `Selected -> Date: ${item.date
+                      .toISOString()
+                      .slice(0, 10)}, Day: ${item.day}, Week: ${item.week}`
                   );
                 }}
-                className={`flex flex-col px-[7px] py-2 gap-1 cursor-pointer rounded-[12px] ${
+                title={
+                  disabled ? "Selection disabled (beyond +7 days)" : undefined
+                }
+                className={[
+                  "flex flex-col px-[7px] py-2 gap-1 rounded-[12px] select-none",
+                  disabled ? "opacity-40 pointer-events-none" : "cursor-pointer",
                   isSelected
                     ? "bg-[#308BF9] text-white"
                     : isFuture
                     ? "text-[#A1A1A1]"
-                    : "text-[#535359]"
-                }`}
+                    : "text-[#535359]",
+                ].join(" ")}
               >
                 <span className="text-center text-[15px] font-semibold leading-[126%] tracking-[-0.3px]">
                   {item.day}
@@ -99,7 +129,7 @@ export const ResultEvaluation = () => {
                 <span className="text-center text-[10px] font-normal leading-normal tracking-[-0.2px]">
                   {item.week}
                 </span>
-                {/* optional tiny dot for today (keeps design intact) */}
+                {/* tiny dot for today */}
                 {isToday && !isSelected && (
                   <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-[#308BF9]" />
                 )}
@@ -107,22 +137,30 @@ export const ResultEvaluation = () => {
             );
           })}
 
+          {/* Next (disabled when at or beyond maxWindowStart) */}
           <IoIosArrowForward
-            className="w-[52px] h-[52px] cursor-pointer py-[13px] pl-2.5"
-            onClick={() => setWindowStart(addDays(windowStart, VISIBLE_COUNT))}
-            title="Next"
+            className={[
+              "w-[52px] h-[52px] py-[13px] pl-2.5",
+              canGoNext ? "cursor-pointer" : "opacity-40 cursor-not-allowed",
+            ].join(" ")}
+            onClick={() => {
+              if (!canGoNext) return;
+              setWindowStart(addDays(windowStart, VISIBLE_COUNT));
+            }}
+            title={canGoNext ? "Next" : "No further future dates"}
+            aria-disabled={!canGoNext}
           />
         </div>
 
         <div className="my-[20px] border border-[#E1E6ED]"></div>
       </div>
 
-      <div className="flex justify-start gap-[17px]">
+      <div className="flex justify-start gap-[17px] ">
         <TestEvaluation />
         <Trends />
       </div>
-      <FoodEvaluation/>
-      <MealLogged/>
+      <FoodEvaluation />
+      <MealLogged />
     </div>
   );
 };

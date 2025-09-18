@@ -74,9 +74,14 @@ export default function Header() {
        <div className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white">
     <MonoIcon src="/icons/hugeicons_notification-01.svg" color="#A1A1A1" alt="notification" />
   </div>
-  <div className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white">
-    <MonoIcon src="/icons/hugeicons_user.svg" color="#A1A1A1" alt="user" />
-  </div>
+
+   <Link
+          href="/loginuser"
+         className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white"
+          aria-label="User"
+        >
+          <MonoIcon src="/icons/hugeicons_user.svg" color="#A1A1A1" size={20} alt="user" />
+        </Link>
       </div>
     </div>
   );

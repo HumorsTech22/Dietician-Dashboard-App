@@ -1,5 +1,6 @@
 "use client"
 import { ClientProfile } from "@/components/client-profile";
+import NoPlans from "@/components/no-plans";
 import { ResultEvaluation } from "@/components/result-evaluation";
 
 
@@ -10,7 +11,8 @@ export default function Profile(){
 
         <div className="flex gap-5">
         <ClientProfile/>
-        <ResultEvaluation/>
+       <ResultEvaluation/> 
+        {/* <NoPlans/> */}
         </div>
         </>
     )
