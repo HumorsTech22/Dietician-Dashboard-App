@@ -6,7 +6,8 @@ import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { GoPlus } from "react-icons/go";
 
-export const ClientProfile = ({ showPlanDetails = true }) => {
+
+export const ClientProfile = ({ showPlanDetails = true, showOverview = true, }) => {
     return (
         <>
 
@@ -20,6 +21,8 @@ export const ClientProfile = ({ showPlanDetails = true }) => {
                             alt='Frame 383'
                             width={32}
                             height={32}
+                            className='cursor-pointer'
+                            onClick={() => window.history.back()}
                         />
                         <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Clients</span>
                     </div>
@@ -31,6 +34,8 @@ export const ClientProfile = ({ showPlanDetails = true }) => {
                     </div>
                 </div>
 
+
+  {showOverview && (
                 <div className='flex flex-col pb-[48px] gap-5 bg-[#FFFFFF] rounded-[15px] overflow-y-auto max-h-[calc(16.75*64px)] hide-scrollbar'>
                     <div className="flex flex-col items-center gap-5 mt-[55px]">
                         {/* Avatar */}
@@ -75,8 +80,8 @@ export const ClientProfile = ({ showPlanDetails = true }) => {
                         </div>
 
                     </div>
- 
-  {showPlanDetails && (
+
+                    {/* {showPlanDetails && ( */}
                     <div className='mx-2.5 pt-5  rounded-[15px] mt-[17px] bg-[#F5F7FA]'>
                         <div className='flex items-center justify-between ml-[30px] mr-[17px] '>
                             <span className="text-[#3FAF58] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">Active</span>
@@ -90,7 +95,7 @@ export const ClientProfile = ({ showPlanDetails = true }) => {
 
                         </div>
 
-                     
+
 
                         <div className='my-5 mx-[5px] border border-[#E1E6ED]'></div>
 
@@ -105,7 +110,7 @@ export const ClientProfile = ({ showPlanDetails = true }) => {
                             </div>
                         </div>
 
-                    
+
                         <div className='my-5 mx-[5px] border border-[#E1E6ED]'></div>
 
 
@@ -205,17 +210,17 @@ export const ClientProfile = ({ showPlanDetails = true }) => {
                                 </div>
                             </div>
                         </div>
-                    </div> 
- )}
+                    </div>
+                    {/* //  )} */}
 
 
-                       <div className='flex mx-2.5 bg-[#F5F7FA] rounded-[15px] whitespace-nowrap py-[13px] pl-[30px] pr-[15px] gap-[80px] items-center'>
-                             <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">No plan</span>
-                             <div className='flex gap-[15px] px-[18px] py-[9px] bg-[#308BF9] rounded-[5px]'>
-                                <GoPlus className='text-white w-[15px] h-[15px]'/>
-                                <span className='text-white text-[12px] font-semibold leading-[110%] tracking-[-0.24px]'>Create Plan</span>
-                             </div>
+                    <div className='flex mx-2.5 bg-[#F5F7FA] rounded-[15px] whitespace-nowrap py-[13px] pl-[30px] pr-[15px] gap-[80px] items-center'>
+                        <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">No plan</span>
+                        <div className='flex gap-[15px] px-[18px] py-[9px] bg-[#308BF9] rounded-[5px]'>
+                            <GoPlus className='text-white w-[15px] h-[15px] cursor-pointer' />
+                            <span className='text-white text-[12px] font-semibold leading-[110%] tracking-[-0.24px] cursor-pointer'>Create Plan</span>
                         </div>
+                    </div>
 
 
                     <div className='flex flex-col gap-10 mt-[30px]'>
@@ -283,69 +288,70 @@ export const ClientProfile = ({ showPlanDetails = true }) => {
 
 
                 </div>
+                )}
 
 
-  {showPlanDetails && (
-                <div className='mt-[30px] bg-white rounded-[15px] px-[22px] py-10'>
-                    <div className='ml-5'>
-                        <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>Plan History(2)</span>
-                    </div>
-
-                    <div className='my-[22px] border boder-[#E1E6ED]'></div>
-
-
-
-                    <div className='flex flex-col gap-[30px]'>
-                        <div className='flex flex-col '>
-                            <div className='flex gap-[25px] justify-between'>
-                                <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>1-Month Plan</span>
-                                <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>05 July-05 Aug</span>
-                            </div>
-
-                            <div className='flex justify-between'>
-                                <div>
-                                    <span className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize'>Updated 05 Jul, 12:30pm</span>
-                                </div>
-                                <div className='flex gap-[3px] items-center'>
-                                    <Image
-                                        src="/icons/verified.svg"
-                                        alt='verified'
-                                        width={12}
-                                        height={12}
-                                    />
-                                    <span className='text-[#3FAF58] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Finished</span>
-                                </div>
-                            </div>
-
+                {showPlanDetails && (
+                    <div className='mt-[30px] bg-white rounded-[15px] px-[22px] py-10'>
+                        <div className='ml-5'>
+                            <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>Plan History(2)</span>
                         </div>
 
+                        <div className='my-[22px] border boder-[#E1E6ED]'></div>
 
-                        <div className='flex flex-col '>
-                            <div className='flex gap-[25px] justify-between'>
-                                <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>1-Month Plan</span>
-                                <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>05 July-05 Aug</span>
+
+
+                        <div className='flex flex-col gap-[30px]'>
+                            <div className='flex flex-col '>
+                                <div className='flex gap-[25px] justify-between '>
+                                    <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] cursor-pointer'>1-Month Plan</span>
+                                    <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px] cursor-pointer'>05 July-05 Aug</span>
+                                </div>
+
+                                <div className='flex justify-between'>
+                                    <div>
+                                        <span className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize'>Updated 05 Jul, 12:30pm</span>
+                                    </div>
+                                    <div className='flex gap-[3px] items-center'>
+                                        <Image
+                                            src="/icons/verified.svg"
+                                            alt='verified'
+                                            width={12}
+                                            height={12}
+                                        />
+                                        <span className='text-[#3FAF58] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Finished</span>
+                                    </div>
+                                </div>
+
                             </div>
 
-                            <div className='flex justify-between'>
-                                <div>
-                                    <span className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize'>Updated 05 Jul, 12:30pm</span>
-                                </div>
-                                <div className='flex gap-[3px] items-center'>
-                                    <Image
-                                        src="/icons/close icon.svg"
-                                        alt='close icon'
-                                        width={12}
-                                        height={12}
-                                    />
-                                    <span className='text-[#A1A1A1] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Cancelled</span>
-                                </div>
-                            </div>
 
+                            <div className='flex flex-col '>
+                                <div className='flex gap-[25px] justify-between'>
+                                    <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>1-Month Plan</span>
+                                    <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>05 July-05 Aug</span>
+                                </div>
+
+                                <div className='flex justify-between'>
+                                    <div>
+                                        <span className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize'>Updated 05 Jul, 12:30pm</span>
+                                    </div>
+                                    <div className='flex gap-[3px] items-center'>
+                                        <Image
+                                            src="/icons/close icon.svg"
+                                            alt='close icon'
+                                            width={12}
+                                            height={12}
+                                        />
+                                        <span className='text-[#A1A1A1] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Cancelled</span>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
-                    </div>
 
-                </div>
- )}
+                    </div>
+                )}
             </div>
 
 

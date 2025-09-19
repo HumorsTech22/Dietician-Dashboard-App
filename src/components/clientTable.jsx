@@ -128,7 +128,7 @@ export default function ClientTable() {
                         <span className="text-[#3FAF58] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">
                           {client.planStatus}
                         </span>
-                        <span>{client.planType}</span>
+                        <span className="text-[#535359] text-[10px] font-normal leading-normal tracking-[-0.2px]">{client.planType}</span>
                         <div className="flex gap-[5px]">
                           <p className="text-[#308BF9] cursor-pointer font-semibold text-[10px] leading-[110%] tracking-[-0.2px]">
                             View Plan
