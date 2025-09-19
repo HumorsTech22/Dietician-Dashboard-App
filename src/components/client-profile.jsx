@@ -6,7 +6,7 @@ import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { GoPlus } from "react-icons/go";
 
-export const ClientProfile = () => {
+export const ClientProfile = ({ showPlanDetails = true }) => {
     return (
         <>
 
@@ -76,6 +76,7 @@ export const ClientProfile = () => {
 
                     </div>
  
+  {showPlanDetails && (
                     <div className='mx-2.5 pt-5  rounded-[15px] mt-[17px] bg-[#F5F7FA]'>
                         <div className='flex items-center justify-between ml-[30px] mr-[17px] '>
                             <span className="text-[#3FAF58] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">Active</span>
@@ -205,7 +206,7 @@ export const ClientProfile = () => {
                             </div>
                         </div>
                     </div> 
-
+ )}
 
 
                        <div className='flex mx-2.5 bg-[#F5F7FA] rounded-[15px] whitespace-nowrap py-[13px] pl-[30px] pr-[15px] gap-[80px] items-center'>
@@ -284,7 +285,7 @@ export const ClientProfile = () => {
                 </div>
 
 
-
+  {showPlanDetails && (
                 <div className='mt-[30px] bg-white rounded-[15px] px-[22px] py-10'>
                     <div className='ml-5'>
                         <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>Plan History(2)</span>
@@ -344,7 +345,7 @@ export const ClientProfile = () => {
                     </div>
 
                 </div>
-
+ )}
             </div>
 
 

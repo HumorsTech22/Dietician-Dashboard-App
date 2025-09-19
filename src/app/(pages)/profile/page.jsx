@@ -5,14 +5,15 @@ import { ResultEvaluation } from "@/components/result-evaluation";
 
 
 export default function Profile(){
+     const showNoPlans = true;
     return(
         <>
        
 
         <div className="flex gap-5">
-        <ClientProfile/>
-       <ResultEvaluation/> 
-        {/* <NoPlans/> */}
+     <ClientProfile showPlanDetails={!showNoPlans} />
+    {/* {showNoPlans && <div className="flex-1"><NoPlans /></div>}  */}
+    <ResultEvaluation /> 
         </div>
         </>
     )
