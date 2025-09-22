@@ -11,7 +11,11 @@ export default function Profile(){
        
 
         <div className="flex gap-5">
-     <ClientProfile showPlanDetails={!showNoPlans} />
+            <div className="">
+     <ClientProfile 
+     //showPlanDetails={!showNoPlans} 
+     />
+     </div>
     {/* {showNoPlans && <div className="flex-1"><NoPlans /></div>}  */}
     <ResultEvaluation /> 
         </div>

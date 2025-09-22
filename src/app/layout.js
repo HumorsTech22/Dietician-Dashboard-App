@@ -1,5 +1,6 @@
 
 import { Poppins } from "next/font/google";
+import 'react-responsive-modal/styles.css';
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 

@@ -23,7 +23,7 @@ export default function NoPlans() {
 
         {/* Plan History */}
         <div className="max-w-[332px] mt-[30px] bg-white rounded-[15px] px-[22px] py-10">
-          <div className="ml-5">
+          <div className="">
             <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">
               Plan History(2)
             </span>
@@ -34,7 +34,7 @@ export default function NoPlans() {
           <div className="flex flex-col gap-[30px]">
             {/* Finished Plan */}
             <div className="flex flex-col">
-              <div className="flex gap-[25px] justify-between">
+              <div className="flex gap-[25px] justify-betwee cursor-pointer">
                 <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">
                   1-Month Plan
                 </span>
@@ -65,7 +65,7 @@ export default function NoPlans() {
 
             {/* Cancelled Plan */}
             <div className="flex flex-col">
-              <div className="flex gap-[25px] justify-between">
+              <div className="flex gap-[25px] justify-between cursor-pointer">
                 <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">
                   1-Month Plan
                 </span>

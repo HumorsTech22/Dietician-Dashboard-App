@@ -5,10 +5,9 @@ import HistoryPlan from "@/components/history-plan";
 export default function PlanHistory(){
     return(
         <>
-        <p className="text-black">plan history page</p>
 
-         <div className="flex gap-5">
-          <ClientProfile />
+         <div className="flex gap-5 ">
+          <ClientProfile showOverview={false} showPlanDetails={true}/>
      <HistoryPlan/>
            </div>
         </>

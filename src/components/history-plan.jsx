@@ -1,16 +1,17 @@
 "use client"
 import Image from "next/image"
+import { ResultEvaluation } from "./result-evaluation"
 
 export default function HistoryPlan() {
     return (
         <>
 
-            <div className="w-full flex flex-col  bg-white">
+            <div className="w-full flex flex-col rounded-[10px] bg-white">
 
-                <div className=" flex justify-between pt-[30px] pl-[30px] pr-[25px]">
-                    <div className="flex justify-between">
-                        <div className="flex flex-col gap-[15px]">
-                            <div className="flex  justify-between items-end ">
+                <div className=" flex justify-between items-start pt-[30px] pl-[30px] pr-[25px] ">
+                    <div className="flex justify-between ">
+                        <div className="flex flex-col gap-[15px] ">
+                            <div className="flex gap-5  justify-between items-center ">
                                 <span className="text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]">1-Month Plan</span>
                                 <span className="items-end text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24]">05 July-05 Aug</span>
                             </div>
@@ -27,21 +28,36 @@ export default function HistoryPlan() {
                         </div>
                     </div>
 
-                    <div className="flex gap-1.5 px-5 py-[15px] items-center border border-[#D9D9D9] bg-white rounded-[10px] cursor-alias">
-                        <Image
-                            src="/icons/hugeicons_file-export.svg"
-                            alt="add-icons"
-                            width={20}
-                            height={20}
-                        />
-                        <p className="text-[12px] font-semibold text-black space-x-0">
-                            Export Data
-                        </p>
+                    <div className="flex gap-5 ">
+                        <div className="flex gap-1.5 px-5 py-[15px] items-center border border-[#D9D9D9] bg-white rounded-[10px] cursor-pointer">
+                            <Image
+                                src="/icons/hugeicons_file-export.svg"
+                                alt="export icon"
+                                width={20}
+                                height={20}
+                            />
+                            <span className="text-[12px] font-semibold text-black">
+                                Export Data
+                            </span>
+                        </div>
+
+
+                        <div className="flex flex-wrap gap-1.5 px-5 py-[15px] items-center border border-[#D9D9D9] bg-[#308BF9] rounded-[10px] cursor-alias">
+                            <Image
+                                src="/icons/hugeicons_rotate-01.svg"
+                                alt="hugeicons_rotate-01"
+                                width={20}
+                                height={20}
+                            />
+                            <span className="text-[12px] font-semibold text-white">
+                                Repeat Plan
+                            </span>
+                        </div>
                     </div>
 
                 </div>
 
-                <div className="my-[20px] border border-[#E1E6ED]"></div>
+                <div className="my-[20px] mx-[15px] border border-[#E1E6ED]"></div>
 
 
 
@@ -58,7 +74,7 @@ export default function HistoryPlan() {
                             <span className="text-[#DA5747] text-[12px] font-normal leading-normal tracking-[-0.24px]">Pending (1/1)</span>
                         </div>
                     </div>
-                    <div className="my-[20px]  border border-[#E1E6ED]"></div>
+                    <div className="my-[20px] mx-[15px] border border-[#E1E6ED]"></div>
 
 
                     <div className="flex flex-col gap-5">
@@ -77,14 +93,14 @@ export default function HistoryPlan() {
                             <div className="flex flex-col gap-5">
                                 <span className="text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]">Weight Loss</span>
 
-                                <div className="flex gap-5">
+                                <div className="flex items-center gap-5">
                                     <div className="flex flex-col gap-2.5">
                                         <span className="text-[#252525] text-[20px] font-bold leading-[126%] tracking-[-0.4px]">75Kg</span>
                                         <span className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px]">Past stat</span>
                                     </div>
 
 
-                                    <div className="h-px my-[7px] w-[205px] border border-[#E1E6ED]"></div>
+                                    <div className="flex items-center h-px my-[7px] w-[205px] border border-[#E1E6ED]"></div>
 
 
 
@@ -117,18 +133,18 @@ export default function HistoryPlan() {
                         </div>
 
 
-<div className="flex justify-end pr-10">
-                        <div className="text-[#535359] text-[12px] font-semibold leading-normal tracking-[-0.24px] px-5 py-[15px] rounded-[10px] bg-[#D9D9D9]">
-                           Update
+                        <div className="flex flex-wrap justify-end pr-10">
+                            <div className="flex items-center px-5 py-[15px] rounded-[10px] bg-[#D9D9D9] ">
+                                <span className="text-[#535359] text-[12px] font-semibold leading-normal tracking-[-0.24px]">Update</span>
                             </div>
-                            </div>
+                        </div>
                     </div>
 
-                      <div className="my-[20px] border border-[#E1E6ED]"></div>
+                    <div className="my-[20px] mx-[15px] border border-[#E1E6ED]"></div>
 
 
-                             <div className="flex flex-col gap-[22px] mb-[30px]">
-  <div className="flex gap-[5px] pl-[30px] ">
+                    <div className="flex flex-col gap-[22px] mb-[30px]">
+                        <div className="flex gap-[5px] pl-[30px] ">
                             <Image
                                 src="/icons/hugeicons_sparkles.svg"
                                 alt="hugeicons_sparkles.svg"
@@ -140,28 +156,134 @@ export default function HistoryPlan() {
 
 
 
-<div className="flex gap-[5px] ml-[50px]">
-    <div className="px-5 py-[5px] rounded-[20px] bg-white text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]">
-        Low
-    </div>
+                        <div className="flex gap-[5px] ml-[50px]">
+                            <div className="px-5 py-[5px] rounded-[20px] bg-white text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]">
+                                Low
+                            </div>
 
-     <div className="px-5 py-[5px] rounded-[20px] bg-white text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]">
-        High Protein
-    </div>
+                            <div className="px-5 py-[5px] rounded-[20px] bg-white text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]">
+                                High Protein
+                            </div>
 
-     <div className="px-5 py-[5px] rounded-[20px] bg-white text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]">
-       Balanced Fiber
-    </div>
+                            <div className="px-5 py-[5px] rounded-[20px] bg-white text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]">
+                                Balanced Fiber
+                            </div>
 
-     <div className="px-5 py-[5px] rounded-[20px] bg-white text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]">
-       Calorie Deficit
-    </div>
-</div>
+                            <div className="px-5 py-[5px] rounded-[20px] bg-white text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]">
+                                Calorie Deficit
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+
+
+                <div className=" flex justify-between items-start pt-[70px] pl-[30px] pr-[25px] ">
+                    <div className="flex justify-between ">
+                        <div className="flex flex-col gap-[10px] ">
+                            <div className="flex gap-5  justify-between items-center ">
+                                <span className="text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]">Client Log</span>
+
+                            </div>
+                            <div className="flex gap-[3px]">
+                                <span className="text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px]">Last Logged 05 Jul, 12:30pm</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div className="my-[20px] mx-[15px] border border-[#E1E6ED]"></div>
+
+                <div className="flex flex-col gap-[15px]">
+
+                    <div className="flex gap-[442px]">
+                        <div className="flex gap-[5px] pl-[30px] ">
+                            <Image
+                                src="/icons/hugeicons_rice-bowl-01.svg"
+                                alt="hugeicons_rice-bowl-01"
+                                width={15}
+                                height={15}
+                            />
+                            <span className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[0.24px]">Test Log</span>
+                        </div>
+
+                        <div className="flex gap-[5px] pl-[30px] ">
+                            <Image
+                                src="/icons/hugeicons_rice-bowl-01.svg"
+                                alt="hugeicons_rice-bowl-01"
+                                width={15}
+                                height={15}
+                            />
+                            <span className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[0.24px]">Meal Log</span>
+                        </div>
+                    </div>
+
+
+                    <div className="flex gap-5 mx-5">
+                        <div className="w-[235px] py-[15px] pl-[15px] pr-[81px] rounded-[10px] bg-[#F5F7FA]">
+                           <div className="flex items-start flex-col gap-[27px]">
+                         
+                                <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">Tests Taken</span>
+                             
+
+                              <div className="flex flex-col gap-[5px] ">
+                                 <span  className="text-[#252525] text-[25px] font-semibold leading-[126%] tracking-[-0.5px]">14</span>
+                                 <span className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px]">out of 15 tests</span>
+                              </div>
+                           </div>
+                           
+                        </div>
+
+                      <div className="w-[235px] py-[15px] pl-[15px] pr-[81px] rounded-[10px] bg-[#F5F7FA]">
+                           <div className="flex items-start flex-col gap-[27px]">
+                         
+                                <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">Tests Taken</span>
+                             
+
+                              <div className="flex flex-col gap-[5px] ">
+                                 <span  className="text-[#252525] text-[25px] font-semibold leading-[126%] tracking-[-0.5px]">14</span>
+                                 <span className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px]">out of 15 tests</span>
+                              </div>
+                           </div>
+                           
+                        </div>
+
+
+                      <div className="w-[235px] py-[15px] pl-[15px] pr-[81px] rounded-[10px] bg-[#F5F7FA]">
+                           <div className="flex items-start flex-col gap-[27px]">
+                         
+                                <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">Tests Taken</span>
+                             
+
+                              <div className="flex flex-col gap-[5px] ">
+                                 <span  className="text-[#252525] text-[25px] font-semibold leading-[126%] tracking-[-0.5px]">14</span>
+                                 <span className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px]">out of 15 tests</span>
+                              </div>
+                           </div>
+                           
+                        </div>
+
+
+                        <div className="w-[235px] py-[15px] pl-[15px] pr-[81px] rounded-[10px] bg-[#F5F7FA]">
+                           <div className="flex items-start flex-col gap-[27px]">
+                         
+                                <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">Tests Taken</span>
+                             
+
+                              <div className="flex flex-col gap-[5px] ">
+                                 <span  className="text-[#252525] text-[25px] font-semibold leading-[126%] tracking-[-0.5px]">14</span>
+                                 <span className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px]">out of 15 tests</span>
+                              </div>
+                           </div>
+                           
+                        </div>
+                    </div>
                 </div>
 
 
-         
+
+ <ResultEvaluation/>
             </div>
         </>
     )
