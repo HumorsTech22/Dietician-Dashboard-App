@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { UserProfile } from "./user-profile";
+import { toast } from "sonner";
 
 export default function ClientTable() {
   const [search, setSearch] = useState("");
@@ -41,6 +42,19 @@ export default function ClientTable() {
     },
     
   ];
+
+
+
+ const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast.success("Reference code copied!");
+    }).catch(err => {
+      toast.error("Failed to copy reference code");
+      console.error('Failed to copy: ', err);
+    });
+  };
+
+
 
   const filteredClients = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -92,17 +106,21 @@ export default function ClientTable() {
                 </tr>
               ) : (
                 filteredClients.map((client, idx) => (
-                  <tr key={`${client.name}-${idx}`} className="align-top">
+                  <tr 
+                  key={`${client.name}-${idx}`} 
+                  className="align-top cursor-pointer [&>td]:cursor-pointer"
+                   onClick={() => window.location.href = "/profile"}
+                    >
                     {/* Client Name */}
                     <td className="px-[15px] py-5">
-                      <Link href="/profile" className="flex flex-col gap-1 cursor-pointer">
+                      <div className="flex flex-col gap-1">
                         <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">
                           {client.name}
                         </span>
                         <span className="font-normal text-[10px] leading-normal tracking-[-0.2px]">
                           {client.age}
                         </span>
-                      </Link>
+                      </div>
                     </td>
 
                     {/* Date Created */}
@@ -118,7 +136,9 @@ export default function ClientTable() {
                         <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">
                           {client.referenceCode}
                         </span>
-                        <Image src="/icons/hugeicons_copy-02.svg" alt="copy" width={15} height={15} className="cursor-pointer"/>
+                        <Image src="/icons/hugeicons_copy-02.svg" alt="copy" width={15} height={15} className="cursor-pointer"
+onClick={() => copyToClipboard(client.referenceCode)}
+                        />
                       </div>
                     </td>
 
