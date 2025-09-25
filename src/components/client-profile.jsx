@@ -25,7 +25,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, }) 
     const [showUploadModal, setShowUploadModal] = useState(false);
 
     const options = [
-        { value: "auto", label: "Automatically fill" },
+       
         { value: "manual", label: "Manual fill" },
         { value: "copy", label: "Copy previous plan" },
     ];
