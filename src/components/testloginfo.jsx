@@ -2,7 +2,7 @@
 export default function TestLogInfo(){
     return(
         <>
-         <div className='flex-1 flex-col gap-[310px]'>
+         <div className='flex-1 flex-col gap-[310px] h-full'>
 
             <div className='pt-[23px] pb-[18px] '>
               <p className='text-[#252525] pb-[18px] pt-[23px] text-[20px] font-semibold leading-[110%] tracking-[0.4px] whitespace-nowrap'>Test log info</p>

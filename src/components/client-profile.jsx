@@ -13,7 +13,7 @@ import CreatePlanModal from './modal/create-plan';
 
 
 
-export const ClientProfile = ({ showPlanDetails = true, showOverview = true, }) => {
+export const ClientProfile = ({ showPlanDetails = true, showOverview = true, showPlanSelection = true, showPlanHistoryMargin = true}) => {
     const pathname = usePathname();
 
     const hideClientBits = (pathname || '').toLowerCase().includes('testlog-info')
@@ -25,7 +25,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, }) 
     const [showUploadModal, setShowUploadModal] = useState(false);
 
     const options = [
-       
+
         { value: "manual", label: "Manual fill" },
         { value: "copy", label: "Copy previous plan" },
     ];
@@ -336,7 +336,8 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, }) 
 
 
                         {showPlanDetails && (
-                            <div className={`bg-white rounded-[15px] px-[22px] py-10 whitespace-nowrap ${showOverview ? "" : "mt-[30px]"
+                            <div className={`bg-white rounded-[15px] px-[22px] py-10 whitespace-nowrap ${
+                               showOverview ? "" : (showPlanHistoryMargin ? "mt-[30px]" : "")
                                 }`}>
                                 <div className='flex justify-between items-center'>
                                     <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>Plan History(2)</span>
@@ -409,8 +410,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, }) 
                     </div>
                 )}
 
-
-
+  {showPlanSelection && (
                 <div className='w-[333px] flex flex-col gap-5 bg-white rounded-[15px] px-[15px] pb-[15px]'>
                     <div className='pt-[30px] pl-[30px]'>
                         <span className='text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]'>Select one to continue</span>
@@ -441,6 +441,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, }) 
                         ))}
                     </div>
                 </div>
+                 )}
 
             </div>
 

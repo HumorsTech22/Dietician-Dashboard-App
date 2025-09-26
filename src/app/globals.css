@@ -132,3 +132,13 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+
+.border-collapse-hidden-left {
+  border-collapse: collapse;
+}
+
+.border-collapse-hidden-left th:first-child,
+.border-collapse-hidden-left td:first-child {
+  border-left: none;
+}
