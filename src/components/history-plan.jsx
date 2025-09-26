@@ -29,7 +29,7 @@ export default function HistoryPlan() {
                     </div>
 
                     <div className="flex gap-5 ">
-                        <div className="flex gap-1.5 px-5 py-[15px] items-center border border-[#D9D9D9] bg-white rounded-[10px] cursor-pointer">
+                        <div className="flex gap-1.5 px-5 py-[15px] items-center border border-[#D9D9D9] bg-white rounded-[10px] cursor-alias">
                             <Image
                                 src="/icons/hugeicons_file-export.svg"
                                 alt="export icon"
@@ -42,7 +42,7 @@ export default function HistoryPlan() {
                         </div>
 
 
-                        <div className="flex flex-wrap gap-1.5 px-5 py-[15px] items-center border border-[#D9D9D9] bg-[#308BF9] rounded-[10px] cursor-alias">
+                        <div className="flex flex-wrap gap-1.5 px-5 py-[15px] items-center border border-[#D9D9D9] bg-[#308BF9] rounded-[10px] cursor-pointer">
                             <Image
                                 src="/icons/hugeicons_rotate-01.svg"
                                 alt="hugeicons_rotate-01"

@@ -19,7 +19,7 @@ export default function Preview() {
   const [activePanel, setActivePanel] = useState('summary');
 
   return (
-    <div className='flex-1 bg-white rounded-[15px]  p-[15px] '>
+    <div className='overflow-hidden w-full bg-white rounded-[15px]  p-[15px] '>
       <div className='flex justify-between'>
         <p className='text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]'>Preview</p>
         <div className='flex gap-[25px] items-center pb-2.5'>
