@@ -1,17 +1,17 @@
 "use client"
 import { IoIosArrowDown } from "react-icons/io";
 import { RxCross2 } from "react-icons/rx";
-import React, { useState, useRef, useEffect  } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 export default function Summary() {
-    const [approachInput, setApproachInput] = useState('');
-    const [approachTags, setApproachTags] = useState([]);
+  const [approachInput, setApproachInput] = useState('');
+  const [approachTags, setApproachTags] = useState([]);
 
   const [currentUnit, setCurrentUnit] = useState('Unit');
   const [targetUnit, setTargetUnit] = useState('Unit');
-const [showCurrentDropdown, setShowCurrentDropdown] = useState(false);
+  const [showCurrentDropdown, setShowCurrentDropdown] = useState(false);
   const [showTargetDropdown, setShowTargetDropdown] = useState(false);
-  
+
   // Ref for dropdown containers
   const currentDropdownRef = useRef(null);
   const targetDropdownRef = useRef(null);
@@ -21,7 +21,7 @@ const [showCurrentDropdown, setShowCurrentDropdown] = useState(false);
     'kg', 'g', 'lb', 'oz', 'cm', 'm', 'inch', 'ft', '%', 'bpm', 'cal', 'kcal'
   ];
 
-    useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (currentDropdownRef.current && !currentDropdownRef.current.contains(event.target)) {
         setShowCurrentDropdown(false);
@@ -37,27 +37,27 @@ const [showCurrentDropdown, setShowCurrentDropdown] = useState(false);
     };
   }, []);
 
-    const addTag = () => {
-        const t = approachInput.trim();
-        if (!t) return;
-        const exists = approachTags.some(a => a.toLowerCase() === t.toLowerCase());
-        if (!exists) setApproachTags(prev => [...prev, t]);
-        setApproachInput('');
-    };
+  const addTag = () => {
+    const t = approachInput.trim();
+    if (!t) return;
+    const exists = approachTags.some(a => a.toLowerCase() === t.toLowerCase());
+    if (!exists) setApproachTags(prev => [...prev, t]);
+    setApproachInput('');
+  };
 
-    const removeTag = (i) => {
-        setApproachTags(prev => prev.filter((_, idx) => idx !== i));
-    };
+  const removeTag = (i) => {
+    setApproachTags(prev => prev.filter((_, idx) => idx !== i));
+  };
 
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter' || e.key === ',') {
-            e.preventDefault();
-            addTag();
-        }
-    };
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addTag();
+    }
+  };
 
 
-     const handleUnitSelect = (unit, type) => {
+  const handleUnitSelect = (unit, type) => {
     if (type === 'current') {
       setCurrentUnit(unit);
       setShowCurrentDropdown(false);
@@ -77,14 +77,14 @@ const [showCurrentDropdown, setShowCurrentDropdown] = useState(false);
     setShowCurrentDropdown(false);
   };
 
-    return (
+  return (
     <>
       <div className='w-full'>
         <div className='pt-[23px]'>
           <p className='text-[#252525] pb-[18px] pt-[23px] text-[20px] font-semibold leading-[110%] tracking-[0.4px] whitespace-nowrap'>Plan Summary</p>
-          
+
           <div className="w-full border-b border-[#E1E6ED]"></div>
-          
+
           <div className='mt-[15px]'>
             <div className="flex gap-5 items-end">
               {/* Name of the plan */}
@@ -171,7 +171,7 @@ const [showCurrentDropdown, setShowCurrentDropdown] = useState(false);
 
                     <div className="h-[20px] border-l border-[#E1E6ED] mx-3"></div>
 
-                    <div 
+                    <div
                       className="flex items-center gap-2 cursor-pointer relative"
                       onClick={toggleCurrentDropdown}
                     >
@@ -179,7 +179,7 @@ const [showCurrentDropdown, setShowCurrentDropdown] = useState(false);
                         {currentUnit}
                       </span>
                       <IoIosArrowDown className={`text-[#A1A1A1] w-[15px] h-[15px] transition-transform ${showCurrentDropdown ? 'rotate-180' : ''}`} />
-                    
+
                       {/* Dropdown Menu */}
                       {showCurrentDropdown && (
                         <div className="absolute top-full right-0 mt-1 bg-white border border-[#E1E6ED] rounded-[8px] shadow-lg z-10 min-w-[100px] max-h-[200px] overflow-y-auto">
@@ -222,7 +222,7 @@ const [showCurrentDropdown, setShowCurrentDropdown] = useState(false);
 
                     <div className="h-[20px] border-l border-[#E1E6ED] mx-3"></div>
 
-                    <div 
+                    <div
                       className="flex items-center gap-2 cursor-pointer relative"
                       onClick={toggleTargetDropdown}
                     >
@@ -230,7 +230,7 @@ const [showCurrentDropdown, setShowCurrentDropdown] = useState(false);
                         {targetUnit}
                       </span>
                       <IoIosArrowDown className={`text-[#A1A1A1] w-[15px] h-[15px] transition-transform ${showTargetDropdown ? 'rotate-180' : ''}`} />
-                    
+
                       {/* Dropdown Menu */}
                       {showTargetDropdown && (
                         <div className="absolute top-full right-0 mt-1 bg-white border border-[#E1E6ED] rounded-[8px] shadow-lg z-10 min-w-[100px] max-h-[200px] overflow-y-auto">
@@ -325,5 +325,5 @@ const [showCurrentDropdown, setShowCurrentDropdown] = useState(false);
         </div>
       </div>
     </>
-    )
+  )
 };

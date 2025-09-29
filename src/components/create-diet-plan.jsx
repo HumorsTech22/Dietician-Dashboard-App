@@ -6,6 +6,8 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoIosArrowForward } from "react-icons/io";
 import { IoIosArrowDown } from "react-icons/io";
 import Expand from "./modal/expand-popup";
+import { GoPlus } from "react-icons/go";
+import DietEvent from "./modal/diet-event-popup";
 
 // Create a reusable component for the table cell
 function DietPlanTableCell({ dayNumber, hideLeftBorder = false, hideBottomBorder = false  }) {
@@ -95,8 +97,12 @@ const borderClasses = `
               <IoIosArrowForward className="text-[#308BF9] w-[26px] h-[26px]" />
             </div>
           </div>
+
+        
         </div>
 
+        
+                
         {/* Event 2 */}
         <div className="flex flex-col gap-5 bg-white rounded-[10px] px-[15px] pt-[16px] pb-[15px] border-t-[9px] border-[#9FFFCE] ">
           <div className="flex justify-between">
@@ -327,6 +333,7 @@ const borderClasses = `
 
 export default function CreateDietPlan({ isExpanded = false, onToggleExpand }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEventPopUp, setIsEventPopUp] = useState(false);
   // Show 7 days total; scroll horizontally to see beyond the first ~3 columns
   const days = [1, 2, 3, 4, 5, 6, 7];
 
@@ -339,6 +346,10 @@ export default function CreateDietPlan({ isExpanded = false, onToggleExpand }) {
   };
 
 
+  const handleAddEvent = () =>{
+    setIsEventPopUp(true);
+  }
+
   return (
     <>
       <div className='w-full max-w-full min-w-0 overflow-x-hidden relative flex flex-col gap-[310px]'>
@@ -347,9 +358,11 @@ export default function CreateDietPlan({ isExpanded = false, onToggleExpand }) {
           <div className="flex justify-between pl-[15px] pr-[20px]">
             <p className='text-[#252525] pb-[18px] pt-[23px] text-[20px] font-semibold leading-[110%] tracking-[0.4px] whitespace-nowrap'>Diet Plan</p>
 
-            <div className='flex gap-2.5 items-center pb-2.5 cursor-pointer'>
+            <div className='flex gap-2.5 items-center pb-2.5 cursor-pointer'
+            onClick={handleExpandClick}
+            >
               <span className='text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[-0.24px]'
-                onClick={handleExpandClick}
+                
               >
                 {isExpanded ? 'Collapse' : 'Expand'}
               </span>
@@ -418,10 +431,24 @@ export default function CreateDietPlan({ isExpanded = false, onToggleExpand }) {
                       {days.map((day, index) => (
                         <DietPlanTableCell key={day} dayNumber={day} hideLeftBorder={index === 0}
           hideBottomBorder={true}/>
+
+          
                       ))}
+                     
                     </tr>
+                    
                   </tbody>
+
+                 
                 </table>
+   <div className="max-w-[134px] ml-[71px] cursor-pointer  flex gap-2.5 px-5 py-[15px] rounded-[10px] bg-white border-[#D9D9D9]"
+    onClick={handleAddEvent}
+   >
+          <GoPlus className="text-[#308BF9] w-6 h-6"/>
+          <button className="cursor-pointer text-[#308BF9] text-[12px] font-semibold leading-[100%] tracking-[-0.24px]"
+         
+          >Add Event</button>
+        </div>
 
               </div>
 
@@ -457,6 +484,10 @@ export default function CreateDietPlan({ isExpanded = false, onToggleExpand }) {
       <Expand
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+      />
+      <DietEvent
+      open={isEventPopUp}
+      onClose={() => setIsEventPopUp(false)}
       />
     </>
   )
