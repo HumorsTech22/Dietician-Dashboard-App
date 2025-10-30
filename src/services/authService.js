@@ -13,25 +13,21 @@ export const loginService = async (email, password) => {
   });
 };
 
-
 export const sendOtpService = async (email) => {
   return apiFetcher(API_ENDPOINTS.AUTH.SEND_OTP, {
     method: "POST",
-    body: JSON.stringify({ email }),
-    headers: {
-      "Content-Type": "application/json",
-    },
+    body: JSON.stringify({
+      email: email,
+    }),
   });
 };
 
 export const resetPasswordService = async (email, password) => {
-  const formData = new URLSearchParams();
-  formData.append("email", email);
-  formData.append("password", password);
-
   return apiFetcher(API_ENDPOINTS.AUTH.RESET_PASSWORD, {
     method: "POST",
-    body: formData,
+    body: JSON.stringify({
+      email: email,
+      password: password,
+    }),
   });
 };
-
