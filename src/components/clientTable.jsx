@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { UserProfile } from "./user-profile";
 import { toast } from "sonner";
 
-export default function ClientTable() {
+export default function ClientTable({ showUserProfile = true, showDailyStatusHeader = true, testAssigned = true }) {
   const [search, setSearch] = useState("");
 
   const clients = [
@@ -24,6 +24,7 @@ export default function ClientTable() {
       dietGoal: "75% completed",
       dietGoalDate: "21 July",
       plansCompleted: 0,
+      testAssigned: 23,
     },
     {
       name: "Humors Tech",
@@ -39,13 +40,95 @@ export default function ClientTable() {
       dietGoal: "75% completed",
       dietGoalDate: "21 July",
       plansCompleted: 0,
+      testAssigned: 23,
     },
-    
+     {
+      name: "Zebster Tech",
+      age: "29 years, Male",
+      dateCreated: "21 Jul 2025",
+      referenceCode: "521685982",
+      planStatus: "Active",
+      planType: "1-month plan",
+      lastLogged: "23 mins ago",
+      metabolismStatus: "Attention Required",
+      metabolismColor: "#DA5747",
+      metabolismBg: "#FFEDED",
+      dietGoal: "75% completed",
+      dietGoalDate: "21 July",
+      plansCompleted: 0,
+      testAssigned: 23,
+    },
+     {
+      name: "Reynolds Tech",
+      age: "29 years, Male",
+      dateCreated: "21 Jul 2025",
+      referenceCode: "521685982",
+      planStatus: "Active",
+      planType: "1-month plan",
+      lastLogged: "23 mins ago",
+      metabolismStatus: "Attention Required",
+      metabolismColor: "#DA5747",
+      metabolismBg: "#FFEDED",
+      dietGoal: "75% completed",
+      dietGoalDate: "21 July",
+      plansCompleted: 0,
+      testAssigned: 23,
+    },
+     {
+      name: "Railnill Tech",
+      age: "29 years, Male",
+      dateCreated: "21 Jul 2025",
+      referenceCode: "521685982",
+      planStatus: "Active",
+      planType: "1-month plan",
+      lastLogged: "23 mins ago",
+      metabolismStatus: "Attention Required",
+      metabolismColor: "#DA5747",
+      metabolismBg: "#FFEDED",
+      dietGoal: "75% completed",
+      dietGoalDate: "21 July",
+      plansCompleted: 0,
+      testAssigned: 23,
+    },
+     {
+      name: "Respyr Tech",
+      age: "29 years, Male",
+      dateCreated: "21 Jul 2025",
+      referenceCode: "521685982",
+      planStatus: "Active",
+      planType: "1-month plan",
+      lastLogged: "23 mins ago",
+      metabolismStatus: "Attention Required",
+      metabolismColor: "#DA5747",
+      metabolismBg: "#FFEDED",
+      dietGoal: "75% completed",
+      dietGoalDate: "21 July",
+      plansCompleted: 0,
+      testAssigned: 23,
+    },
+     {
+      name: "Tcs mahindra",
+      age: "29 years, Male",
+      dateCreated: "21 Jul 2025",
+      referenceCode: "521685982",
+      planStatus: "Active",
+      planType: "1-month plan",
+      lastLogged: "23 mins ago",
+      metabolismStatus: "Attention Required",
+      metabolismColor: "#DA5747",
+      metabolismBg: "#FFEDED",
+      dietGoal: "75% completed",
+      dietGoalDate: "21 July",
+      plansCompleted: 0,
+      testAssigned: 23,
+    },
+
+
   ];
 
 
 
- const copyToClipboard = (text) => {
+  const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
       toast.success("Reference code copied!");
     }).catch(err => {
@@ -65,9 +148,11 @@ export default function ClientTable() {
   return (
     <>
       {/* Show the same search bar header; on /clients path this renders the client search */}
-      <div className="">
-        <UserProfile searchQuery={search} onSearchChange={setSearch} />
-      </div>
+      {showUserProfile && (
+        <div className="">
+          <UserProfile searchQuery={search} onSearchChange={setSearch} />
+        </div>
+      )}
 
       <div>
         <div className="rounded-[10px] overflow-hidden">
@@ -79,18 +164,34 @@ export default function ClientTable() {
                 <th className="px-[15px] pt-5 pb-[5px] text-left"><p className="text-[#535359] font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins']">Reference code</p></th>
                 <th className="px-[15px] pt-5 pb-[5px] text-left"><p className="text-[#535359] font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins']">Current Plan</p></th>
                 <th className="px-[15px] pt-5 pb-[5px] text-left"><p className="text-[#535359] font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins']">Last Logged</p></th>
-                <th className="px-[15px] pt-5 pb-[5px] text-center">
-                  <div className="flex flex-col items-center gap-[15px]">
-                    <p className="text-[#535359] font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins']">Daily Status</p>
-                    <div className="flex justify-center w-[333px] items-center py-0.5 gap-5 bg-[#D9D9D9] rounded-[7px]">
-                      <p className="text-[#535359] text-center font-normal text-[12px] leading-[110%] tracking-[-0.24px]">Metabolism Status</p>
-                      <p className="text-[#535359] text-center font-normal text-[12px] leading-[110%] tracking-[-0.24px]">Diet Goal</p>
+                {showDailyStatusHeader && (
+                  <th className="px-[15px] pt-5 pb-[5px] text-center">
+
+                    <div className="flex flex-col items-center gap-[15px]">
+                      <p className="text-[#535359] font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins']">Daily Status</p>
+                      <div className="flex justify-center w-[333px] items-center py-0.5 gap-5 bg-[#D9D9D9] rounded-[7px]">
+                        <p className="text-[#535359] text-center font-normal text-[12px] leading-[110%] tracking-[-0.24px]">Metabolism Status</p>
+                        <p className="text-[#535359] text-center font-normal text-[12px] leading-[110%] tracking-[-0.24px]">Diet Goal</p>
+                      </div>
                     </div>
-                  </div>
-                </th>
-                <th className="px-[15px] pt-5 pb-[5px] text-left">
-                  <p className="text-[#535359] text-center font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins']">Plans completed</p>
-                </th>
+
+                  </th>
+                )}
+
+
+                {showDailyStatusHeader && (
+                  <th className="px-[15px] pt-5 pb-[5px] text-left">
+
+                    <p className="text-[#535359] text-center font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins']">Plans completed</p>
+
+                  </th>
+                )}
+
+                {testAssigned && (
+                  <th className="px-[15px] pt-5 pb-[5px] text-left">
+                    <p className="text-[#535359] text-center font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins']">Test Assigned</p>
+                  </th>
+                )}
                 <th className="px-[15px] pt-5 pb-[5px] text-left">
                   <p className="text-[#535359] font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins']">Actions</p>
                 </th>
@@ -106,11 +207,11 @@ export default function ClientTable() {
                 </tr>
               ) : (
                 filteredClients.map((client, idx) => (
-                  <tr 
-                  key={`${client.name}-${idx}`} 
-                  className="align-top cursor-pointer [&>td]:cursor-pointer"
-                   onClick={() => window.location.href = "/profile"}
-                    >
+                  <tr
+                    key={`${client.name}-${idx}`}
+                    className="align-top cursor-pointer [&>td]:cursor-pointer"
+                    onClick={() => window.location.href = "/profile"}
+                  >
                     {/* Client Name */}
                     <td className="px-[15px] py-5">
                       <div className="flex flex-col gap-1">
@@ -137,7 +238,7 @@ export default function ClientTable() {
                           {client.referenceCode}
                         </span>
                         <Image src="/icons/hugeicons_copy-02.svg" alt="copy" width={15} height={15} className="cursor-pointer"
-onClick={() => copyToClipboard(client.referenceCode)}
+                          onClick={() => copyToClipboard(client.referenceCode)}
                         />
                       </div>
                     </td>
@@ -166,44 +267,61 @@ onClick={() => copyToClipboard(client.referenceCode)}
                     </td>
 
                     {/* Daily Status */}
-                    <td className="px-[15px] py-5">
-                      <div className="flex justify-center gap-5">
-                        <div>
-                          <div
-                            className="w-[179px] flex justify-center items-center rounded-[20px] px-2 py-2.5"
-                            style={{ backgroundColor: client.metabolismBg }}
-                          >
-                            <p
-                              className="text-[12px] font-semibold tracking-[-0.24px] leading-[126%]"
-                              style={{ color: client.metabolismColor }}
+                    {showDailyStatusHeader && (
+                      <td className="px-[15px] py-5">
+
+                        <div className="flex justify-center gap-5">
+                          <div>
+                            <div
+                              className="w-[179px] flex justify-center items-center rounded-[20px] px-2 py-2.5"
+                              style={{ backgroundColor: client.metabolismBg }}
                             >
-                              {client.metabolismStatus}
-                            </p>
+                              <p
+                                className="text-[12px] font-semibold tracking-[-0.24px] leading-[126%]"
+                                style={{ color: client.metabolismColor }}
+                              >
+                                {client.metabolismStatus}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">
+                              {client.dietGoal}
+                            </span>
+                            <span className="font-normal text-[10px] leading-normal tracking-[-0.2px]">
+                              {client.dietGoalDate}
+                            </span>
                           </div>
                         </div>
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">
-                            {client.dietGoal}
-                          </span>
-                          <span className="font-normal text-[10px] leading-normal tracking-[-0.2px]">
-                            {client.dietGoalDate}
-                          </span>
-                        </div>
-                      </div>
-                    </td>
+
+                      </td>
+                    )}
 
                     {/* Plans completed */}
-                    <td className="text-center px-[15px] py-5">
-                      <span className="text-[#252525] text-center text-[12px] font-semibold leading-[1.26px]">
-                        {client.plansCompleted}
-                      </span>
-                    </td>
+                    {showDailyStatusHeader && (
+                      <td className="text-center px-[15px] py-5">
+
+                        <span className="text-[#252525] text-center text-[12px] font-semibold leading-[1.26px]">
+                          {client.plansCompleted}
+                        </span>
+
+                      </td>
+                    )}
+
+                    {testAssigned && (
+                      <td className="text-center px-[15px] py-5">
+                        <span className="text-[#252525] text-center text-[12px] font-semibold leading-[1.26px]">
+                          {client.testAssigned}
+                        </span>
+                      </td>
+                    )}
+
 
                     {/* Actions */}
                     <td className="px-[15px] py-5">
                       <div className="py-2.5 flex gap-5">
-                        <Image src="/icons/hugeicons_message-02.svg" alt="message" width={20} height={20} className="cursor-pointer"/>
-                        <Image src="/icons/hugeicons_view.svg" alt="view" width={20} height={20} className="cursor-pointer"/>
+                        <Image src="/icons/hugeicons_message-02.svg" alt="message" width={20} height={20} className="cursor-pointer" />
+                        <Image src="/icons/hugeicons_view.svg" alt="view" width={20} height={20} className="cursor-pointer" />
                       </div>
                       <div />
                     </td>

@@ -73,7 +73,7 @@ export default function Summary() {
   };
 
   const toggleTargetDropdown = () => {
-    setShowTargetDropdown(!showTargetDropdown);
+    setShowTargetDropdown(!showTargetDropdown); 
     setShowCurrentDropdown(false);
   };
 

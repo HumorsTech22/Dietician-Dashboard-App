@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import CreateDietPlan from './create-diet-plan';
 import Summary from './summary';
 import TestLogInfo from './testloginfo';
+import DietPlanCreated from './diet-plan-created';
 
 export default function Preview() {
   const pathname = (usePathname() || '').toLowerCase();
@@ -16,7 +17,7 @@ export default function Preview() {
     pathname.includes('/plan-summary') || pathname.endsWith('/plansummary');
 
   // now track summary | testlog | dietplan
-  const [activePanel, setActivePanel] = useState('summary');
+  const [activePanel, setActivePanel] = useState('summary'); 
 
   return (
     <div className='overflow-hidden w-full bg-white rounded-[15px]  p-[15px] '>
@@ -30,6 +31,7 @@ export default function Preview() {
               alt='hugeicons_rotate-01'
               width={20}
               height={20}
+            
             />
             <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Re-upload</span>
           </div>
@@ -97,7 +99,8 @@ export default function Preview() {
                 {/* Right side content based on activePanel */}
                 {activePanel === 'summary' && <Summary />}
                 {activePanel === 'testlog' && <TestLogInfo />}
-                {activePanel === 'dietplan' && <CreateDietPlan />}
+                {/* {activePanel === 'dietplan' && <CreateDietPlan />}  */}
+               {activePanel === 'dietplan' && <DietPlanCreated />} 
               </div>
             )}
 

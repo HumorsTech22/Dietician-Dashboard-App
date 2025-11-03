@@ -13,7 +13,7 @@ import CreatePlanModal from './modal/create-plan';
 
 
 
-export const ClientProfile = ({ showPlanDetails = true, showOverview = true, showPlanSelection = true, showPlanHistoryMargin = true}) => {
+export const ClientProfile = ({ showPlanDetails = true, showOverview = true, showPlanSelection = true, showPlanHistoryMargin = true }) => {
     const pathname = usePathname();
 
     const hideClientBits = (pathname || '').toLowerCase().includes('testlog-info')
@@ -25,7 +25,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
     const [showUploadModal, setShowUploadModal] = useState(false);
 
     const options = [
-
+        { value: "automatically", label: "Automatically fill" },
         { value: "manual", label: "Manual fill" },
         { value: "copy", label: "Copy previous plan" },
     ];
@@ -47,27 +47,63 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
             <div className='flex flex-col gap-[5px]'>
 
 
-                <div className='flex gap-2.5 pl-[15px]  py-[14px] bg-white rounded-[15px]'>
-                    <div className='flex gap-[15px] items-center'>
-                        {/* <MdOutlineKeyboardBackspace className='w-7 h-7 cursor-pointer' /> */}
-                        <Image
-                            src="/icons/Frame 383.svg"
-                            alt='Frame 383'
-                            width={32}
-                            height={32}
-                            className='cursor-pointer'
-                            onClick={() => window.history.back()}
-                        />
-                        <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Clients</span>
+                <div className='flex gap-5'>
+                    <div className='w-[333px] flex gap-2.5 pl-[15px]  py-[14px] bg-white rounded-[15px]'>
+                        <div className='flex gap-[15px] items-center'>
+                            {/* <MdOutlineKeyboardBackspace className='w-7 h-7 cursor-pointer' /> */}
+                            <Image
+                                src="/icons/Frame 383.svg"
+                                alt='Frame 383'
+                                width={32}
+                                height={32}
+                                className='cursor-pointer'
+                                onClick={() => window.history.back()}
+                            />
+                            <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Clients</span>
+                        </div>
+
+                        <div className='flex gap-[5px] items-center'>
+                            <IoChevronBackSharp className='w-[20px] h-[20px] cursor-pointer' />
+
+                            <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Sagar Hosur</span>
+                        </div>
                     </div>
 
-                    <div className='flex gap-[5px] items-center'>
-                        <IoChevronBackSharp className='w-[20px] h-[20px] cursor-pointer' />
 
-                        <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Sagar Hosur</span>
-                    </div>
+
+                    {showPlanSelection && !pathname?.toLowerCase().includes('/profile') &&(
+                        <div className='w-full flex justify-center items-center gap-5 bg-white rounded-[15px] pl-[30px] '>
+                            <div className='w-[170px]'>
+                                <span className='text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] whitespace-nowrap'>Select one to continue</span>
+                            </div>
+
+                            <div className="flex  w-full gap-5">
+                                {options.map((opt) => (
+                                    <label
+                                        key={opt.value}
+                                        className={`w-[215px] flex gap-2.5 items-center py-[18px] pl-2.5 pr-3 rounded-[5px] cursor-pointer transition-colors
+                    ${selectedPlan === opt.value
+                                                ? "border-[2px] border-[#308BF9] bg-[#F5F7FA]"
+                                                : ""
+                                            }`}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="planType"
+                                            value={opt.value}
+                                            checked={selectedPlan === opt.value}
+                                            onChange={() => setSelectedPlan(opt.value)}
+                                            className="w-4 h-4 text-[#308BF9] border-[#252525] font-semibold focus:ring-[#308BF9]"
+                                        />
+                                        <span className="text-[#252525] text-[15px] font-semibold leading-normal tracking-[-0.3px] whitespace-nowrap">
+                                            {opt.label}
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
-
 
 
                 {!hideClientBits && (
@@ -336,8 +372,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
 
 
                         {showPlanDetails && (
-                            <div className={`bg-white rounded-[15px] px-[22px] py-10 whitespace-nowrap ${
-                               showOverview ? "" : (showPlanHistoryMargin ? "mt-[30px]" : "")
+                            <div className={`bg-white rounded-[15px] px-[22px] py-10 whitespace-nowrap ${showOverview ? "" : (showPlanHistoryMargin ? "mt-[30px]" : "")
                                 }`}>
                                 <div className='flex justify-between items-center'>
                                     <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>Plan History(2)</span>
@@ -410,38 +445,38 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                     </div>
                 )}
 
-  {showPlanSelection && (
-                <div className='w-[333px] flex flex-col gap-5 bg-white rounded-[15px] px-[15px] pb-[15px]'>
-                    <div className='pt-[30px] pl-[30px]'>
-                        <span className='text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]'>Select one to continue</span>
-                    </div>
+                {/* {showPlanSelection && (
+                    <div className='w-[333px] flex flex-col gap-5 bg-white rounded-[15px] px-[15px] pb-[15px]'>
+                        <div className='pt-[30px] pl-[30px]'>
+                            <span className='text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]'>Select one to continue</span>
+                        </div>
 
-                    <div className="flex flex-col w-full gap-[15px]">
-                        {options.map((opt) => (
-                            <label
-                                key={opt.value}
-                                className={`flex gap-2.5 items-center py-[18px] pl-2.5 pr-3 rounded-[5px] cursor-pointer transition-colors
+                        <div className="flex flex-col w-full gap-[15px]">
+                            {options.map((opt) => (
+                                <label
+                                    key={opt.value}
+                                    className={`flex gap-2.5 items-center py-[18px] pl-2.5 pr-3 rounded-[5px] cursor-pointer transition-colors
                     ${selectedPlan === opt.value
-                                        ? "border-[2px] border-[#308BF9] bg-[#F5F7FA]"
-                                        : ""
-                                    }`}
-                            >
-                                <input
-                                    type="radio"
-                                    name="planType"
-                                    value={opt.value}
-                                    checked={selectedPlan === opt.value}
-                                    onChange={() => setSelectedPlan(opt.value)}
-                                    className="w-4 h-4 text-[#308BF9] border-gray-300 focus:ring-[#308BF9]"
-                                />
-                                <span className="text-[#252525] text-[15px] font-normal leading-normal tracking-[-0.3px] whitespace-nowrap">
-                                    {opt.label}
-                                </span>
-                            </label>
-                        ))}
+                                            ? "border-[2px] border-[#308BF9] bg-[#F5F7FA]"
+                                            : ""
+                                        }`}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="planType"
+                                        value={opt.value}
+                                        checked={selectedPlan === opt.value}
+                                        onChange={() => setSelectedPlan(opt.value)}
+                                        className="w-4 h-4 text-[#308BF9] border-gray-300 focus:ring-[#308BF9]"
+                                    />
+                                    <span className="text-[#252525] text-[15px] font-normal leading-normal tracking-[-0.3px] whitespace-nowrap">
+                                        {opt.label}
+                                    </span>
+                                </label>
+                            ))}
+                        </div>
                     </div>
-                </div>
-                 )}
+                )} */}
 
             </div>
 

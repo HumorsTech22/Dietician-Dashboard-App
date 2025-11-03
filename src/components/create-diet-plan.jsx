@@ -14,7 +14,7 @@ function DietPlanTableCell({ dayNumber, hideLeftBorder = false, hideBottomBorder
 const borderClasses = `
     border 
     ${hideLeftBorder ? 'border-l-0' : ''}
-    ${hideBottomBorder ? 'border-b-0' : ''}
+    ${hideBottomBorder ? 'border-b-0' : ''} 
     border-[#D9D9D9] 
     px-[15px] 
     py-[15px] 
