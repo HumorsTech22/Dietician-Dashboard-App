@@ -40,6 +40,9 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
 
 
 
+    const isPlanHistoryPage = pathname?.toLowerCase().includes('planhistory');
+
+
     return (
         <>
 
@@ -59,13 +62,21 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                 className='cursor-pointer'
                                 onClick={() => window.history.back()}
                             />
-                            <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Clients</span>
+
+                             {isPlanHistoryPage ? (
+                            <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Sagar Hosur</span>
+                              ) : (
+                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Clients</span>
+                            )}
                         </div>
 
                         <div className='flex gap-[5px] items-center'>
                             <IoChevronBackSharp className='w-[20px] h-[20px] cursor-pointer' />
-
+ {isPlanHistoryPage ? (
+     <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Plan History(2)</span>
+       ) : (
                             <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Sagar Hosur</span>
+                               )}
                         </div>
                     </div>
 

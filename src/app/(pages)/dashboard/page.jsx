@@ -16,9 +16,9 @@ const Dashboard = () => {
 
   <div className='flex gap-5'>
         {/* <DashboardSidebar/> */}
-        <div className="flex flex-col gap-5 w-full">
+        <div className="flex flex-col gap-5">
           <GoalTracker/> 
-          <ClientRisk/>
+    
         </div>
       </div>
  

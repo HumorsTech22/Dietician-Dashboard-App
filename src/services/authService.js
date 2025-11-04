@@ -31,3 +31,15 @@ export const resetPasswordService = async (email, password) => {
     }),
   });
 };
+
+export const fetchClientsWithDietPlan = async (dieticianId) => {
+  return apiFetcher(API_ENDPOINTS.CLIENT.CLIENTTABLE, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      dietician_id: dieticianId,
+    }),
+  });
+};

@@ -11,5 +11,8 @@ export const API_ENDPOINTS = {
     SEND_OTP: "/humors_app/app_final/dieticianapp/web/api/send_diatitian_otp.php",
     RESET_PASSWORD: "/humors_app/app_final/dieticianapp/web/api/update_diatitian_password.php",
   },
+  CLIENT:{
+    CLIENTTABLE:"/dietitian/api/web/get_clients_with_diet_plan.php"
+  }
   
 };

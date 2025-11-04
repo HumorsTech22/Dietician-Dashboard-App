@@ -2,6 +2,7 @@
 import Image from "next/image"
 import { IoIosArrowForward } from "react-icons/io";
 import ClientRisk from "./client-risk";
+import DashboardGraph from "./dashboard-graph";
 export default function TestMonitor() {
     return (
         <>
@@ -9,8 +10,8 @@ export default function TestMonitor() {
                 <div className="flex justify-between pb-[23px] border-b border-[#E1E6ED]">
                     <span className="text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]">Test Analytics</span>
 
-                    <div className="flex gap-5">
-                        <span className="text-[#A1A1A1] text-[12px] font-normal leading-normal tracking-[-0.24px]"></span>
+                    <div className="flex gap-5 items-center">
+                        <span className="text-[#A1A1A1] text-[12px] font-normal leading-normal tracking-[-0.24px]">Today, 12 April 2025</span>
                         <Image
                             src="/icons/hugeicons_calendar-03.svg"
                             alt="hugeicons_calendar-03.svg"
@@ -21,7 +22,7 @@ export default function TestMonitor() {
                 </div>
 
                 <div className=" flex flex-col gap-[18px]">
-                    <span className="pl-3.5 text-[#252525] text-[15px] font-semibold leading-[110%">Tests Tracking</span>
+                    <span className="pl-3.5 text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] mt-[30px]">Tests Tracking</span>
 
                     <div className="flex gap-5">
                         <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
@@ -55,10 +56,14 @@ export default function TestMonitor() {
                 </div>
 
 
+                <div className="mt-[34px]">
+                    <DashboardGraph />
+                </div>
+
 
                 <div className=" flex flex-col gap-[26px]">
-                    <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">Tests Results</span>
-                    <ClientRisk />
+                    <span className="mt-10 ml-3.5 text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">Tests Results</span>
+                    <ClientRisk hideDietGoal={true} />
                 </div>
             </div>
         </>
