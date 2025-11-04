@@ -1241,11 +1241,14 @@ import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import DietEvent from "./modal/diet-event-popup";
 
 export default function DietPlanCreated() {
   const [activeDay, setActiveDay] = useState(0);
   const [days, setDays] = useState([]);
   const [currentDate, setCurrentDate] = useState(new Date());
+    const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedMeal, setSelectedMeal] = useState(null);
 
   // Diet plan data array
   const dietPlanData = [
@@ -1574,6 +1577,23 @@ export default function DietPlanCreated() {
     setCurrentDate(newDate);
   };
 
+
+    // Function to handle edit button click
+  const handleEditClick = (meal, section) => {
+    setSelectedMeal({
+      meal,
+      section,
+      day: days[activeDay]
+    });
+    setIsModalOpen(true);
+  };
+
+  // Function to close modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedMeal(null);
+  };
+
   return (
     <>
       <div className='w-full max-w-full min-w-0 overflow-x-hidden relative flex flex-col gap-[310px]'>
@@ -1732,7 +1752,9 @@ export default function DietPlanCreated() {
                             </div>
 
                             {meal.id === 1 && (
-                              <div className="flex flex-col ml-[33px] mb-[44px] mr-2.5 gap-2.5 border border-[#D9D9D9] rounded-[10px] py-[15px] px-5 cursor-pointer">
+                              <div className="flex flex-col ml-[33px] mb-[44px] mr-2.5 gap-2.5 border border-[#D9D9D9] rounded-[10px] py-[15px] px-5 cursor-pointer"
+                              onClick={() => handleEditClick(meal, section)}
+                              >
                                 <Image
                                   src="/icons/hugeicons_edit-03.svg"
                                   alt="hugeicons_edit-03"
@@ -1823,7 +1845,9 @@ export default function DietPlanCreated() {
                             </div>
 
                             {option.id === 1 && (
-                              <div className="flex flex-col h-[72px] gap-2.5 border border-[#D9D9D9] rounded-[10px] py-[15px] px-5 cursor-pointer self-start">
+                              <div className="flex flex-col h-[72px] gap-2.5 border border-[#D9D9D9] rounded-[10px] py-[15px] px-5 cursor-pointer self-start"
+                                onClick={() => handleEditClick(option.meals[0], section)}
+                              >
                                 <Image
                                   src="/icons/hugeicons_edit-03.svg"
                                   alt="hugeicons_edit-03"
@@ -1865,6 +1889,14 @@ export default function DietPlanCreated() {
 
         </div>
       </div>
+
+
+ <DietEvent 
+        open={isModalOpen} 
+        onClose={handleCloseModal}
+        selectedMeal={selectedMeal}
+      />
+
     </>
   )
 }

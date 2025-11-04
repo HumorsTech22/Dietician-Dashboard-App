@@ -4,7 +4,7 @@ import { Modal } from "react-responsive-modal";
 import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 import Image from "next/image";
 
-export default function DietEvent({ open, onClose }) {
+export default function DietEvent({ open, onClose, selectedMeal  }) {
 
     return (
         <>

@@ -3,12 +3,12 @@ import { Poppins } from "next/font/google";
 import 'react-responsive-modal/styles.css';
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-
+import Providers  from "./providers";
 
 const poppins = Poppins({
   subsets: ["latin"],
   variable: "--font-poppins",
-  weight: ["300", "400", "500", "600", "700"], 
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 
@@ -18,19 +18,21 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
- 
+
   return (
     <html lang="en">
       <body
         className={`${poppins.className} antialiased`}
       >
-       
-       
-         <div className="mx-[25px] mt-[30px] mb-[37px]">
-          
-          {children}
-        </div>
-        <Toaster />
+
+    <Providers>
+          <div className=" mt-[30px] mb-[37px]">
+
+            {children}
+          </div>
+
+          <Toaster />
+    </Providers>
       </body>
     </html>
   );
