@@ -1,101 +1,127 @@
 
+
+
+
+
+
+
 // import Image from "next/image";
 // import { IoIosArrowForward } from "react-icons/io";
-// export default function DashboardCard() {
+
+// export default function DashboardCard({ activeTab }) {
+//   if (activeTab === "Client Monitor") {
 //     return (
-//         <>
-//             <div className="flex gap-5">
-//                 <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
-//                     <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">Total Client</span>
-//                     <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">45</span>
-//                 </div>
+//       <div className="flex gap-5">
+//         <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+//           <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
+//             Total Client
+//           </span>
+//           <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">45</span>
+//         </div>
 
-//                 <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
-//                     <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">Active Plans</span>
-//                     <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">40</span>
-//                 </div>
+//         <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+//           <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
+//             Active Plans
+//           </span>
+//           <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">40</span>
+//         </div>
 
-//                 <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
-//                     <div className="flex gap-[119px]">
-
-//                         <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">Needs Plan</span>
-
-//                         <div className="flex gap-2.5">
-//                             <span className="text-[#308BF9] txt-[12px] font-semibold leading-[110%] tracking-[-0.24px] whitespace-nowrap">Give Plans</span>
-
-//                             <IoIosArrowForward className="text-[#308BF9]" />
-//                         </div>
-//                     </div>
-//                     <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">5</span>
-//                 </div>
-
-//                 <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
-//                     <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">Total Tests purchased</span>
-//                     <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">10000</span>
-//                 </div>
-
-//                 <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
-//                     <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">Tests Assigned</span>
-//                     <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">4000</span>
-//                 </div>
-
-//                 <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
-//                     <div className="flex gap-[119px]">
-
-//                         <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">Tests Remaining</span>
-
-//                         <div className="flex gap-2.5">
-//                             <span className="text-[#308BF9] txt-[12px] font-semibold leading-[110%] tracking-[-0.24px] whitespace-nowrap">Purchase more </span>
-
-//                             <IoIosArrowForward className="text-[#308BF9]" />
-//                         </div>
-//                     </div>
-//                     <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">2000</span>
-//                 </div>
-
-
-//                 <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
-//                     <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">Client Tracked</span>
-//                     <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">45</span>
-//                 </div>
-
-//                 <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
-//                     <div className="flex gap-[5px]">
-//                         <Image
-//                             src="/icons/hugeicons_liver14.svg"
-//                             alt="hugeicons_liver14.svg"
-//                             width={18}
-//                             height={18}
-//                         />
-//                         <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">Clients
-//                             Followed</span>
-//                     </div>
-//                     <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">5</span>
-//                 </div>
-
-//                 <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
-//                     <div className="flex gap-[119px]">
-//                         <div className="flex gap-[5px]">
-//                             <Image
-//                                 src="/icons/hugeicons_24liver.svg"
-//                                 alt="hugeicons_24liver.svg"
-//                                 width={18}
-//                                 height={18}
-//                             />
-//                             <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">Clients
-//                                 Not Followed</span>
-//                         </div>
-//                         <div className="flex gap-2.5">
-//                             <span className="text-[#308BF9] txt-[12px] font-semibold leading-[110%] tracking-[-0.24px] whitespace-nowrap">Send Message </span>
-
-//                             <IoIosArrowForward className="text-[#308BF9]" />
-//                         </div>
-//                     </div>
-//                     <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">2000</span>
-//                 </div>
+//         <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+//           <div className="flex gap-[119px]">
+//             <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
+//               Needs Plan
+//             </span>
+//             <div className="flex gap-2.5">
+//               <span className="text-[#308BF9] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] whitespace-nowrap">
+//                 Give Plans
+//               </span>
+//               <IoIosArrowForward className="text-[#308BF9]" />
 //             </div>
-//         </>
-//     )
+//           </div>
+//           <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">5</span>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   if (activeTab === "Test Monitor") {
+//     return (
+//       <div className="flex gap-5">
+//         <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+//           <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
+//             Total Tests purchased
+//           </span>
+//           <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">10000</span>
+//         </div>
+
+//         <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+//           <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
+//             Tests Assigned
+//           </span>
+//           <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">4000</span>
+//         </div>
+
+//         <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+//           <div className="flex gap-[119px]">
+//             <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
+//               Tests Remaining
+//             </span>
+//             <div className="flex gap-2.5">
+//               <span className="text-[#308BF9] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] whitespace-nowrap">
+//                 Purchase more
+//               </span>
+//               <IoIosArrowForward className="text-[#308BF9]" />
+//             </div>
+//           </div>
+//           <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">2000</span>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   if (activeTab === "Diet Plan Monitor") {
+//     return (
+//       <div className="flex gap-5">
+//         <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+//           <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
+//             Client Tracked
+//           </span>
+//           <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">45</span>
+//         </div>
+
+//         <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+//           <div className="flex gap-[5px]">
+//             <Image src="/icons/hugeicons_liver14.svg" alt="hugeicons_liver14.svg" width={18} height={18} />
+//             <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
+//               Clients Followed
+//             </span>
+//           </div>
+//           <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">5</span>
+//         </div>
+
+//         <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+//           <div className="flex gap-[119px]">
+//             <div className="flex gap-[5px]">
+//               <Image src="/icons/hugeicons_24liver.svg" alt="hugeicons_24liver.svg" width={18} height={18} />
+//               <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
+//                 Clients Not Followed
+//               </span>
+//             </div>
+//             <div className="flex gap-2.5">
+//               <span className="text-[#308BF9] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] whitespace-nowrap">
+//                 Send Message
+//               </span>
+//               <IoIosArrowForward className="text-[#308BF9]" />
+//             </div>
+//           </div>
+//           <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">2000</span>
+//         </div>
+//       </div>
+//     );
+//   }
+
+  
+//   return null;
 // }
 
 
@@ -114,29 +140,75 @@
 
 
 
+
+"use client"
 import Image from "next/image";
 import { IoIosArrowForward } from "react-icons/io";
+import { useSelector } from "react-redux";
+import { selectClients } from "../store/clientSlice";
 
 export default function DashboardCard({ activeTab }) {
+   const clients = useSelector(selectClients);
+   console.log("client123:-", clients);
+
+  // Calculate metrics from clients data
+  const calculateClientMetrics = () => {
+    if (!clients || !Array.isArray(clients)) {
+      return {
+        totalClients: 0,
+        activePlans: 0,
+        needsPlan: 0
+      };
+    }
+
+    const totalClients = clients.length;
+    
+    const activePlans = clients.reduce((count, client) => {
+      return count + (client.plans_count?.active || 0);
+    }, 0);
+    
+    const needsPlan = clients.reduce((count, client) => {
+      // Clients with no active plans and no plans at all
+      const hasNoActivePlans = (client.plans_count?.active || 0) === 0;
+      const hasNoPlans = (client.plans_count?.total || 0) === 0;
+      return count + (hasNoActivePlans ? 1 : 0);
+    }, 0);
+
+    return {
+      totalClients,
+      activePlans,
+      needsPlan
+    };
+  };
+
+  const metrics = calculateClientMetrics();
+
   if (activeTab === "Client Monitor") {
     return (
       <div className="flex gap-5">
-        <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+        {/* Total Client Card */}
+        <div className="w-[332px] flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8">
           <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
             Total Client
           </span>
-          <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">45</span>
+          <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">
+            {metrics.totalClients}
+          </span>
         </div>
 
-        <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+        {/* Active Plans Card */}
+        <div className="w-[333px] flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 ">
           <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
             Active Plans
           </span>
-          <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">40</span>
+          <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">
+            {metrics.activePlans}
+          </span>
         </div>
 
-        <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
-          <div className="flex gap-[119px]">
+        {/* Needs Plan Card */}
+        <div className="w-[312px] flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-5">
+          <div className="flex gap-[119px] items-center">
             <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
               Needs Plan
             </span>
@@ -147,7 +219,9 @@ export default function DashboardCard({ activeTab }) {
               <IoIosArrowForward className="text-[#308BF9]" />
             </div>
           </div>
-          <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">5</span>
+          <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">
+            {metrics.needsPlan}
+          </span>
         </div>
       </div>
     );
@@ -170,8 +244,8 @@ export default function DashboardCard({ activeTab }) {
           <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">4000</span>
         </div>
 
-        <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
-          <div className="flex gap-[119px]">
+        <div className="w-full flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-5">
+          <div className="flex gap-[58px] items-center">
             <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
               Tests Remaining
             </span>

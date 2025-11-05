@@ -63,26 +63,26 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                 onClick={() => window.history.back()}
                             />
 
-                             {isPlanHistoryPage ? (
-                            <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Sagar Hosur</span>
-                              ) : (
-                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Clients</span>
+                            {isPlanHistoryPage ? (
+                                <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Sagar Hosur</span>
+                            ) : (
+                                <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Clients</span>
                             )}
                         </div>
 
                         <div className='flex gap-[5px] items-center'>
                             <IoChevronBackSharp className='w-[20px] h-[20px] cursor-pointer' />
- {isPlanHistoryPage ? (
-     <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Plan History(2)</span>
-       ) : (
-                            <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Sagar Hosur</span>
-                               )}
+                            {isPlanHistoryPage ? (
+                                <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Plan History(2)</span>
+                            ) : (
+                                <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Sagar Hosur</span>
+                            )}
                         </div>
                     </div>
 
 
 
-                    {showPlanSelection && !pathname?.toLowerCase().includes('/profile') &&(
+                    {showPlanSelection && !pathname?.toLowerCase().includes('/profile') && (
                         <div className='w-full flex justify-center items-center gap-5 bg-white rounded-[15px] pl-[30px] '>
                             <div className='w-[170px]'>
                                 <span className='text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] whitespace-nowrap'>Select one to continue</span>

@@ -12,7 +12,8 @@ export default function CreatePlanModal({ open, onClose }) {
   const [showUploadModal, setShowUploadModal] = useState(false);
 
   const options = [
-    { value: "auto", label: "Automatically fill" },
+    // { value: "auto", label: "Automatically fill" },
+       { value: "auto", label: "Upload Files" },
     { value: "manual", label: "Manual fill" },
     { value: "copy", label: "Copy previous plan" },
   ];

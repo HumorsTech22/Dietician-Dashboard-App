@@ -123,39 +123,90 @@
 
 
 
-// app/clients/page.jsx (your Client component file)
-/* your existing code … */
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
 import ClientTable from "@/components/clientTable"
 import { UserProfile } from "@/components/user-profile"
+import {
+  getClientsForDietician,
+  selectClients,
+  selectClientsCount,
+  selectClientsStatus,
+  selectClientsError,
+} from "../../../store/clientSlice";
 
 import { useDispatch, useSelector } from "react-redux";
 import { fetchClientsForDietician } from "../../../store/clientSlice"
+import Cookies from "js-cookie";
 
 export default function Client() {
-  const tabs = useMemo(
-    () => [
-      { id: "all", label: "All Clients (45)" },
-      { id: "active", label: "Active Plan (40)" },
-      { id: "needs", label: "Needs Plan (10)" },
-    ],
-    []
-  )
 
-  const [activeTab, setActiveTab] = useState("all")
-  const activeIndex = tabs.findIndex(t => t.id === activeTab)
+ const dispatch = useDispatch();
+  const clients = useSelector(selectClients);
+  const count = useSelector(selectClientsCount);
+  const status = useSelector(selectClientsStatus);
+  const error = useSelector(selectClientsError);
 
-  // NEW: fire the fetch once
-  const dispatch = useDispatch();
-  const { status, error, count } = useSelector((s) => s.clients);
 
-  useEffect(() => {
-    dispatch(fetchClientsForDietician());
+useEffect(() => {
+   
+    const dieticianCookie = Cookies.get("dietician");
+
+    if (dieticianCookie) {
+      try {
+  
+        const dieticianData = JSON.parse(decodeURIComponent(dieticianCookie));
+        
+      
+        const dieticianId = dieticianData?.dietician_id;
+
+        if (dieticianId) {
+        
+          dispatch(getClientsForDietician({ dieticianId }));
+        } else {
+          console.error("dietician_id not found in cookie data.");
+         
+        }
+      } catch (e) {
+        console.error("Failed to parse dietician cookie:", e);
+       
+      }
+    } else {
+      console.warn("Dietician cookie not found.");
+     
+    }
+
   }, [dispatch]);
 
-  // (Optional) You can show loading/error somewhere above the table without touching the table itself
+
+    const activeCount = useMemo(
+    () => clients.filter(c => (c?.plans_count?.active ?? 0) > 0).length,
+    [clients]
+  );
+  const needsCount = useMemo(
+    () => clients.filter(c => (c?.plans_count?.total ?? 0) === 0).length,
+    [clients]
+  );
+
+
+   const tabs = useMemo(
+    () => [
+      { id: "all", label: `All Clients (${count ?? 0})` },
+      { id: "active", label: `Active Plan (${activeCount ?? 0})` },
+      { id: "needs", label: `Needs Plan (${needsCount ?? 0})` },
+    ],
+    [count, activeCount, needsCount]
+  );
+
+
+const [activeTab, setActiveTab] = useState("all");
+  const activeIndex = tabs.findIndex((t) => t.id === activeTab);
+
+
+   if (status === "loading") return <div>Loading clients…</div>;
+  if (status === "failed") return <div>Error: {error}</div>;
+
   return (
     <>
       <div>
@@ -172,17 +223,10 @@ export default function Client() {
           ))}
         </div>
 
-        {/* Optional tiny status line (non-breaking) */}
-        <div className="mt-2 mb-2 text-xs text-[#535359]">
-          {status === "loading" && "Loading clients…"}
-          {status === "failed" && `Failed to load clients: ${error}`}
-          {status === "succeeded" && `Loaded ${count} client(s) from API`}
-        </div>
-
         {/* Content wrapper */}
         <div className="border border-[#D9D9D9] border-t-0 rounded-b-[10px] rounded-tr-[10px] bg-white p-5">
           {/* <UserProfile /> */}
-          <ClientTable activeTab={activeTab}  testAssigned={false}/>
+          <ClientTable activeTab={activeTab}  testAssigned={false} clients={clients}/>
         </div>
       </div>
     </>
