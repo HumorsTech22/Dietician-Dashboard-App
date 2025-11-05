@@ -11,7 +11,9 @@ import DashboardCard from "./dashboard-card";
 
 export default function GoalTracker() {
   const [activeTab, setActiveTab] = useState("Client Monitor");
-  const menuItems = ["Client Monitor", "Test Monitor", "Diet Plan Monitor"];
+  const menuItems = ["Client Monitor", "Test Monitor",
+    //  "Diet Plan Monitor"
+    ];
   const [isMounted, setIsMounted] = useState(false);
 
 
