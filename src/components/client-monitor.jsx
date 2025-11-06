@@ -49,7 +49,6 @@ import { useRouter } from "next/navigation";
 
 export default function ClientMonitor() {
     const clients = useSelector(selectClients);
-    console.log("clients52:-", clients);
     const router = useRouter();
 
     const handleViewAllClients = () => {

@@ -149,7 +149,6 @@ import { selectClients } from "../store/clientSlice";
 
 export default function DashboardCard({ activeTab }) {
    const clients = useSelector(selectClients);
-   console.log("client123:-", clients);
 
   // Calculate metrics from clients data
   const calculateClientMetrics = () => {

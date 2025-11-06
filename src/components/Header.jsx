@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { cookieManager } from '../lib/cookies';
 
 const MonoIcon = ({ src, size = 20, color = "#A1A1A1", alt = "" }) => (
   <span
@@ -26,7 +27,9 @@ const MonoIcon = ({ src, size = 20, color = "#A1A1A1", alt = "" }) => (
 
 export default function Header() {
   const pathname = usePathname();
+   const router = useRouter();
   const [active, setActive] = useState(pathname);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Update active state when route changes
   useEffect(() => {
@@ -39,6 +42,21 @@ export default function Header() {
     { name: "Messages", icon: "/icons/hugeicons_message-02.svg", path: "/messages" },
     { name: "Settings", icon: "/icons/hugeicons_settings-03.svg", path: "/settings" },
   ];
+
+
+    const handleLogout = () => {
+    try {
+      cookieManager.clearAuth();
+      setIsDropdownOpen(false);
+      
+      // Redirect to login page
+      router.push('/');
+     
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
 
   return (
     <div className="flex justify-between bg-[#F5F7FA] p-4">
@@ -71,17 +89,54 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-5">
-       <div className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white">
-    <MonoIcon src="/icons/hugeicons_notification-01.svg" color="#A1A1A1" alt="notification" />
-  </div>
+        <div className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white">
+          <MonoIcon src="/icons/hugeicons_notification-01.svg" color="#A1A1A1" alt="notification" />
+        </div>
 
-   <Link
+        {/* <Link
           href="/loginuser"
-         className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white"
+          className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white"
           aria-label="User"
         >
           <MonoIcon src="/icons/hugeicons_user.svg" color="#A1A1A1" size={20} alt="user" />
-        </Link>
+        </Link> */}
+
+        <div className="flex items-center gap-5">
+       
+
+        {/* User Dropdown */}
+        <div 
+          className="relative"
+          onMouseEnter={() => setIsDropdownOpen(true)}
+          onMouseLeave={() => setIsDropdownOpen(false)}
+        >
+          <div className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white">
+            <MonoIcon src="/icons/hugeicons_user.svg" color="#A1A1A1" size={20} alt="user" />
+          </div>
+
+          {/* Dropdown Menu */}
+          {isDropdownOpen && (
+            <div className="absolute right-0 top-full  w-48 bg-white rounded-[15px] shadow-lg p-1.5 z-50">
+              {/* <Link 
+                href="/profile" 
+                className="flex items-center px-4 py-3 text-sm text-[#A1A1A1] hover:bg-gray-100 transition-colors"
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                
+                <span className="ml-3 cursor-pointer">Profile</span>
+              </Link> */}
+              
+              <button
+                onClick={handleLogout}
+                  className="flex items-center cursor-pointer w-full px-4  py-3 text-sm text-[#A1A1A1] hover:bg-gray-100 transition-colors"
+              >
+                
+                <span className="ml-3 cursor-pointer">Logout</span>
+              </button>
+            </div>
+          )}
+        </div>
+        </div>
       </div>
     </div>
   );
