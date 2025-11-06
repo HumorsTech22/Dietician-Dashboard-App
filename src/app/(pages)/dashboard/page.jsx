@@ -63,7 +63,7 @@ const Dashboard = () => {
 
       <div className='flex gap-5'>
         {/* <DashboardSidebar/> */}
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5 w-full">
           <GoalTracker/>
 
         </div>
