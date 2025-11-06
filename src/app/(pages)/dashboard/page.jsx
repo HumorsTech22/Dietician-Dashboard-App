@@ -58,7 +58,7 @@ const Dashboard = () => {
     <>
 
 
-      <UserProfile />
+      <UserProfile /> 
       {/* <Notification/> */}
 
       <div className='flex gap-5'>
