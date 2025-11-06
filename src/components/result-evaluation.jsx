@@ -119,8 +119,8 @@ export const ResultEvaluation = () => {
                   isSelected
                     ? "bg-[#308BF9] text-white"
                     : isFuture
-                    ? "text-[#A1A1A1]"
-                    : "text-[#535359]",
+                      ? "text-[#A1A1A1]"
+                      : "text-[#535359]",
                 ].join(" ")}
               >
                 <span className="text-center text-[15px] font-semibold leading-[126%] tracking-[-0.3px]">
@@ -155,12 +155,14 @@ export const ResultEvaluation = () => {
         <div className="my-[20px] border border-[#E1E6ED]"></div>
       </div>
 
-      <div className="flex justify-start gap-[17px] ">
+      <div className="flex flex-col gap-[50px] ">
         <TestEvaluation />
         <Trends />
+        <FoodEvaluation />
+        <MealLogged />
       </div>
-      <FoodEvaluation />
-      <MealLogged />
+
+
     </div>
   );
 };

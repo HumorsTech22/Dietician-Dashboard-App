@@ -21,7 +21,6 @@ import { useState, useMemo, useEffect } from "react"
 const Dashboard = () => {
   const dispatch = useDispatch();
   const clients = useSelector(selectClients);
-  console.log("clients250:-", clients);
 
   
   useEffect(() => {

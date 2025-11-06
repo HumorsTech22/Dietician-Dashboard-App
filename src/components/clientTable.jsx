@@ -377,8 +377,6 @@ export default function ClientTable({ showUserProfile = true, showDailyStatusHea
   clients: clientsList
 }) {
 
-  console.log("clientsList18:-", clientsList);
-
   const [search, setSearch] = useState("");
 
   // Helper function to format date

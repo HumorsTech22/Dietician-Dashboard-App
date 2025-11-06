@@ -133,11 +133,44 @@ export default function FoodEvaluation() {
                                 <span className="text-[#252525] text-[18px] font-semibold leading-[126%] tracking-[-0.36px]">
                                     150g
                                 </span>
-                                <span className="text-[#252525] text-[10px] leading-normal tracking-[-0.2px]">
+                                <span className="text-[#252525] text-[10px] leading-[126%] tracking-[-0.2px]">
                                     out of 100g
                                 </span>
                             </div>
                         </div>
+
+                         <div className="w-[169px] bg-[#F5F7FA] rounded-[10px] py-2.5 pl-5 pr-2.5">
+                            <div>
+                                <span className="text-[#535359] text-[14px] font-medium">Protein</span>
+                            </div>
+
+                            <div className="flex justify-start py-[15px]">
+                                <svg viewBox="0 0 117 6" className="h-[6px]">
+                                    <path
+                                        d="M3 3H114"
+                                        stroke="#D9D9D9"
+                                        strokeWidth="5"
+                                        strokeLinecap="round"
+                                    />
+                                    <path
+                                        d="M3 3H81"
+                                        stroke="#FFC107"
+                                        strokeWidth="5"
+                                        strokeLinecap="round"
+                                    />
+                                </svg>
+                            </div>
+
+                            <div className="mt-3 flex flex-col gap-[5px]">
+                                <span className="text-[#252525] text-[18px] font-semibold leading-[126%] tracking-[-0.36px]">
+                                    150g
+                                </span>
+                                <span className="text-[#252525] text-[10px] leading-[126%] tracking-[-0.2px]">
+                                    out of 100g
+                                </span>
+                            </div>
+                        </div>
+                        
 
                         <div className="w-[169px] bg-[#F5F7FA] rounded-[10px] py-2.5 pl-5 pr-2.5">
                             <div>
@@ -155,7 +188,7 @@ export default function FoodEvaluation() {
                                 <span className="text-[#252525] text-[18px] font-semibold leading-[126%] tracking-[-0.36px]">
                                     70 g
                                 </span>
-                                <span className="text-[#252525] text-[10px] leading-normal tracking-[-0.2px]">
+                                <span className="text-[#252525] text-[10px] leading-[126%] tracking-[-0.2px]">
                                     out of 100g
                                 </span>
                             </div>
@@ -177,7 +210,7 @@ export default function FoodEvaluation() {
                                 <span className="text-[#252525] text-[18px] font-semibold leading-[126%] tracking-[-0.36px]">
                                     25 g
                                 </span>
-                                <span className="text-[#252525] text-[10px] leading-normal tracking-[-0.2px]">
+                                <span className="text-[#252525] text-[10px] leading-[126%] tracking-[-0.2px]">
                                     out of 100g
                                 </span>
                             </div>
@@ -199,7 +232,7 @@ export default function FoodEvaluation() {
                                 <span className="text-[#252525] text-[18px] font-semibold leading-[126%] tracking-[-0.36px]">
                                     25g
                                 </span>
-                                <span className="text-[#252525] text-[10px] leading-normal tracking-[-0.2px]">
+                                <span className="text-[#252525] text-[10px] leading-[126%] tracking-[-0.2px]">
                                     out of 100g
                                 </span>
                             </div>

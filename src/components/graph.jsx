@@ -55,7 +55,7 @@ function hexToRgba(hex, alpha = 1) {
 }
 
 export default function Graph({
-    title = "Absorptive Metabolism Score",
+    title = "",
     labels = ["05 Aug", "06 Aug", "07 Aug", "07 Aug", "07 Aug", "07 Aug", "07 Aug"],
     values = [30, 65, 55, 48, 60, 54, 62],
     color = "#DA5747",
@@ -88,15 +88,15 @@ export default function Graph({
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
-         animations: {
-    colors: false,
-    x: { duration: 0 },
-    y: { duration: 0 },
-    tension: { duration: 0 },
-  },
-  transitions: {
-    active: { animation: { duration: 0 } },
-  },
+        animations: {
+            colors: false,
+            x: { duration: 0 },
+            y: { duration: 0 },
+            tension: { duration: 0 },
+        },
+        transitions: {
+            active: { animation: { duration: 0 } },
+        },
         plugins: {
             legend: { display: false },
             title: { display: false },
@@ -145,18 +145,18 @@ export default function Graph({
 
     return (
         <div className="w-full">
-            <div className="flex justify-center mb-2">
+            {/* <div className="flex justify-center mb-2">
                 <span className="text-[#535359] text-[12px] leading-[110%] tracking-[-0.24px]">
                     {title}
                 </span>
-            </div>
+            </div> */}
 
-            <div className="w-full">
+            
                 <Line data={data} options={options}
                 // width={400}   
                 // height={180}  
                 />
-            </div>
+           
         </div>
     );
 }
