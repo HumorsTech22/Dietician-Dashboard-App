@@ -186,7 +186,7 @@ export default function DashboardCard({ activeTab }) {
     return (
       <div className="flex gap-5">
         {/* Total Client Card */}
-        <div className="w-[332px] flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8">
+        <div className="w-full flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8">
           <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
             Total Client
           </span>
@@ -196,7 +196,7 @@ export default function DashboardCard({ activeTab }) {
         </div>
 
         {/* Active Plans Card */}
-        <div className="w-[333px] flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 ">
+        <div className="w-full flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 ">
           <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
             Active Plans
           </span>
@@ -206,7 +206,7 @@ export default function DashboardCard({ activeTab }) {
         </div>
 
         {/* Needs Plan Card */}
-        <div className="w-[312px] flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-5">
+        <div className="w-full flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-5">
           <div className="flex gap-[119px] items-center">
             <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
               Needs Plan
@@ -229,21 +229,21 @@ export default function DashboardCard({ activeTab }) {
   if (activeTab === "Test Monitor") {
     return (
       <div className="flex gap-5">
-        <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+        <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 w-full">
           <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
             Total Tests purchased
           </span>
           <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">10000</span>
         </div>
 
-        <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+        <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 w-full">
           <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
             Tests Assigned
           </span>
           <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">4000</span>
         </div>
 
-        <div className="w-full flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-5">
+        <div className="w-full flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 ">
           <div className="flex gap-[58px] items-center">
             <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
               Tests Remaining

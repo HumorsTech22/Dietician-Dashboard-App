@@ -107,7 +107,7 @@ export default function FoodEvaluation() {
                     </div>
 
                     <div className="flex gap-[20px]">
-                        <div className="w-[169px] bg-[#F5F7FA] rounded-[10px] py-2.5 pl-5 pr-2.5">
+                        <div className="w-full bg-[#F5F7FA] rounded-[10px] py-2.5 pl-5 pr-2.5">
                             <div>
                                 <span className="text-[#535359] text-[14px] font-medium">Protein</span>
                             </div>
@@ -139,7 +139,7 @@ export default function FoodEvaluation() {
                             </div>
                         </div>
 
-                         <div className="w-[169px] bg-[#F5F7FA] rounded-[10px] py-2.5 pl-5 pr-2.5">
+                         <div className="w-full bg-[#F5F7FA] rounded-[10px] py-2.5 pl-5 pr-2.5">
                             <div>
                                 <span className="text-[#535359] text-[14px] font-medium">Protein</span>
                             </div>
@@ -172,7 +172,7 @@ export default function FoodEvaluation() {
                         </div>
                         
 
-                        <div className="w-[169px] bg-[#F5F7FA] rounded-[10px] py-2.5 pl-5 pr-2.5">
+                        <div className="w-full bg-[#F5F7FA] rounded-[10px] py-2.5 pl-5 pr-2.5">
                             <div>
                                 <span className="text-[#535359] text-[14px] font-medium">Carbs</span>
                             </div>
@@ -194,7 +194,7 @@ export default function FoodEvaluation() {
                             </div>
                         </div>
 
-                        <div className="w-[169px] bg-[#F5F7FA] rounded-[10px] py-2.5 pl-5 pr-2.5">
+                        <div className="w-full bg-[#F5F7FA] rounded-[10px] py-2.5 pl-5 pr-2.5">
                             <div>
                                 <span className="text-[#535359] text-[14px] font-medium">Fats</span>
                             </div>
@@ -216,7 +216,7 @@ export default function FoodEvaluation() {
                             </div>
                         </div>
 
-                        <div className="w-[169px] bg-[#F5F7FA] rounded-[10px] py-2.5 pl-5 pr-2.5">
+                        <div className="w-full bg-[#F5F7FA] rounded-[10px] py-2.5 pl-5 pr-2.5">
                             <div>
                                 <span className="text-[#535359] text-[14px] font-medium">Fiber</span>
                             </div>

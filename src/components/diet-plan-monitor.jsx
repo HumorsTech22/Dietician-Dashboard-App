@@ -36,7 +36,7 @@ export default function DietPlanMonitor() {
 
 
                     <div className="flex gap-5">
-                        <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+                        <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 w-full">
                             <div className="">
 
                                 <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
@@ -46,7 +46,7 @@ export default function DietPlanMonitor() {
                             <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">45</span>
                         </div>
 
-                        <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+                        <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 w-full">
                             <div className="flex gap-[5px]">
                                 <Image src="/icons/hugeicons_liver14.svg" alt="hugeicons_liver14.svg" width={18} height={18} />
                                 <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
@@ -56,7 +56,7 @@ export default function DietPlanMonitor() {
                             <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">5</span>
                         </div>
 
-                        <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+                        <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 w-full">
                             <div className="flex gap-[119px]">
                                 <div className="flex gap-[5px]">
                                     <Image src="/icons/hugeicons_24liver.svg" alt="hugeicons_24liver.svg" width={18} height={18} />

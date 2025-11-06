@@ -166,16 +166,16 @@ export default function MealLogged() {
                 <div className="flex flex-col gap-9 bg-[#F5F7FA] rounded-[15px]">
                     <div className="flex items-center bg-[#E1E6ED] rounded-[15px] border-4 border-[#F5F7FA]">
                         <div className="flex justify-between w-[170px] py-[30px] pl-[30px]">
-                            <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">Select a Week</span>
+                            <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] whitespace-nowrap">Select a Week</span>
                             <IoIosArrowBack
                                 className="text-[#252525] cursor-pointer"
                             />
                         </div>
 
                         <div className="flex items-center">
-                            {/* Static days data */}
+                          
                             <div className="flex items-center">
-                                <div className="flex flex-col w-[165px] gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer bg-[#308BF9]">
+                                <div className="flex flex-col w-full gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer bg-[#308BF9]">
                                     <span className="text-white text-[12px] font-semibold leading-[110%] tracking-[-0.48px]">
                                         Week 1
                                     </span>
@@ -186,7 +186,7 @@ export default function MealLogged() {
 
                                 <div className="border-white border-r h-8 mx-2"></div>
 
-                                <div className="flex flex-col w-[165px] gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer bg-transparent">
+                                <div className="flex flex-col w-full gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer bg-transparent">
                                     <span className="text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.48px]">
                                         Week 2
                                     </span>
@@ -197,7 +197,7 @@ export default function MealLogged() {
 
                                 <div className="border-white border-r h-8 mx-2"></div>
 
-                                <div className="flex flex-col w-[165px] gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer bg-transparent">
+                                <div className="flex flex-col w-full gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer bg-transparent">
                                     <span className="text-[#A1A1A1] text-[12px] font-semibold leading-[110%] tracking-[-0.48px]">
                                         Week 3
                                     </span>
@@ -208,7 +208,7 @@ export default function MealLogged() {
 
                                 <div className="border-white border-r h-8 mx-2"></div>
 
-                                <div className="flex flex-col w-[165px] gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer bg-transparent">
+                                <div className="flex flex-col w-full gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer bg-transparent">
                                     <span className="text-[#A1A1A1] text-[12px] font-semibold leading-[110%] tracking-[-0.48px]">
                                         Week 4
                                     </span>
@@ -219,7 +219,7 @@ export default function MealLogged() {
 
                                 <div className="border-white border-r h-8 mx-2"></div>
 
-                                <div className="flex flex-col w-[165px] gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer bg-transparent">
+                                <div className="flex flex-col w-full gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer bg-transparent">
                                     <span className="text-[#A1A1A1] text-[12px] font-semibold leading-[110%] tracking-[-0.48px]">
                                         Week 5
                                     </span>

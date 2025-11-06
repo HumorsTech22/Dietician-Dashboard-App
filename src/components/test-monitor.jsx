@@ -92,7 +92,7 @@ export default function TestMonitor() {
                     <span className="pl-3.5 text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] mt-[30px]">Tests Tracking</span>
 
                     <div className="flex gap-5">
-                        <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-[238px]">
+                        <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 w-full">
                             <div className="flex gap-[5px]">
 
                                 <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
@@ -102,7 +102,7 @@ export default function TestMonitor() {
                             <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">40</span>
                         </div>
 
-                        <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 ">
+                        <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 w-full">
                             <div className="w-[333px] flex gap-[69px]">
                                 <div className="flex gap-[5px]">
 

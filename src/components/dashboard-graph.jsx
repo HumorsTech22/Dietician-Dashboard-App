@@ -73,7 +73,7 @@ export default function DashboardGraph() {
     return (
         <div className="px-6 ">
 
-            <div className="w-[969px] h-[300px]">
+            <div className="flex justify-center w-full h-[300px]">
                 <Bar data={data} options={options} />
             </div>
 

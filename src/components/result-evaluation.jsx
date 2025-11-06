@@ -68,7 +68,7 @@ export const ResultEvaluation = () => {
 
       <div className="my-[20px] border border-[#E1E6ED]"></div>
 
-      <div className="flex flex-col gap-[20px]">
+     <div className="flex flex-col gap-[20px]">
         <div className="ml-4">
           <span className="text-[#535359] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">
             Select a date
@@ -76,14 +76,13 @@ export const ResultEvaluation = () => {
         </div>
 
         <div className="flex items-center justify-between">
-          {/* Prev */}
+         
           <IoChevronBackSharp
             className="w-[52px] h-[52px] cursor-pointer py-[13px] pl-2.5"
             onClick={() => setWindowStart(addDays(windowStart, -VISIBLE_COUNT))}
             title="Previous"
           />
 
-          {/* Dates */}
           {dates.map((item, idx) => {
             const isToday =
               startOfDay(item.date).getTime() === today.getTime();
@@ -129,7 +128,7 @@ export const ResultEvaluation = () => {
                 <span className="text-center text-[10px] font-normal leading-normal tracking-[-0.2px]">
                   {item.week}
                 </span>
-                {/* tiny dot for today */}
+               
                 {isToday && !isSelected && (
                   <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-[#308BF9]" />
                 )}
@@ -137,7 +136,7 @@ export const ResultEvaluation = () => {
             );
           })}
 
-          {/* Next (disabled when at or beyond maxWindowStart) */}
+         
           <IoIosArrowForward
             className={[
               "w-[52px] h-[52px] py-[13px] pl-2.5",
@@ -153,13 +152,13 @@ export const ResultEvaluation = () => {
         </div>
 
         <div className="my-[20px] border border-[#E1E6ED]"></div>
-      </div>
+      </div> 
 
       <div className="flex flex-col gap-[50px] ">
-        <TestEvaluation />
-        <Trends />
-        <FoodEvaluation />
-        <MealLogged />
+     <TestEvaluation /> 
+       <Trends /> 
+    <FoodEvaluation /> 
+      <MealLogged /> 
       </div>
 
 
