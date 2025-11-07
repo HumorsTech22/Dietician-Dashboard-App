@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { UserPlus } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
+import { cookieManager } from "../lib/cookies"
 
 export const UserProfile = ({
   searchQuery = "",
@@ -14,6 +15,24 @@ export const UserProfile = ({
   const isClientPage =
     pathname?.startsWith("/client") || pathname?.startsWith("/clients");
   const isMessagesPage = pathname?.startsWith("/messages");
+
+ const [dieticianName, setDieticianName] = useState('Dietician');
+  const [currentDate, setCurrentDate] = useState('-');
+
+  useEffect(() => {
+    
+    const dieticianData = cookieManager.getJSON('dietician');
+    setDieticianName(dieticianData?.name || 'Dietician');
+
+   
+    const date = new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long'
+    });
+    setCurrentDate(date);
+  }, []);
+
 
   return (
     <div
@@ -77,10 +96,10 @@ export const UserProfile = ({
         ) : (
           <div className="flex flex-col gap-[15px]">
             <p className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
-              Monday, 21 July
+              {currentDate}
             </p>
             <p className="text-[#252525] text-[34px] font-normal leading-none tracking-[-2.04px]">
-              Hello, Dt. Manoranjan
+              Hello, Dt. {dieticianName}
             </p>
           </div>
         )}

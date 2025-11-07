@@ -13,6 +13,9 @@ export const API_ENDPOINTS = {
   },
   CLIENT:{
     CLIENTTABLE:"/dietitian/api/web/get_clients_with_diet_plan.php"
+  },
+  SCOREANALYSIS:{
+    GRAPH:"/dietitian/api/web/get_score_trend.php"
   }
   
 };

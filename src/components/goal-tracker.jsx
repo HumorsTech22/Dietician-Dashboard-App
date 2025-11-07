@@ -4,7 +4,7 @@
 import Image from "next/image";
 import { useState, useEffect  } from "react";
 import { IoIosArrowForward } from "react-icons/io";
-import ClientMonitor from "./Client-Monitor";
+import ClientMonitor from "./client-monitor";
 import TestMonitor from "./test-monitor";
 import DietPlanMonitor from "./diet-plan-monitor";
 import DashboardCard from "./dashboard-card";

@@ -16,7 +16,7 @@
 // }) {
 
 //   console.log("clientsList18:-", clientsList);
-  
+
 //   const [search, setSearch] = useState("");
 
 //   const clients = [
@@ -364,7 +364,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState, useEffect  } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { UserProfile } from "./user-profile";
 import { toast } from "sonner";
 import {
@@ -373,11 +374,13 @@ import {
 } from "../store/clientSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-export default function ClientTable({ showUserProfile = true, showDailyStatusHeader = true, testAssigned = true, 
-  clients: clientsList
+export default function ClientTable({ showUserProfile = true, showDailyStatusHeader = true, testAssigned = true,
+  clients: clientsList,
+   activeTab = "all"
 }) {
 
   const [search, setSearch] = useState("");
+    const router = useRouter();
 
   // Helper function to format date
   const formatDate = (dateString) => {
@@ -414,14 +417,14 @@ export default function ClientTable({ showUserProfile = true, showDailyStatusHea
     if (allPlans.length === 0) return null;
 
     // Sort by start date (most recent first) as default
-    const sortedPlans = allPlans.sort((a, b) => 
+    const sortedPlans = allPlans.sort((a, b) =>
       new Date(b.plan_start_date || 0) - new Date(a.plan_start_date || 0)
     );
 
     // Prioritize active plans first
     const activePlans = client.plans_summary.active || [];
     if (activePlans.length > 0) {
-      return activePlans.sort((a, b) => 
+      return activePlans.sort((a, b) =>
         new Date(b.plan_start_date || 0) - new Date(a.plan_start_date || 0)
       )[0];
     }
@@ -429,7 +432,7 @@ export default function ClientTable({ showUserProfile = true, showDailyStatusHea
     // Then not started plans
     const notStartedPlans = client.plans_summary.not_started || [];
     if (notStartedPlans.length > 0) {
-      return notStartedPlans.sort((a, b) => 
+      return notStartedPlans.sort((a, b) =>
         new Date(b.plan_start_date || 0) - new Date(a.plan_start_date || 0)
       )[0];
     }
@@ -441,26 +444,26 @@ export default function ClientTable({ showUserProfile = true, showDailyStatusHea
   // Helper function to calculate plan duration and type
   const getPlanType = (activePlan) => {
     if (!activePlan) return "No plan";
-    
+
     const startDate = activePlan.plan_start_date;
     const endDate = activePlan.plan_end_date;
-    
+
     if (!startDate || !endDate) return "Custom plan";
-    
+
     try {
       const start = new Date(startDate);
       const end = new Date(endDate);
-      
+
       // Calculate difference in days
       const timeDiff = end.getTime() - start.getTime();
       const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1; // +1 to include both start and end days
-      
+
       if (dayDiff <= 0) return "Invalid dates";
-      
+
       // Convert to months and days for better display
       const months = Math.floor(dayDiff / 30);
       const days = dayDiff % 30;
-      
+
       if (months > 0) {
         return days > 0 ? `${months}-month ${days}-day plan` : `${months}-month plan`;
       } else {
@@ -478,7 +481,7 @@ export default function ClientTable({ showUserProfile = true, showDailyStatusHea
     return apiData.map(client => {
       // Get the most relevant plan
       const relevantPlan = getMostRelevantPlan(client);
-      
+
       return {
         name: client.profile_name || "N/A",
         age: `${client.age || "N/A"} years, ${client.gender || "N/A"}`,
@@ -490,21 +493,39 @@ export default function ClientTable({ showUserProfile = true, showDailyStatusHea
         metabolismStatus: "",
         metabolismColor: "#DA5747",
         metabolismBg: "#FFEDED",
-        dietGoal: "",
+        dietGoal: "-",
         dietGoalDate: formatDate(client.dttm),
         plansCompleted: client.plans_count?.completed || 0,
-        testAssigned: 23,
-        // Keep original API data for reference
+        testAssigned: "-",
         originalData: client,
-        image:client.profile_image_url
+        image: client.profile_image_url,
+        dieticianId: client.dietician_id, 
+        profileId: client.profile_id 
       };
     });
   };
 
+
+
+  // 🔽 Filter data based on activeTab (from parent)
+  let filteredByTab = clientsList;
+  if (activeTab === "active") {
+    filteredByTab = clientsList.filter(
+      (c) => (c?.plans_count?.active ?? 0) > 0
+    );
+  } else if (activeTab === "needs") {
+    filteredByTab = clientsList.filter(
+      (c) => (c?.plans_count?.total ?? 0) === 0
+    );
+  }
+
+  const clients = useMemo(() => transformClientData(filteredByTab), [filteredByTab]);
+
+
   // Use the transformed data
-  const clients = useMemo(() => {
-    return transformClientData(clientsList);
-  }, [clientsList]);
+  // const clients = useMemo(() => {
+  //   return transformClientData(clientsList);
+  // }, [clientsList]);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -514,6 +535,15 @@ export default function ClientTable({ showUserProfile = true, showDailyStatusHea
       console.error('Failed to copy: ', err);
     });
   };
+
+
+  const handleRowClick = (client) => {
+    const params = new URLSearchParams({
+        dietician_id: client.dieticianId,
+      profile_id: client.profileId
+    });
+    router.push(`/profile?${params.toString()}`);
+  }
 
   const filteredClients = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -578,7 +608,7 @@ export default function ClientTable({ showUserProfile = true, showDailyStatusHea
               {filteredClients.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-[15px] py-8 text-center">
-                    <p className="text-[#A1A1A1] text-sm">No clients found.</p>
+                    <p className="text-[#A1A1A1] text-[18px]">No clients found.</p>
                   </td>
                 </tr>
               ) : (
@@ -586,30 +616,32 @@ export default function ClientTable({ showUserProfile = true, showDailyStatusHea
                   <tr
                     key={`${client.name}-${idx}`}
                     className="align-top cursor-pointer [&>td]:cursor-pointer"
-                    onClick={() => window.location.href = "/profile"}
+                    //onClick={() => window.location.href = "/profile"}
+                    onClick={() => handleRowClick(client)}
                   >
                     {/* Client Name */}
                     <td className="px-[15px] py-5">
                       <div className="flex gap-[15px]">
-<div className="rounded-full bg-[#F0F0F0] p-2">
- <Image
-    src={client.image || "/icons/hugeicons_user-circle-02.svg"}
-    alt={client.name || "profile"}
-    width={24}
-    height={24}
-    className="rounded-full object-cover"
-    unoptimized={false} 
-  />
-</div>
+                        <div className="relative h-8 w-8 rounded-full overflow-hidden bg-[#F0F0F0]">
+                          <Image
+                            src={client.image || "/icons/hugeicons_user-circle-02.svg"}
+                            alt={client.name || "profile"}
+                            fill
+                            className="object-cover"
+                            sizes="32px"
+                            priority={false}
+                          />
+                        </div>
 
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">
-                          {client.name}
-                        </span>
-                        <span className="font-normal text-[10px] leading-normal tracking-[-0.2px]">
-                          {client.age}
-                        </span>
-                      </div>
+
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">
+                            {client.name}
+                          </span>
+                          <span className="font-normal text-[10px] leading-normal tracking-[-0.2px]">
+                            {client.age}
+                          </span>
+                        </div>
                       </div>
                     </td>
 
