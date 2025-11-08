@@ -44,34 +44,35 @@ export const fetchClientsWithDietPlan = async (dieticianId) => {
   });
 };
 
-// export const fetchScoreTrend = async (dieticianId, profileId, mode = "weekly") => {
-//   return apiFetcher(API_ENDPOINTS.SCOREANALYSIS.GRAPH, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({
-//       dietician_id: dieticianId,
-//       profile_id: profileId,
-//       mode: mode,
-//     }),
-//   });
-// };
+
 
 
 
 export const fetchScoreTrend = async (dieticianId, profileId, mode) => {
-  return apiFetcher(API_ENDPOINTS.SCOREANALYSIS.GRAPH, {
+  return apiFetcher(API_ENDPOINTS.PROFILESCOREANALYSIS.GRAPH, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      // dietician_id: dieticianId,
-      // profile_id: profileId,
-       dietitian_id: "do01",
-    profile_id: "p01",
+      dietitian_id: dieticianId,
+      profile_id: profileId,
       mode: mode.toLowerCase(), 
+    }),
+  });
+};
+
+
+export const fetchScoresInsight = async (dieticianId, profileId, date) => {
+  return apiFetcher(API_ENDPOINTS.PROFILESCOREANALYSIS.SCORESINSIGHT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      dietician_id: dieticianId,
+      profile_id: profileId,
+      date: date,
     }),
   });
 };

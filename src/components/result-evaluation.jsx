@@ -103,11 +103,7 @@ export const ResultEvaluation = () => {
                 onClick={() => {
                   if (disabled) return; // block selection
                   setSelectedDate(item.date);
-                  console.log(
-                    `Selected -> Date: ${item.date
-                      .toISOString()
-                      .slice(0, 10)}, Day: ${item.day}, Week: ${item.week}`
-                  );
+                 
                 }}
                 title={
                   disabled ? "Selection disabled (beyond +7 days)" : undefined
@@ -156,7 +152,9 @@ export const ResultEvaluation = () => {
 
       <div className="flex flex-col gap-[50px] ">
      <TestEvaluation /> 
-       <Trends /> 
+       <Trends 
+        selectedDate={selectedDate}
+       /> 
     <FoodEvaluation /> 
       <MealLogged /> 
       </div>
