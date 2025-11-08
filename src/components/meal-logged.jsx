@@ -216,16 +216,16 @@ export default function MealLogged() {
                     : `${wrapBase} bg-transparent cursor-pointer`;
 
                   const titleClass = isFuture
-                    ? "text-[#A1A1A1] text-[12px] font-semibold leading-[110%] tracking-[-0.48px]"
+                    ? "text-[#A1A1A1] text-[12px] font-semibold leading-[110%] tracking-[-0.48px] whitespace-nowrap"
                     : isSelected
-                    ? "text-white text-[12px] font-semibold leading-[110%] tracking-[-0.48px]"
-                    : "text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.48px]";
+                    ? "text-white text-[12px] font-semibold leading-[110%] tracking-[-0.48px] whitespace-nowrap"
+                    : "text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.48px] whitespace-nowrap";
 
                   const dateClass = isFuture
                     ? "text-[#A1A1A1] text-[10px] font-normal leading-[110%] tracking-[-0.2px] whitespace-nowrap"
                     : isSelected
                     ? "text-white text-[10px] font-normal leading-[110%] tracking-[-0.2px] whitespace-nowrap"
-                    : "text-[#252525] text-[10px] font-normal leading-[110%] tracking-[-0.2px]";
+                    : "text-[#252525] text-[10px] font-normal leading-[110%] tracking-[-0.2px] whitespace-nowrap";
 
                   return (
                     <React.Fragment key={w.label}>

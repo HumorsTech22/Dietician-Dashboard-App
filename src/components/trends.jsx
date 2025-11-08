@@ -687,25 +687,15 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
 "use client"
 import { useMemo, useState, useEffect } from "react"
 import { IoIosArrowDown } from "react-icons/io";
 import Image from "next/image";
 import Graph from "./graph";
-import { fetchScoreTrend } from "../services/authService"; // adjust path as needed
+import { fetchScoreTrend, fetchScoresInsight } from "../services/authService";
 import { useSearchParams } from "next/navigation";
 
-export default function Trends() {
+export default function Trends({selectedDate}) {
   const searchParams = useSearchParams();
   const dieticianId = searchParams.get('dietician_id');
   const profileId = searchParams.get('profile_id');
@@ -716,17 +706,438 @@ export default function Trends() {
   const [firstShowDropdown, setFirstShowDropdown] = useState(false)
   const [secondShowDropdown, setSecondShowDropdown] = useState(false)
   const [graphData, setGraphData] = useState(null)
+  const [scoresInsightData, setScoresInsightData] = useState(null)
+  console.log("scoresInsightData712:-", scoresInsightData);
   const [loading, setLoading] = useState(false)
+  const [scoresLoading, setScoresLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [apiMessage, setApiMessage] = useState(null)
+
+  // Function to format date to YYYY-MM-DD
+  const formatDateToYYYYMMDD = (date) => {
+    if (!date) return null;
+    
+    // If it's already a string in YYYY-MM-DD format, return as is
+    if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return date;
+    }
+    
+    // If it's a Date object or string that needs formatting
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) {
+      console.error("Invalid date:", date);
+      return null;
+    }
+    
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  };
+
+  // Fetch ALL data once when component mounts
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      if (!dieticianId || !profileId) return;
+      
+      setLoading(true);
+      setError(null);
+      setApiMessage(null);
+      try {
+        const response = await fetchScoreTrend(dieticianId, profileId, "weekly");
+        if (response.success) {
+          setGraphData(response);
+          setApiMessage(null);
+        } else {
+          setGraphData(null);
+          setApiMessage(response.message || "No data available");
+        }
+      } catch (err) {
+        setError(err.message || "An error occurred");
+        setGraphData(null);
+        setApiMessage(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInitialData();
+  }, [dieticianId, profileId]);
+
+  // Fetch scores insight data when selectedDate changes
+  useEffect(() => {
+    const fetchScoresData = async () => {
+      if (!dieticianId || !profileId || !selectedDate) return;
+      
+      // Format the date to YYYY-MM-DD
+      const formattedDate = formatDateToYYYYMMDD(selectedDate);
+      if (!formattedDate) {
+        console.error("Invalid date format, cannot fetch scores insight");
+        return;
+      }
+      
+      console.log("Fetching scores insight for date:", formattedDate);
+      
+      setScoresLoading(true);
+      try {
+        const response = await fetchScoresInsight(dieticianId, profileId, formattedDate);
+        console.log("response787:-", response);
+       if (response && response.latest_test) {
+        setScoresInsightData(response);
+        console.log("✅ scoresInsightData set successfully");
+      } else {
+        console.log("❌ API response missing latest_test data");
+        setScoresInsightData(null);
+      }
+      } catch (err) {
+        console.error("Error fetching scores insight:", err);
+        setScoresInsightData(null);
+      } finally {
+        setScoresLoading(false);
+      }
+    };
+
+    fetchScoresData();
+  }, [dieticianId, profileId, selectedDate]);
+
+  
+  // Get active marker based on tab
+  const getActiveMarker = () => {
+    switch(active) {
+      case "Gut Fermentation":
+        return {
+          name: "Hydrogen",
+          value: scoresInsightData?.latest_test?.ppm?.h2,
+          unit: "ppm"
+        };
+      case "Glucose -Vs- Fat":
+        return {
+          name: "Acetone", 
+          value: scoresInsightData?.latest_test?.ppm?.acetone,
+          unit: "ppm"
+        };
+      case "Liver Heptic":
+        return {
+          name: "Ethanol",
+          value: scoresInsightData?.latest_test?.ppm?.ethanol,
+          unit: "ppm"
+        };
+      default:
+        return {
+          name: "Hydrogen",
+          value: scoresInsightData?.latest_test?.ppm?.h2,
+          unit: "ppm"
+        };
+    }
+  };
+
+  const activeMarker = getActiveMarker();
+
+  // Get progress bar configuration from scores insight data
+  const getProgressBarConfigs = () => {
+    if (!scoresInsightData || !scoresInsightData.latest_test) {
+      // Return default config if no data
+      return getDefaultProgressBarConfigs();
+    }
+
+    const testJson = scoresInsightData.latest_test.test_json;
+    const scores = scoresInsightData.latest_test.scores;
+    
+    console.log("testJson851:-", testJson);
+    console.log("scores853:-", scores);
+
+    // Check if we have actual data or just raw blob
+    const hasActualData = testJson && testJson.Metabolism_Score_Analysis;
+    const hasOnlyRawData = testJson && testJson.raw;
+
+    // If only raw data is available, show "No Data Found"
+    if (hasOnlyRawData) {
+      return getNoDataProgressBarConfigs();
+    }
+
+    // If we have actual metabolism data
+    if (hasActualData) {
+      const metabolismData = testJson.Metabolism_Score_Analysis;
+
+      const getZoneColor = (zone) => {
+        switch(zone) {
+          case "Good": return "#3FAF58";
+          case "Fair": return "#FFC412";
+          case "Poor": return "#DA5747";
+          default: return "#3FAF58";
+        }
+      };
+
+      const getProgressColors = (score) => {
+        if (score >= 80) {
+          return [
+            { color: "#3FAF58", width: "30%" },
+            { color: "#FFC412", width: "40%" },
+            { color: "#DA5747", width: "30%" }
+          ];
+        } else if (score >= 60) {
+          return [
+            { color: "#FFC412", width: "30%" },
+            { color: "#3FAF58", width: "40%" },
+            { color: "#DA5747", width: "30%" }
+          ];
+        } else {
+          return [
+            { color: "#DA5747", width: "30%" },
+            { color: "#FFC412", width: "40%" },
+            { color: "#3FAF58", width: "30%" }
+          ];
+        }
+      };
+
+      // Return different data based on active tab
+      switch(active) {
+        case "Gut Fermentation":
+          return [
+            {
+              percentage: scores.absorptive || 0,
+              colors: getProgressColors(scores.absorptive || 0),
+              markers: [
+                { position: "0%", label: "0" },
+                { position: "30%", label: "60" },
+                { position: "70%", label: "80" },
+                { position: "100%", label: "100" }
+              ],
+              status: metabolismData.absorption?.zone || "N/A",
+              statusColor: getZoneColor(metabolismData.absorption?.zone),
+              interpretation: metabolismData.absorption?.interpretation || "No interpretation available",
+              intervention: metabolismData.absorption?.intervention || "No intervention available"
+            },
+            {
+              percentage: scores.fermentative || 0,
+              colors: getProgressColors(scores.fermentative || 0),
+              markers: [
+                { position: "0%", label: "0" },
+                { position: "30%", label: "60" },
+                { position: "70%", label: "80" },
+                { position: "100%", label: "100" }
+              ],
+              status: metabolismData.fermentation?.zone || "N/A",
+              statusColor: getZoneColor(metabolismData.fermentation?.zone),
+              interpretation: metabolismData.fermentation?.interpretation || "No interpretation available",
+              intervention: metabolismData.fermentation?.intervention || "No intervention available"
+            }
+          ];
+
+        case "Glucose -Vs- Fat":
+          return [
+            {
+              percentage: scores.fat || 0,
+              colors: getProgressColors(scores.fat || 0),
+              markers: [
+                { position: "0%", label: "0" },
+                { position: "30%", label: "60" },
+                { position: "70%", label: "80" },
+                { position: "100%", label: "100" }
+              ],
+              status: metabolismData.fat_metabolism?.zone || "N/A",
+              statusColor: getZoneColor(metabolismData.fat_metabolism?.zone),
+              interpretation: metabolismData.fat_metabolism?.interpretation || "No interpretation available",
+              intervention: metabolismData.fat_metabolism?.intervention || "No intervention available"
+            },
+            {
+              percentage: scores.glucose || 0,
+              colors: getProgressColors(scores.glucose || 0),
+              markers: [
+                { position: "0%", label: "0" },
+                { position: "30%", label: "60" },
+                { position: "70%", label: "80" },
+                { position: "100%", label: "100" }
+              ],
+              status: metabolismData.glucose_metabolism?.zone || "N/A",
+              statusColor: getZoneColor(metabolismData.glucose_metabolism?.zone),
+              interpretation: metabolismData.glucose_metabolism?.interpretation || "No interpretation available",
+              intervention: metabolismData.glucose_metabolism?.intervention || "No intervention available"
+            }
+          ];
+
+        case "Liver Heptic":
+          return [
+            {
+              percentage: scores.hepatic_stress || 0,
+              colors: getProgressColors(scores.hepatic_stress || 0),
+              markers: [
+                { position: "0%", label: "0" },
+                { position: "30%", label: "60" },
+                { position: "70%", label: "80" },
+                { position: "100%", label: "100" }
+              ],
+              status: metabolismData.hepatic_stress?.zone || "N/A",
+              statusColor: getZoneColor(metabolismData.hepatic_stress?.zone),
+              interpretation: metabolismData.hepatic_stress?.interpretation || "No interpretation available",
+              intervention: metabolismData.hepatic_stress?.intervention || "No intervention available"
+            },
+            {
+              percentage: scores.detoxification || 0,
+              colors: getProgressColors(scores.detoxification || 0),
+              markers: [
+                { position: "0%", label: "0" },
+                { position: "30%", label: "60" },
+                { position: "70%", label: "80" },
+                { position: "100%", label: "100" }
+              ],
+              status: metabolismData.detoxification?.zone || "N/A",
+              statusColor: getZoneColor(metabolismData.detoxification?.zone),
+              interpretation: metabolismData.detoxification?.interpretation || "No interpretation available",
+              intervention: metabolismData.detoxification?.intervention || "No intervention available"
+            }
+          ];
+
+        default:
+          return getDefaultProgressBarConfigs();
+      }
+    }
+
+    // If no data at all
+    return getNoDataProgressBarConfigs();
+  };
+
+  // Helper function for default config
+  const getDefaultProgressBarConfigs = () => {
+    return [
+      {
+        percentage: "-",
+        colors: [
+          { color: "#DA5747", width: "30%" },
+          { color: "#FFC412", width: "40%" },
+          { color: "#3FAF58", width: "30%" }
+        ],
+        markers: [
+          { position: "0%", label: "0" },
+          { position: "30%", label: "60" },
+          { position: "70%", label: "80" },
+          { position: "100%", label: "100" }
+        ],
+        status: "Good",
+        statusColor: "#3FAF58",
+        interpretation: "-",
+        intervention: "-"
+      },
+      {
+        percentage: "-",
+        colors: [
+          { color: "#3FAF58", width: "30%" },
+          { color: "#FFC412", width: "40%" },
+          { color: "#DA5747", width: "30%" }
+        ],
+        markers: [
+          { position: "0%", label: "0" },
+          { position: "30%", label: "60" },
+          { position: "70%", label: "80" },
+          { position: "100%", label: "100" }
+        ],
+        status: "Good",
+        statusColor: "#3FAF58",
+        interpretation: "-",
+        intervention: "-"
+      }
+    ];
+  };
+
+  // Helper function for "No Data Found" config
+  const getNoDataProgressBarConfigs = () => {
+    return [
+      {
+        percentage: 0,
+        colors: [
+          { color: "#E1E6ED", width: "30%" },
+          { color: "#E1E6ED", width: "40%" },
+          { color: "#E1E6ED", width: "30%" }
+        ],
+        markers: [
+          { position: "0%", label: "0" },
+          { position: "30%", label: "60" },
+          { position: "70%", label: "80" },
+          { position: "100%", label: "100" }
+        ],
+        status: "No Data",
+        statusColor: "#A1A1A1",
+        interpretation: "No test data available for the selected date",
+        intervention: "Please select a different date with available test results"
+      },
+      {
+        percentage: 0,
+        colors: [
+          { color: "#E1E6ED", width: "30%" },
+          { color: "#E1E6ED", width: "40%" },
+          { color: "#E1E6ED", width: "30%" }
+        ],
+        markers: [
+          { position: "0%", label: "0" },
+          { position: "30%", label: "60" },
+          { position: "70%", label: "80" },
+          { position: "100%", label: "100" }
+        ],
+        status: "No Data",
+        statusColor: "#A1A1A1",
+        interpretation: "No test data available for the selected date",
+        intervention: "Please select a different date with available test results"
+      }
+    ];
+  };
+
+  const progressBarConfigs = getProgressBarConfigs();
+
+  // ProgressBar component
+  const ProgressBarSection = ({ config }) => (
+    <div className="flex flex-col gap-5 w-full lg:w-auto">
+      <div className="flex flex-col gap-[5px] w-full relative">
+        <div className="w-full rounded-full h-2.5 flex gap-0.5 overflow-hidden relative">
+          {config.colors.map((colorConfig, index) => (
+            <div 
+              key={index}
+              className="h-2.5 rounded-[5px]" 
+              style={{ 
+                backgroundColor: colorConfig.color, 
+                width: colorConfig.width 
+              }}
+            />
+          ))}
+          <div 
+            className="absolute top-1/2 w-[11px] h-[22px] border-[10px] border-[#252525] rounded-[10px] transform -translate-y-1/2" 
+            style={{ left: `${config.percentage}%` }}
+          />
+        </div>
+        <div className="relative w-full">
+          {config.markers.map((marker, index) => (
+            <span 
+              key={index}
+              className="absolute -translate-x-1/2 text-[8px] text-[#252525] font-normal"
+              style={{ left: marker.position }}
+            >
+              {marker.label}
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="flex items-center">
+        <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">{config.percentage}%</p>
+        <div className="mx-3 h-4 w-px bg-[#252525]"></div>
+        <p className="text-[20px] md:text-[25px] font-semibold" style={{ color: config.statusColor }}>{config.status}</p>
+      </div>
+      <div className="flex flex-col gap-[5px]">
+        <span className="text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]">Interpretation:</span>
+        <span className="text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px]">{config.interpretation}</span>
+      </div>
+      <div className="border-b border-[#E1E6ED]"></div>
+      <div className="flex flex-col gap-[5px]">
+        <span className="text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]">Intervention:</span>
+        <span className="text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px] break-words">{config.intervention}</span>
+      </div>
+    </div>
+  );
 
   // Helper functions
   const getWeekOfMonth = (date) => {
     const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-    const firstDayOfWeek = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
-    
-    // Adjust to start week from Monday (if you want Sunday start, remove the adjustment)
+    const firstDayOfWeek = firstDay.getDay();
     const adjustedFirstDay = (firstDayOfWeek === 0) ? 6 : firstDayOfWeek - 1;
-    
     const diff = Math.floor((date.getDate() + adjustedFirstDay - 1) / 7) + 1;
     return diff;
   };
@@ -746,7 +1157,6 @@ export default function Trends() {
         };
       }
       
-      // Get the score based on score type
       let score = 0;
       switch(scoreType) {
         case "absorptive":
@@ -761,7 +1171,7 @@ export default function Trends() {
         case "glucose":
           score = parseInt(item.glucose_metabolism_score) || 0;
           break;
-        case "hepatic":
+        case "hepatic_stress":
           score = parseInt(item.hepatic_stress_metabolism_score) || 0;
           break;
         case "detoxification":
@@ -775,7 +1185,6 @@ export default function Trends() {
       weeklyData[weekKey].count++;
     });
     
-    // Calculate average for each week
     const result = {
       labels: [],
       values: []
@@ -791,126 +1200,100 @@ export default function Trends() {
     return result;
   };
 
-  // Fetch graph data
-  const fetchGraphData = async (mode) => {
-    if (!dieticianId || !profileId) return;
-    
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetchScoreTrend(dieticianId, profileId, mode);
-      if (response.success) {
-        setGraphData(response);
-      } else {
-        setError("Failed to fetch graph data");
-      }
-    } catch (err) {
-      setError(err.message || "An error occurred");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch data when component mounts or time range changes
-  useEffect(() => {
-    fetchGraphData(firstTimeRange);
-  }, [dieticianId, profileId, firstTimeRange]);
-
-  // ---- helpers (labels) ----
   const formatDateLabel = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short" }).replace(",", "");
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        console.error("Invalid date string:", dateString);
+        return "Invalid Date";
+      }
+      
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = date.toLocaleDateString("en-GB", { month: "short" });
+      return `${day} ${month}`;
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Invalid Date";
+    }
   };
 
-  const getLabelsFromApiData = () => {
-    if (!graphData || !graphData.data) return [];
-    return graphData.data.map(item => formatDateLabel(item.date));
-  };
-
-  const getWeeklyLabels = () => {
-    if (graphData && graphData.data) {
-      return getLabelsFromApiData();
+  // Get data based on current time range selection (CLIENT-SIDE FILTERING)
+  const getProcessedData = (scoreType, timeRange) => {
+    if (!graphData || !graphData.data || !graphData.range) {
+      return { labels: [], values: [] };
     }
-    // Fallback to original logic if no API data
-    const today = new Date();
-    const arr = [];
-    for (let i = 6; i >= 0; i--) {
-      const dt = new Date(today);
-      dt.setDate(today.getDate() - i);
-      arr.push(formatDateLabel(dt));
-    }
-    return arr;
-  };
 
-  const getMonthlyWeekLabels = (scoreType = "absorptive") => {
-    if (graphData && graphData.data) {
-      const weeklyData = aggregateDataByWeek(graphData.data, scoreType);
-      return weeklyData.labels;
-    }
-    
-    // Fallback to original logic if no API data
-    const now = new Date();
-    const monthShort = now.toLocaleDateString("en-GB", { month: "short" });
-    const year = now.getFullYear();
-    const month = now.getMonth();
-
-    const firstOfMonth = new Date(year, month, 1);
-    const lastOfMonth = new Date(year, month + 1, 0);
-
-    const start = new Date(firstOfMonth);
-    const day = start.getDay();
-    const diffToMonday = (day + 6) % 7;
-    start.setDate(start.getDate() - diffToMonday);
-
-    const labels = [];
-    let w = 1;
-    let cursor = new Date(start);
-    while (cursor <= lastOfMonth) {
-      labels.push(`Week ${w}`);
-      cursor.setDate(cursor.getDate() + 7);
-      w += 1;
-      if (w > 6) break;
-    }
-    return labels;
-  };
-
-  // ---- helpers (values) ----
-  const getScoreValues = (scoreType, timeRange) => {
-    if (!graphData || !graphData.data) return fitValues(firstLabels.length);
-    
-    if (timeRange === "Monthly") {
-      // For monthly mode, return weekly aggregated values
-      const weeklyData = aggregateDataByWeek(graphData.data, scoreType);
-      return weeklyData.values;
-    } else {
-      // For weekly mode, return daily values
-      return graphData.data.map(item => {
-        switch(scoreType) {
-          case "absorptive":
-            return parseInt(item.absorptive_metabolism_score) || 0;
-          case "fermentative":
-            return parseInt(item.fermentative_metabolism_score) || 0;
-          case "fat":
-            return parseInt(item.fat_metabolism_score) || 0;
-          case "glucose":
-            return parseInt(item.glucose_metabolism_score) || 0;
-          case "hepatic":
-            return parseInt(item.hepatic_stress_metabolism_score) || 0;
-          case "detoxification":
-            return parseInt(item.detoxification_metabolism_score) || 0;
-          default:
-            return 0;
+    // For Weekly view - ensure exactly 7 days from start_date
+    if (timeRange === "Weekly") {
+      const startDate = new Date(graphData.range.start_date);
+      const labels = [];
+      const values = [];
+      
+      // Create exactly 7 days starting from start_date
+      for (let i = 0; i < 7; i++) {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + i);
+        
+        const dateString = currentDate.toISOString().split('T')[0];
+        const formattedLabel = formatDateLabel(dateString);
+        
+        labels.push(formattedLabel);
+        
+        // Find matching data for this date
+        const matchingData = graphData.data.find(item => item.date === dateString);
+        
+        if (matchingData) {
+          // Get the score based on scoreType
+          let score = 0;
+          switch(scoreType) {
+            case "absorptive":
+              score = parseInt(matchingData.absorptive_metabolism_score) || 0;
+              break;
+            case "fermentative":
+              score = parseInt(matchingData.fermentative_metabolism_score) || 0;
+              break;
+            case "fat":
+              score = parseInt(matchingData.fat_metabolism_score) || 0;
+              break;
+            case "glucose":
+              score = parseInt(matchingData.glucose_metabolism_score) || 0;
+              break;
+            case "hepatic_stress":
+              score = parseInt(matchingData.hepatic_stress_metabolism_score) || 0;
+              break;
+            case "detoxification":
+              score = parseInt(matchingData.detoxification_metabolism_score) || 0;
+              break;
+            default:
+              score = 0;
+          }
+          values.push(score);
+        } else {
+          // If no data for this date, push 0
+          values.push(0);
         }
-      });
+      }
+      
+      return { labels, values };
+    } 
+    // For Monthly view - use your existing aggregation
+    else if (timeRange === "Monthly") {
+      const weeklyData = aggregateDataByWeek(graphData.data, scoreType);
+      return weeklyData;
     }
+    
+    return { labels: [], values: [] };
   };
 
-  const baseValues = [30, 42, 55, 48, 60, 54, 62];
-  const fitValues = (desiredLen) => {
-    if (desiredLen === baseValues.length) return baseValues;
-    if (desiredLen < baseValues.length) return baseValues.slice(0, desiredLen);
-    const extra = Array.from({ length: desiredLen - baseValues.length }, () => baseValues[baseValues.length - 1]);
-    return [...baseValues, ...extra];
+  // Smooth dropdown handlers - NO API CALLS
+  const handleFirstTimeRangeChange = (newRange) => {
+    setFirstTimeRange(newRange);
+    setFirstShowDropdown(false);
+  };
+
+  const handleSecondTimeRangeChange = (newRange) => {
+    setSecondTimeRange(newRange);
+    setSecondShowDropdown(false);
   };
 
   const tabs = [
@@ -918,9 +1301,6 @@ export default function Trends() {
     { label: "Glucose -Vs- Fat", color: "#3FAF58" },
     { label: "Liver Heptic", color: "#3FAF58" },
   ]
-
-  const firstSectionPercentage = 80;
-  const secondSectionPercentage = 20;
 
   const getTitles = () => {
     switch(active) {
@@ -940,9 +1320,9 @@ export default function Trends() {
         };
       case "Liver Heptic":
         return { 
-          firstTitle: "Heptic Metabolism Score", 
+          firstTitle: "Hepatic Stress Score", 
           secondTitle: "Detoxification Metabolism Score",
-          firstScoreType: "hepatic",
+          firstScoreType: "hepatic_stress",
           secondScoreType: "detoxification"
         };
       default:
@@ -954,40 +1334,19 @@ export default function Trends() {
         };
     }
   };
+
   const titles = getTitles();
 
-  // Compute labels per section based on dropdown
-  const firstLabels = useMemo(
-    () => (firstTimeRange === "Weekly" ? getWeeklyLabels() : getMonthlyWeekLabels(titles.firstScoreType)),
-    [firstTimeRange, graphData, titles.firstScoreType]
-  );
-  const secondLabels = useMemo(
-    () => (secondTimeRange === "Weekly" ? getWeeklyLabels() : getMonthlyWeekLabels(titles.secondScoreType)),
-    [secondTimeRange, graphData, titles.secondScoreType]
+  // Get processed data for each section using client-side filtering
+  const firstSectionData = useMemo(() => 
+    getProcessedData(titles.firstScoreType, firstTimeRange), 
+    [graphData, titles.firstScoreType, firstTimeRange]
   );
 
-  // Fit values length to labels length for each section
-  const firstValues = useMemo(() => 
-    getScoreValues(titles.firstScoreType, firstTimeRange), 
-    [graphData, titles.firstScoreType, firstLabels, firstTimeRange]
+  const secondSectionData = useMemo(() => 
+    getProcessedData(titles.secondScoreType, secondTimeRange), 
+    [graphData, titles.secondScoreType, secondTimeRange]
   );
-  const secondValues = useMemo(() => 
-    getScoreValues(titles.secondScoreType, secondTimeRange), 
-    [graphData, titles.secondScoreType, secondLabels, secondTimeRange]
-  );
-
-  // Handle time range change
-  const handleFirstTimeRangeChange = (newRange) => {
-    setFirstTimeRange(newRange);
-    setFirstShowDropdown(false);
-    fetchGraphData(newRange);
-  };
-
-  const handleSecondTimeRangeChange = (newRange) => {
-    setSecondTimeRange(newRange);
-    setSecondShowDropdown(false);
-    fetchGraphData(newRange);
-  };
 
   if (loading) {
     return <div className="flex-1 min-w-0 rounded-[15px] mx-2 p-4">Loading graph data...</div>;
@@ -1034,9 +1393,13 @@ export default function Trends() {
         </div>
 
         <div className="flex flex-col gap-9 pt-1.5 pl-[5px] pr-[13px] rounded-[15px]">
-          <div className="flex flex-col gap-[5px] px-[15px] py-[18px] bg-[#F0F0F0] rounded-[15px]">
-            <span className="text-[#252525] text-[12px] font-semibold leading-[130%] tracking-[-0.24px]">Main Marker: Hydrogen</span>
-            <span className="text-[#252525] text-[20px] font-semibold leading-[110%] tracking-[-0.4px]">4.752 ppm</span>
+         <div className="flex flex-col gap-[5px] px-[15px] py-[18px] bg-[#F0F0F0] rounded-[15px]">
+            <span className="text-[#252525] text-[12px] font-semibold leading-[130%] tracking-[-0.24px]">
+              Main Marker: {activeMarker.name}
+            </span>
+            <span className="text-[#252525] text-[20px] font-semibold leading-[110%] tracking-[-0.4px]">
+              {activeMarker.value ? `${activeMarker.value} ${activeMarker.unit}` : "-"}
+            </span>
           </div>
 
           <div className="flex flex-col gap-[42px]">
@@ -1084,40 +1447,21 @@ export default function Trends() {
                       </div>
                     </div>
                   </div>
-                  {/* Pass computed labels/values */}
-                  <Graph title={titles.firstTitle} labels={firstLabels} values={firstValues} />
+                  
+                  {/* Show API message or Graph component */}
+                  {apiMessage ? (
+                    <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="text-center">
+                        <p className="text-gray-500 text-lg font-medium">{apiMessage}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <Graph title={titles.firstTitle} labels={firstSectionData.labels} values={firstSectionData.values} />
+                  )}
                 </div>
 
-                <div className="flex flex-col gap-5 w-full lg:w-auto">
-                  <div className="flex flex-col gap-[5px] w-full relative">
-                    <div className="w-full rounded-full h-2.5 flex gap-0.5 overflow-hidden relative">
-                      <div className="bg-[#DA5747] h-2.5 rounded-[5px]" style={{ width: "30%" }}></div>
-                      <div className="bg-[#FFC412] h-2.5 rounded-[5px]" style={{ width: "40%" }}></div>
-                      <div className="bg-[#3FAF58] h-2.5 rounded-[5px]" style={{ width: "30%" }}></div>
-                      <div className="absolute top-1/2 w-[11px] h-[22px] border-[10px] border-[#252525] rounded-[10px] transform -translate-y-1/2" style={{ left: `${firstSectionPercentage}%` }}></div>
-                    </div>
-                    <div className="relative w-full">
-                      <span className="absolute -translate-x-1/2 text-[8px] text-[#252525] font-normal">0</span>
-                      <span className="absolute -translate-x-1/2 text-[8px] text-[#252525] font-normal" style={{ left: "30%" }}>60</span>
-                      <span className="absolute -translate-x-1/2 text-[8px] text-[#252525] font-normal" style={{ left: "70%" }}>80</span>
-                      <span className="absolute right-0 text-[8px] text-[#252525] font-normal">100</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">{firstSectionPercentage}%</p>
-                    <div className="mx-3 h-4 w-px bg-[#252525]"></div>
-                    <p className="text-[#3FAF58] text-[20px] md:text-[25px] font-semibold">Good</p>
-                  </div>
-                  <div className="flex flex-col gap-[5px]">
-                    <span className="text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]">Interpretation:</span>
-                    <span className="text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px]">Likely malabsorption; prefer smaller meals and easy-to-digest proteins</span>
-                  </div>
-                  <div className="border-b border-[#E1E6ED]"></div>
-                  <div className="flex flex-col gap-[5px]">
-                    <span className="text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]">Interpretation:</span>
-                    <span className="text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px] break-words">2–6 week low-FODMAP trial with structured re-introduction; smaller, evenly spaced meals; prefer curd/paneer/eggs if tolerated </span>
-                  </div>
-                </div>
+                {/* Progress Bar Section - First */}
+                <ProgressBarSection config={progressBarConfigs[0]} />
 
               </div>
             </div>
@@ -1166,40 +1510,21 @@ export default function Trends() {
                       </div>
                     </div>
                   </div>
-                  {/* Pass computed labels/values */}
-                  <Graph title={titles.secondTitle} labels={secondLabels} values={secondValues} />
+                  
+                  {/* Show API message or Graph component */}
+                  {apiMessage ? (
+                    <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="text-center">
+                        <p className="text-gray-500 text-lg font-medium">{apiMessage}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <Graph title={titles.secondTitle} labels={secondSectionData.labels} values={secondSectionData.values} />
+                  )}
                 </div>
 
-                <div className="flex flex-col gap-5 w-full lg:w-auto">
-                  <div className="flex flex-col gap-[5px] w-full relative">
-                    <div className="w-full rounded-full h-2.5 flex gap-0.5 overflow-hidden relative">
-                      <div className="bg-[#3FAF58] h-2.5 rounded-[5px]" style={{ width: "30%" }}></div>
-                      <div className="bg-[#FFC412] h-2.5 rounded-[5px]" style={{ width: "40%" }}></div>
-                      <div className="bg-[#DA5747] h-2.5 rounded-[5px]" style={{ width: "30%" }}></div>
-                      <div className="absolute top-1/2 w-[11px] h-[22px] border-[10px] border-[#252525] rounded-[10px] transform -translate-y-1/2" style={{ left: `${secondSectionPercentage}%` }}></div>
-                    </div>
-                    <div className="relative w-full">
-                      <span className="absolute -translate-x-1/2 text-[8px] text-[#252525] font-normal">0</span>
-                      <span className="absolute -translate-x-1/2 text-[8px] text-[#252525] font-normal" style={{ left: "30%" }}>60</span>
-                      <span className="absolute -translate-x-1/2 text-[#252525] text-[8px] font-normal" style={{ left: "70%" }}>80</span>
-                      <span className="absolute right-0 text-[8px] text-[#252525] font-normal">100</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">{secondSectionPercentage}%</p>
-                    <div className="mx-3 h-4 w-px bg-[#252525]"></div>
-                    <p className="text-[#3FAF58] text-[20px] md:text-[25px] font-semibold">Good</p>
-                  </div>
-                  <div className="flex flex-col gap-[5px]">
-                    <span className="text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]">Interpretation:</span>
-                    <span className="text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px]">Likely malabsorption; prefer smaller meals and easy-to-digest proteins</span>
-                  </div>
-                  <div className="border-b border-[#E1E6ED]"></div>
-                  <div className="flex flex-col gap-[5px]">
-                    <span className="text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]">Interpretation:</span>
-                    <span className="text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px] break-words">2–6 week low-FODMAP trial with structured re-introduction; smaller, evenly spaced meals; prefer curd/paneer/eggs if tolerated </span>
-                  </div>
-                </div>
+                {/* Progress Bar Section - Second */}
+                <ProgressBarSection config={progressBarConfigs[1]} />
 
               </div>
             </div>

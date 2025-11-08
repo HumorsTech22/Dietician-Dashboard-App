@@ -44,33 +44,25 @@ const SoftShadow = {
 
 ChartJS.register(SoftShadow);
 
-// hex → rgba helper
-function hexToRgba(hex, alpha = 1) {
-    const h = hex.replace("#", "");
-    const f = h.length === 3 ? h.split("").map(c => c + c).join("") : h;
-    const r = parseInt(f.slice(0, 2), 16);
-    const g = parseInt(f.slice(2, 4), 16);
-    const b = parseInt(f.slice(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
 export default function Graph({
     title = "",
-    labels = ["05 Aug", "06 Aug", "07 Aug", "07 Aug", "07 Aug", "07 Aug", "07 Aug"],
-    values = [30, 65, 55, 48, 60, 54, 62],
+    labels = [],
+    values = [],
     color = "#DA5747",
 }) {
     const data = useMemo(() => ({
         labels,
         datasets: [{
             label: "Score",
-            data: values.map(v => (typeof v === "string" ? Number(v) : v)),
+            data: values.map(v => {
+                const numValue = typeof v === "string" ? Number(v) : v;
+                return isNaN(numValue) ? 0 : numValue; // Handle NaN values
+            }),
             borderColor: color,
             borderWidth: 3,
             pointRadius: 0,
             tension: 0.45,                 // smooth curve like the mock
             fill: true,
-
             backgroundColor: (ctx) => {
                 const { chartArea, ctx: c } = ctx.chart;
                 if (!chartArea) return "rgba(218,87,71,0.3)"; // fallback
@@ -80,7 +72,6 @@ export default function Graph({
                 g.addColorStop(1, "rgba(218,87,71,0)");   // bottom color transparent
                 return g;
             }
-
         }],
     }), [labels, values, color]);
 
@@ -100,8 +91,9 @@ export default function Graph({
         plugins: {
             legend: { display: false },
             title: { display: false },
-            tooltip: { intersect: false, mode: "index" },
-            tooltip: {
+            tooltip: { 
+                intersect: false, 
+                mode: "index",
                 enabled: false,
             },
             softShadow: { color: "rgba(218,87,71,0.45)", blur: 0 },
@@ -115,7 +107,7 @@ export default function Graph({
         layout: { padding: { top: 8 } },
         scales: {
             y: {
-                min: 20,
+                min: 0,
                 max: 100,
                 ticks: {
                     stepSize: 20,
@@ -145,18 +137,12 @@ export default function Graph({
 
     return (
         <div className="w-full">
-            {/* <div className="flex justify-center mb-2">
-                <span className="text-[#535359] text-[12px] leading-[110%] tracking-[-0.24px]">
-                    {title}
-                </span>
-            </div> */}
-
-            
-                <Line data={data} options={options}
+            <Line 
+                data={data} 
+                options={options}
                 // width={400}   
                 // height={180}  
-                />
-           
+            />
         </div>
     );
 }
