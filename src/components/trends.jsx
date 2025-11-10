@@ -116,7 +116,7 @@
 //                           </span>
 //                           <IoIosArrowDown className="w-5 h-5 cursor-pointer" />
 //                         </div>
-                        
+
 //                         {/* First Dropdown Menu */}
 //                         {firstShowDropdown && (
 //                           <div className="absolute top-full left-0 mt-1 w-full bg-white border border-[#D9D9D9] rounded-[5px] shadow-lg z-10">
@@ -235,7 +235,7 @@
 //                           </span>
 //                           <IoIosArrowDown className="w-5 h-5 cursor-pointer" />
 //                         </div>
-                        
+
 //                         {/* Second Dropdown Menu */}
 //                         {secondShowDropdown && (
 //                           <div className="absolute top-full left-0 mt-1 w-full bg-white border border-[#D9D9D9] rounded-[5px] shadow-lg z-10">
@@ -277,7 +277,7 @@
 //                         className="bg-[#3FAF58] h-2.5 rounded-[5px]"
 //                         style={{ width: "30%" }}
 //                       ></div>
-                      
+
 //                       <div
 //                         className="bg-[#FFC412] h-2.5 rounded-[5px]"
 //                         style={{ width: "40%" }}
@@ -524,7 +524,7 @@
 //                           </span>
 //                           <IoIosArrowDown className="w-5 h-5 cursor-pointer" />
 //                         </div>
-                        
+
 //                         {firstShowDropdown && (
 //                           <div className="absolute top-full left-0 mt-1 w-full bg-white border border-[#D9D9D9] rounded-[5px] shadow-lg z-10">
 //                             <div 
@@ -606,7 +606,7 @@
 //                           </span>
 //                           <IoIosArrowDown className="w-5 h-5 cursor-pointer" />
 //                         </div>
-                        
+
 //                         {secondShowDropdown && (
 //                           <div className="absolute top-full left-0 mt-1 w-full bg-white border border-[#D9D9D9] rounded-[5px] shadow-lg z-10">
 //                             <div 
@@ -695,11 +695,11 @@ import Graph from "./graph";
 import { fetchScoreTrend, fetchScoresInsight } from "../services/authService";
 import { useSearchParams } from "next/navigation";
 
-export default function Trends({selectedDate}) {
+export default function Trends({ selectedDate }) {
   const searchParams = useSearchParams();
   const dieticianId = searchParams.get('dietician_id');
   const profileId = searchParams.get('profile_id');
-  
+
   const [active, setActive] = useState("Gut Fermentation")
   const [firstTimeRange, setFirstTimeRange] = useState("Weekly")
   const [secondTimeRange, setSecondTimeRange] = useState("Weekly")
@@ -707,7 +707,6 @@ export default function Trends({selectedDate}) {
   const [secondShowDropdown, setSecondShowDropdown] = useState(false)
   const [graphData, setGraphData] = useState(null)
   const [scoresInsightData, setScoresInsightData] = useState(null)
-  console.log("scoresInsightData712:-", scoresInsightData);
   const [loading, setLoading] = useState(false)
   const [scoresLoading, setScoresLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -716,23 +715,23 @@ export default function Trends({selectedDate}) {
   // Function to format date to YYYY-MM-DD
   const formatDateToYYYYMMDD = (date) => {
     if (!date) return null;
-    
+
     // If it's already a string in YYYY-MM-DD format, return as is
     if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
       return date;
     }
-    
+
     // If it's a Date object or string that needs formatting
     const dateObj = new Date(date);
     if (isNaN(dateObj.getTime())) {
       console.error("Invalid date:", date);
       return null;
     }
-    
+
     const year = dateObj.getFullYear();
     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
     const day = String(dateObj.getDate()).padStart(2, '0');
-    
+
     return `${year}-${month}-${day}`;
   };
 
@@ -740,7 +739,7 @@ export default function Trends({selectedDate}) {
   useEffect(() => {
     const fetchInitialData = async () => {
       if (!dieticianId || !profileId) return;
-      
+
       setLoading(true);
       setError(null);
       setApiMessage(null);
@@ -769,27 +768,25 @@ export default function Trends({selectedDate}) {
   useEffect(() => {
     const fetchScoresData = async () => {
       if (!dieticianId || !profileId || !selectedDate) return;
-      
+
       // Format the date to YYYY-MM-DD
       const formattedDate = formatDateToYYYYMMDD(selectedDate);
       if (!formattedDate) {
         console.error("Invalid date format, cannot fetch scores insight");
         return;
       }
-      
-      console.log("Fetching scores insight for date:", formattedDate);
-      
+
       setScoresLoading(true);
       try {
         const response = await fetchScoresInsight(dieticianId, profileId, formattedDate);
-        console.log("response787:-", response);
-       if (response && response.latest_test) {
-        setScoresInsightData(response);
-        console.log("✅ scoresInsightData set successfully");
-      } else {
-        console.log("❌ API response missing latest_test data");
-        setScoresInsightData(null);
-      }
+
+        if (response.noData) {
+          setScoresInsightData(null);
+        } else if (response && response.latest_test) {
+          setScoresInsightData(response);
+        } else {
+          setScoresInsightData(null);
+        }
       } catch (err) {
         console.error("Error fetching scores insight:", err);
         setScoresInsightData(null);
@@ -801,10 +798,10 @@ export default function Trends({selectedDate}) {
     fetchScoresData();
   }, [dieticianId, profileId, selectedDate]);
 
-  
+
   // Get active marker based on tab
   const getActiveMarker = () => {
-    switch(active) {
+    switch (active) {
       case "Gut Fermentation":
         return {
           name: "Hydrogen",
@@ -813,7 +810,7 @@ export default function Trends({selectedDate}) {
         };
       case "Glucose -Vs- Fat":
         return {
-          name: "Acetone", 
+          name: "Acetone",
           value: scoresInsightData?.latest_test?.ppm?.acetone,
           unit: "ppm"
         };
@@ -836,6 +833,11 @@ export default function Trends({selectedDate}) {
 
   // Get progress bar configuration from scores insight data
   const getProgressBarConfigs = () => {
+
+    if (scoresInsightData?.noData) {
+      return getNoDataProgressBarConfigs(); // Show "No Data" message
+    }
+
     if (!scoresInsightData || !scoresInsightData.latest_test) {
       // Return default config if no data
       return getDefaultProgressBarConfigs();
@@ -843,9 +845,7 @@ export default function Trends({selectedDate}) {
 
     const testJson = scoresInsightData.latest_test.test_json;
     const scores = scoresInsightData.latest_test.scores;
-    
-    console.log("testJson851:-", testJson);
-    console.log("scores853:-", scores);
+
 
     // Check if we have actual data or just raw blob
     const hasActualData = testJson && testJson.Metabolism_Score_Analysis;
@@ -861,7 +861,7 @@ export default function Trends({selectedDate}) {
       const metabolismData = testJson.Metabolism_Score_Analysis;
 
       const getZoneColor = (zone) => {
-        switch(zone) {
+        switch (zone) {
           case "Good": return "#3FAF58";
           case "Fair": return "#FFC412";
           case "Poor": return "#DA5747";
@@ -892,7 +892,7 @@ export default function Trends({selectedDate}) {
       };
 
       // Return different data based on active tab
-      switch(active) {
+      switch (active) {
         case "Gut Fermentation":
           return [
             {
@@ -1090,23 +1090,23 @@ export default function Trends({selectedDate}) {
       <div className="flex flex-col gap-[5px] w-full relative">
         <div className="w-full rounded-full h-2.5 flex gap-0.5 overflow-hidden relative">
           {config.colors.map((colorConfig, index) => (
-            <div 
+            <div
               key={index}
-              className="h-2.5 rounded-[5px]" 
-              style={{ 
-                backgroundColor: colorConfig.color, 
-                width: colorConfig.width 
+              className="h-2.5 rounded-[5px]"
+              style={{
+                backgroundColor: colorConfig.color,
+                width: colorConfig.width
               }}
             />
           ))}
-          <div 
-            className="absolute top-1/2 w-[11px] h-[22px] border-[10px] border-[#252525] rounded-[10px] transform -translate-y-1/2" 
+          <div
+            className="absolute top-1/2 w-[11px] h-[22px] border-[10px] border-[#252525] rounded-[10px] transform -translate-y-1/2"
             style={{ left: `${config.percentage}%` }}
           />
         </div>
         <div className="relative w-full">
           {config.markers.map((marker, index) => (
-            <span 
+            <span
               key={index}
               className="absolute -translate-x-1/2 text-[8px] text-[#252525] font-normal"
               style={{ left: marker.position }}
@@ -1144,21 +1144,21 @@ export default function Trends({selectedDate}) {
 
   const aggregateDataByWeek = (data, scoreType) => {
     const weeklyData = {};
-    
+
     data.forEach(item => {
       const date = new Date(item.date);
       const weekNumber = getWeekOfMonth(date);
       const weekKey = `Week ${weekNumber}`;
-      
+
       if (!weeklyData[weekKey]) {
         weeklyData[weekKey] = {
           values: [],
           count: 0
         };
       }
-      
+
       let score = 0;
-      switch(scoreType) {
+      switch (scoreType) {
         case "absorptive":
           score = parseInt(item.absorptive_metabolism_score) || 0;
           break;
@@ -1180,23 +1180,23 @@ export default function Trends({selectedDate}) {
         default:
           score = 0;
       }
-      
+
       weeklyData[weekKey].values.push(score);
       weeklyData[weekKey].count++;
     });
-    
+
     const result = {
       labels: [],
       values: []
     };
-    
+
     Object.keys(weeklyData).sort().forEach(week => {
       const weekData = weeklyData[week];
       const average = weekData.values.reduce((sum, val) => sum + val, 0) / weekData.values.length;
       result.labels.push(week);
       result.values.push(Math.round(average));
     });
-    
+
     return result;
   };
 
@@ -1207,7 +1207,7 @@ export default function Trends({selectedDate}) {
         console.error("Invalid date string:", dateString);
         return "Invalid Date";
       }
-      
+
       const day = String(date.getDate()).padStart(2, '0');
       const month = date.toLocaleDateString("en-GB", { month: "short" });
       return `${day} ${month}`;
@@ -1228,24 +1228,24 @@ export default function Trends({selectedDate}) {
       const startDate = new Date(graphData.range.start_date);
       const labels = [];
       const values = [];
-      
+
       // Create exactly 7 days starting from start_date
       for (let i = 0; i < 7; i++) {
         const currentDate = new Date(startDate);
         currentDate.setDate(startDate.getDate() + i);
-        
+
         const dateString = currentDate.toISOString().split('T')[0];
         const formattedLabel = formatDateLabel(dateString);
-        
+
         labels.push(formattedLabel);
-        
+
         // Find matching data for this date
         const matchingData = graphData.data.find(item => item.date === dateString);
-        
+
         if (matchingData) {
           // Get the score based on scoreType
           let score = 0;
-          switch(scoreType) {
+          switch (scoreType) {
             case "absorptive":
               score = parseInt(matchingData.absorptive_metabolism_score) || 0;
               break;
@@ -1273,15 +1273,15 @@ export default function Trends({selectedDate}) {
           values.push(0);
         }
       }
-      
+
       return { labels, values };
-    } 
+    }
     // For Monthly view - use your existing aggregation
     else if (timeRange === "Monthly") {
       const weeklyData = aggregateDataByWeek(graphData.data, scoreType);
       return weeklyData;
     }
-    
+
     return { labels: [], values: [] };
   };
 
@@ -1303,31 +1303,31 @@ export default function Trends({selectedDate}) {
   ]
 
   const getTitles = () => {
-    switch(active) {
+    switch (active) {
       case "Gut Fermentation":
-        return { 
-          firstTitle: "Absorptive Metabolism Score", 
+        return {
+          firstTitle: "Absorptive Metabolism Score",
           secondTitle: "Fermentative Metabolism Score",
           firstScoreType: "absorptive",
           secondScoreType: "fermentative"
         };
       case "Glucose -Vs- Fat":
-        return { 
-          firstTitle: "Fat Metabolism Score", 
+        return {
+          firstTitle: "Fat Metabolism Score",
           secondTitle: "Glucose Metabolism Score",
           firstScoreType: "fat",
           secondScoreType: "glucose"
         };
       case "Liver Heptic":
-        return { 
-          firstTitle: "Hepatic Stress Score", 
+        return {
+          firstTitle: "Hepatic Stress Score",
           secondTitle: "Detoxification Metabolism Score",
           firstScoreType: "hepatic_stress",
           secondScoreType: "detoxification"
         };
       default:
-        return { 
-          firstTitle: "Absorptive Metabolism Score", 
+        return {
+          firstTitle: "Absorptive Metabolism Score",
           secondTitle: "Fermentative Metabolism Score",
           firstScoreType: "absorptive",
           secondScoreType: "fermentative"
@@ -1338,13 +1338,13 @@ export default function Trends({selectedDate}) {
   const titles = getTitles();
 
   // Get processed data for each section using client-side filtering
-  const firstSectionData = useMemo(() => 
-    getProcessedData(titles.firstScoreType, firstTimeRange), 
+  const firstSectionData = useMemo(() =>
+    getProcessedData(titles.firstScoreType, firstTimeRange),
     [graphData, titles.firstScoreType, firstTimeRange]
   );
 
-  const secondSectionData = useMemo(() => 
-    getProcessedData(titles.secondScoreType, secondTimeRange), 
+  const secondSectionData = useMemo(() =>
+    getProcessedData(titles.secondScoreType, secondTimeRange),
     [graphData, titles.secondScoreType, secondTimeRange]
   );
 
@@ -1393,7 +1393,7 @@ export default function Trends({selectedDate}) {
         </div>
 
         <div className="flex flex-col gap-9 pt-1.5 pl-[5px] pr-[13px] rounded-[15px]">
-         <div className="flex flex-col gap-[5px] px-[15px] py-[18px] bg-[#F0F0F0] rounded-[15px]">
+          <div className="flex flex-col gap-[5px] px-[15px] py-[18px] bg-[#F0F0F0] rounded-[15px]">
             <span className="text-[#252525] text-[12px] font-semibold leading-[130%] tracking-[-0.24px]">
               Main Marker: {activeMarker.name}
             </span>
@@ -1409,12 +1409,12 @@ export default function Trends({selectedDate}) {
                 <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.6px]">{titles.firstTitle}</span>
               </div>
               <div className="flex flex-col lg:flex-row gap-[30px] items-start">
-
-                <div className="flex-1 min-w-0 w-full">
+                {/* Graph Section - 50% width */}
+                <div className="flex-1 w-full lg:w-1/2 min-w-0">
                   <div className="mx-[15px] my-4">
-                    <div className="flex justify-between ">
+                    <div className="flex justify-between">
                       <div className="relative">
-                        <div 
+                        <div
                           className="flex gap-6 items-center rounded-[5px] border border-[#D9D9D9] bg-white py-[11px] px-[15px] cursor-pointer"
                           onClick={() => setFirstShowDropdown(!firstShowDropdown)}
                         >
@@ -1423,10 +1423,10 @@ export default function Trends({selectedDate}) {
                           </span>
                           <IoIosArrowDown className="w-5 h-5 cursor-pointer" />
                         </div>
-                        
+
                         {firstShowDropdown && (
                           <div className="absolute top-full left-0 mt-1 w-full bg-white border border-[#D9D9D9] rounded-[5px] shadow-lg z-10">
-                            <div 
+                            <div
                               className="py-[11px] px-[15px] hover:bg-gray-50 cursor-pointer"
                               onClick={() => handleFirstTimeRangeChange("Weekly")}
                             >
@@ -1434,7 +1434,7 @@ export default function Trends({selectedDate}) {
                                 Weekly
                               </span>
                             </div>
-                            <div 
+                            <div
                               className="py-[11px] px-[15px] hover:bg-gray-50 cursor-pointer"
                               onClick={() => handleFirstTimeRangeChange("Monthly")}
                             >
@@ -1447,7 +1447,7 @@ export default function Trends({selectedDate}) {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Show API message or Graph component */}
                   {apiMessage ? (
                     <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg border border-gray-200">
@@ -1460,9 +1460,10 @@ export default function Trends({selectedDate}) {
                   )}
                 </div>
 
-                {/* Progress Bar Section - First */}
-                <ProgressBarSection config={progressBarConfigs[0]} />
-
+                {/* Progress Bar Section - 50% width */}
+                <div className="flex-1 w-full lg:w-1/2 min-w-0">
+                  <ProgressBarSection config={progressBarConfigs[0]} />
+                </div>
               </div>
             </div>
 
@@ -1472,12 +1473,12 @@ export default function Trends({selectedDate}) {
                 <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.6px]">{titles.secondTitle}</span>
               </div>
               <div className="flex flex-col lg:flex-row gap-[30px] items-start">
-
-                <div className="flex-1 min-w-0 w-full">
+                {/* Graph Section - 50% width */}
+                <div className="flex-1 w-full lg:w-1/2 min-w-0">
                   <div className="mx-[15px] my-4">
-                    <div className="flex justify-between ">
+                    <div className="flex justify-between">
                       <div className="relative">
-                        <div 
+                        <div
                           className="flex gap-6 items-center rounded-[5px] border border-[#D9D9D9] bg-white py-[11px] px-[15px] cursor-pointer"
                           onClick={() => setSecondShowDropdown(!secondShowDropdown)}
                         >
@@ -1486,10 +1487,10 @@ export default function Trends({selectedDate}) {
                           </span>
                           <IoIosArrowDown className="w-5 h-5 cursor-pointer" />
                         </div>
-                        
+
                         {secondShowDropdown && (
                           <div className="absolute top-full left-0 mt-1 w-full bg-white border border-[#D9D9D9] rounded-[5px] shadow-lg z-10">
-                            <div 
+                            <div
                               className="py-[11px] px-[15px] hover:bg-gray-50 cursor-pointer"
                               onClick={() => handleSecondTimeRangeChange("Weekly")}
                             >
@@ -1497,7 +1498,7 @@ export default function Trends({selectedDate}) {
                                 Weekly
                               </span>
                             </div>
-                            <div 
+                            <div
                               className="py-[11px] px-[15px] hover:bg-gray-50 cursor-pointer"
                               onClick={() => handleSecondTimeRangeChange("Monthly")}
                             >
@@ -1510,7 +1511,7 @@ export default function Trends({selectedDate}) {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Show API message or Graph component */}
                   {apiMessage ? (
                     <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg border border-gray-200">
@@ -1523,9 +1524,10 @@ export default function Trends({selectedDate}) {
                   )}
                 </div>
 
-                {/* Progress Bar Section - Second */}
-                <ProgressBarSection config={progressBarConfigs[1]} />
-
+                {/* Progress Bar Section - 50% width */}
+                <div className="flex-1 w-full lg:w-1/2 min-w-0">
+                  <ProgressBarSection config={progressBarConfigs[1]} />
+                </div>
               </div>
             </div>
           </div>

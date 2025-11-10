@@ -1,37 +1,118 @@
 "use client"
 import Image from 'next/image'
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { IoIosArrowForward } from "react-icons/io";
 import { usePathname } from 'next/navigation'
 import CreateDietPlan from './create-diet-plan';
 import Summary from './summary';
 import TestLogInfo from './testloginfo';
 import DietPlanCreated from './diet-plan-created';
+import { useSelector, useDispatch } from 'react-redux';
+import { setUploadedFile } from '@/store/pdfSlice';
+import { toast } from 'sonner';
 
 export default function Preview() {
   const pathname = (usePathname() || '').toLowerCase();
+  const dispatch = useDispatch();
+  const fileInputRef = useRef(null);
 
   const isDietPlan = pathname.includes('/dietplan') || pathname.endsWith('/diet-plan');
   const hideActions = pathname.includes('/testlog-info');
-  const hideTestLogOnPlanSummary =
-    pathname.includes('/plan-summary') || pathname.endsWith('/plansummary');
+  const hideTestLogOnPlanSummary = pathname.includes('/plan-summary') || pathname.endsWith('/plansummary');
 
-  // now track summary | testlog | dietplan
-  const [activePanel, setActivePanel] = useState('summary'); 
+  const pdfData = useSelector((state) => state.pdf);
+
+  const [activePanel, setActivePanel] = useState('summary');
+
+
+
+  // Cleanup blob URLs on component unmount
+  useEffect(() => {
+    return () => {
+      if (pdfData.blobUrl) {
+        URL.revokeObjectURL(pdfData.blobUrl);
+      }
+    };
+  }, [pdfData.blobUrl]);
+
+  const handleReupload = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf") {
+      toast.error("Please upload a valid PDF file");
+      return;
+    }
+
+    try {
+      // Clean up previous blob URL if exists
+      if (pdfData.blobUrl) {
+        URL.revokeObjectURL(pdfData.blobUrl);
+      }
+
+      // Create new blob URL
+      const newBlobUrl = URL.createObjectURL(file);
+      
+      // Dispatch action to update Redux state with new file
+      dispatch(
+        setUploadedFile({
+          file: file,
+          blobUrl: newBlobUrl,
+          fileName: file.name,
+        })
+      );
+
+      toast.success(`File re-uploaded: ${file.name}`);
+      
+      // Reset the file input to allow re-uploading the same file
+      event.target.value = '';
+
+    } catch (error) {
+      console.error("Error during re-upload:", error);
+      toast.error("Failed to re-upload file");
+    }
+  };
+
+  const handleReuploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+    const handleSummaryConfirmNext = () => {
+    setActivePanel('testlog');
+  };
+
+  const handleTestLogConfirmNext = () => {
+    setActivePanel('dietplan');
+  };
 
   return (
     <div className='overflow-hidden w-full bg-white rounded-[15px]  p-[15px] '>
       <div className='flex justify-between'>
         <p className='text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]'>Preview</p>
         <div className='flex gap-[25px] items-center pb-2.5'>
-          <span className='text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Sagar Hosur_diet.pdf</span>
-          <div className='flex gap-1.5 px-5 py-[15px] border border-[#D9D9D9] rounded-[10px] '>
+          <span className='text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>
+            {pdfData?.fileName || 'please_upload.pdf'}
+          </span>
+          
+          {/* Hidden file input for re-upload */}
+          <input
+            type="file"
+            accept=".pdf,application/pdf"
+            onChange={handleReupload}
+            ref={fileInputRef}
+            className="hidden"
+          />
+          
+          {/* Re-upload button */}
+          <div 
+            className='flex gap-1.5 px-5 py-[15px] border border-[#D9D9D9] rounded-[10px] cursor-pointer hover:bg-gray-50 transition-colors'
+            onClick={handleReuploadClick}
+          >
             <Image
               src="/icons/hugeicons_rotate-01.svg"
               alt='hugeicons_rotate-01'
               width={20}
               height={20}
-            
             />
             <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Re-upload</span>
           </div>
@@ -97,10 +178,9 @@ export default function Preview() {
                 </div>
 
                 {/* Right side content based on activePanel */}
-                {activePanel === 'summary' && <Summary />}
-                {activePanel === 'testlog' && <TestLogInfo />}
-                {/* {activePanel === 'dietplan' && <CreateDietPlan />}  */}
-               {activePanel === 'dietplan' && <DietPlanCreated />} 
+                {activePanel === 'summary' && <Summary onConfirmNext={handleSummaryConfirmNext}/>}
+                {activePanel === 'testlog' && <TestLogInfo onConfirmNext={handleTestLogConfirmNext}/>}
+                {activePanel === 'dietplan' && <DietPlanCreated />}
               </div>
             )}
 
@@ -152,8 +232,8 @@ export default function Preview() {
                 </div>
 
                 {/* Right side content again */}
-                {activePanel === 'summary' && <Summary />}
-                {activePanel === 'testlog' && <TestLogInfo />}
+                {activePanel === 'summary' && <Summary onConfirmNext={handleSummaryConfirmNext}/>}
+                {activePanel === 'testlog' && <TestLogInfo onConfirmNext={handleTestLogConfirmNext}/>}
                 {activePanel === 'dietplan' && <CreateDietPlan />}
               </div>
             )}

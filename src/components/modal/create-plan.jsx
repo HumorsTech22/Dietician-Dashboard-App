@@ -1,19 +1,43 @@
 "use client";
 
 import { Modal } from "react-responsive-modal";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
+import { toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { setUploadedFile as setPdfUploadedFile } from "@/store/pdfSlice";
 
 export default function CreatePlanModal({ open, onClose }) {
-  const router = useRouter();
+ const router = useRouter();
+  const dispatch = useDispatch();
 
   const [selectedPlan, setSelectedPlan] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadedFile, setLocalUploadedFile] = useState(null);
+  const [blobUrl, setBlobUrl] = useState(null);
+  const [urlParams, setUrlParams] = useState({ dietician_id: null, profile_id: null });
+
+  // Get parameters from URL safely on client side
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      setUrlParams({
+        dietician_id: searchParams.get('dietician_id'),
+        profile_id: searchParams.get('profile_id')
+      });
+    }
+  }, []);
+
+  // cleanup blob url if created
+  useEffect(() => {
+    return () => {
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+    };
+  }, [blobUrl]);
 
   const options = [
-    // { value: "auto", label: "Automatically fill" },
-       { value: "auto", label: "Upload Files" },
+    { value: "auto", label: "Upload Files" },
     { value: "manual", label: "Manual fill" },
     { value: "copy", label: "Copy previous plan" },
   ];
@@ -23,7 +47,12 @@ export default function CreatePlanModal({ open, onClose }) {
 
     if (selectedPlan === "manual") {
       onClose?.();
-      router.push("/plansummary"); // <-- redirect here
+      // Pass parameters to plansummary page
+      const queryParams = new URLSearchParams();
+      if (urlParams.dietician_id) queryParams.append('dietician_id', urlParams.dietician_id);
+      if (urlParams.profile_id) queryParams.append('profile_id', urlParams.profile_id);
+      
+      router.push(`/plansummary?${queryParams.toString()}`);
       return;
     }
 
@@ -34,9 +63,58 @@ export default function CreatePlanModal({ open, onClose }) {
 
   const handleCloseUploadModal = () => setShowUploadModal(false);
 
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf") {
+      toast.error("Please upload a valid PDF file");
+      return;
+    }
+
+    setLocalUploadedFile(file);
+
+    const url = URL.createObjectURL(file);
+    setBlobUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return url;
+    });
+
+    toast.success(`File selected: ${file.name}`);
+  };
+
+  const handleUploadAndRoute = () => {
+    if (!uploadedFile) {
+      toast.warning("Please select a PDF file before uploading");
+      return;
+    }
+
+    try {
+      // Store file in Redux
+      dispatch(
+        setPdfUploadedFile({
+          file: uploadedFile,
+          blobUrl,
+          fileName: uploadedFile.name,
+        })
+      );
+
+      // Route to plan summary with parameters
+      const queryParams = new URLSearchParams();
+      if (urlParams.dietician_id) queryParams.append('dietician_id', urlParams.dietician_id);
+      if (urlParams.profile_id) queryParams.append('profile_id', urlParams.profile_id);
+      
+      setShowUploadModal(false);
+      router.push(`/plansummary?${queryParams.toString()}`);
+    } catch (error) {
+      console.error("Error dispatching to Redux:", error);
+      toast.error("Failed to upload file");
+    }
+  };
+  
   return (
     <>
-      {/* STEP 1: choose creation type */}
+      {/* STEP 1 */}
       <Modal
         open={open}
         onClose={onClose}
@@ -46,7 +124,6 @@ export default function CreatePlanModal({ open, onClose }) {
         showCloseIcon={false}
         classNames={{ modal: "rounded-[10px] p-0", overlay: "bg-black/40" }}
         styles={{ modal: { padding: 0, maxWidth: 620, width: "90%" } }}
-        aria-labelledby="create-plan-title"
       >
         <div className="flex flex-col gap-[107px] pt-[50px] px-8 pb-8">
           <div className="flex gap-5">
@@ -64,9 +141,10 @@ export default function CreatePlanModal({ open, onClose }) {
                 <label
                   key={opt.value}
                   className={`flex gap-2.5 items-center py-[18px] pl-2.5 pr-3 rounded-[5px] cursor-pointer transition-colors
-                    ${selectedPlan === opt.value
-                      ? "border-[2px] border-[#308BF9] bg-[#F5F7FA]"
-                      : "border-[2px] border-[#E1E6ED] bg-[#F5F7FA] hover:border-[#BFD8FF]"
+                    ${
+                      selectedPlan === opt.value
+                        ? "border-[2px] border-[#308BF9] bg-[#F5F7FA]"
+                        : "border-[2px] border-[#E1E6ED] bg-[#F5F7FA] hover:border-[#BFD8FF]"
                     }`}
                 >
                   <input
@@ -89,8 +167,12 @@ export default function CreatePlanModal({ open, onClose }) {
             <button
               onClick={handleNext}
               disabled={!selectedPlan}
-              className={`w-[146px] px-4 py-2 rounded-[10px] text-white text-[12px] font-semibold tracking-[-0.24px] cursor-pointer
-                ${selectedPlan ? "bg-[#308BF9]" : "bg-gray-400 cursor-not-allowed"}`}
+              className={`w-[146px] px-4 py-2 rounded-[10px] text-white text-[12px] font-semibold tracking-[-0.24px]
+                ${
+                  selectedPlan
+                    ? "bg-[#308BF9]"
+                    : "bg-gray-400 cursor-not-allowed"
+                }`}
             >
               Next
             </button>
@@ -98,7 +180,7 @@ export default function CreatePlanModal({ open, onClose }) {
         </div>
       </Modal>
 
-      {/* STEP 2: upload modal (for auto/copy) */}
+      {/* STEP 2 */}
       <Modal
         open={showUploadModal}
         onClose={handleCloseUploadModal}
@@ -108,7 +190,6 @@ export default function CreatePlanModal({ open, onClose }) {
         showCloseIcon={false}
         classNames={{ modal: "rounded-[10px] p-0", overlay: "bg-black/40" }}
         styles={{ modal: { padding: 0, maxWidth: 620, width: "90%" } }}
-        aria-labelledby="upload-file-title"
       >
         <div className="flex gap-6 pt-[50px] px-8 pb-8">
           <div className="max-w-[236px] flex flex-col gap-5">
@@ -128,10 +209,19 @@ export default function CreatePlanModal({ open, onClose }) {
                 width={48}
                 height={48}
               />
-
               <label htmlFor="file-upload" className="cursor-pointer">
-                <input id="file-upload" type="file" className="hidden" />
-                <p className="text-[#252525] text-[15px]">Drag or browse from My Computer</p>
+                <input
+                  id="file-upload"
+                  type="file"
+                  accept="application/pdf,.pdf"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <p className="text-[#252525] text-[15px]">
+                  {uploadedFile
+                    ? `Selected: ${uploadedFile.name}`
+                    : "Drag or browse from My Computer"}
+                </p>
               </label>
             </div>
           </div>
@@ -145,7 +235,7 @@ export default function CreatePlanModal({ open, onClose }) {
             Previous
           </button>
           <button
-            onClick={handleCloseUploadModal}
+            onClick={handleUploadAndRoute}
             className="w-[146px] px-4 py-2 rounded-[10px] bg-[#308BF9] text-white text-[12px] font-semibold"
           >
             Upload
