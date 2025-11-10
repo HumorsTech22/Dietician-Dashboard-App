@@ -63,16 +63,41 @@ export const fetchScoreTrend = async (dieticianId, profileId, mode) => {
 };
 
 
+
 export const fetchScoresInsight = async (dieticianId, profileId, date) => {
-  return apiFetcher(API_ENDPOINTS.PROFILESCOREANALYSIS.SCORESINSIGHT, {
+  try {
+    const response = await apiFetcher(API_ENDPOINTS.PROFILESCOREANALYSIS.SCORESINSIGHT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        dietician_id: dieticianId,
+        profile_id: profileId,
+        date: date,
+      }),
+    });
+    
+    return response;
+  } catch (error) {
+    // If it's the "no data" error, return a special object instead of throwing
+    if (error.message === "No test_data found for given inputs") {
+      return { noData: true, message: error.message };
+    }
+    // Re-throw other errors
+    throw error;
+  }
+};
+
+
+
+
+export const submitPlanSummaryService = async (planData) => {
+  return apiFetcher(API_ENDPOINTS.PLAN.PLANSUMMARYFORM, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      dietician_id: dieticianId,
-      profile_id: profileId,
-      date: date,
-    }),
+    body: JSON.stringify(planData),
   });
 };

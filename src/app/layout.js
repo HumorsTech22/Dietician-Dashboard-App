@@ -31,7 +31,9 @@ export default function RootLayout({ children }) {
             {children}
           </div>
 
-          <Toaster />
+          <div className="fixed top-4 right-4 z-50">
+            <Toaster />
+          </div>
     </Providers>
       </body>
     </html>
