@@ -337,8 +337,6 @@
 
 
 
-
-
 "use client"
 import { IoIosArrowDown } from "react-icons/io";
 import { RxCross2 } from "react-icons/rx";
@@ -352,6 +350,19 @@ export default function Summary({ onConfirmNext }) {
   const [approachTags, setApproachTags] = useState([]);
   const [goals, setGoals] = useState([{ id: 1, title: '', current: '', target: '' }]);
   const [goalUnits, setGoalUnits] = useState([{ id: 1, currentUnit: 'Unit', targetUnit: 'Unit' }]);
+
+  // errors: string = message; empty string = no error
+  const [errors, setErrors] = useState({
+    planTitle: '',
+    fromDate: '',
+    toDate: '',
+    caloriesTarget: '',
+    proteinTarget: '',
+    fiberTarget: '',
+    waterTarget: '',
+    approach: '',
+    goals: {} // { [goalId]: { title:'', current:'', target:'' } }
+  });
 
   // Date states
   const [fromDate, setFromDate] = useState("");
@@ -389,171 +400,173 @@ export default function Summary({ onConfirmNext }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Approach tags functions
+  // Approach tags
   const addTag = () => {
     const t = approachInput.trim();
     if (!t) return;
     const exists = approachTags.some(a => a.toLowerCase() === t.toLowerCase());
-    if (!exists) setApproachTags(prev => [...prev, t]);
+    if (!exists) {
+      setApproachTags(prev => [...prev, t]);
+      setErrors(prev => ({ ...prev, approach: '' }));
+    }
     setApproachInput('');
   };
-
   const removeTag = (i) => setApproachTags(prev => prev.filter((_, idx) => idx !== i));
-
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTag(); }
   };
 
   // Unit selection
   const handleUnitSelect = (unit, type, goalId) => {
-    setGoalUnits(prev => prev.map(goalUnit => 
-      goalUnit.id === goalId 
+    setGoalUnits(prev => prev.map(goalUnit =>
+      goalUnit.id === goalId
         ? { ...goalUnit, [type]: unit }
         : goalUnit
     ));
-    
-    if (type === 'currentUnit') {
-      setShowCurrentDropdown(null);
-    } else {
-      setShowTargetDropdown(null);
-    }
+    if (type === 'currentUnit') setShowCurrentDropdown(null);
+    else setShowTargetDropdown(null);
   };
+  const toggleCurrentDropdown = (goalId) => { setShowCurrentDropdown(goalId); setShowTargetDropdown(null); };
+  const toggleTargetDropdown = (goalId) => { setShowTargetDropdown(goalId); setShowCurrentDropdown(null); };
 
-  const toggleCurrentDropdown = (goalId) => { 
-    setShowCurrentDropdown(goalId); 
-    setShowTargetDropdown(null); 
-  };
-
-  const toggleTargetDropdown = (goalId) => { 
-    setShowTargetDropdown(goalId); 
-    setShowCurrentDropdown(null); 
-  };
-
-  // Date functions
+  // Date utils
   const ymdToDmy = (v) => {
     if (!v) return "";
     const [y, m, d] = v.split("-");
     return `${d}/${m}/${y}`;
   };
-
   const dmyToYmd = (v) => {
     if (!v) return "";
     const [d, m, y] = v.split("/");
     return `${y}-${m}-${d}`;
   };
+  const openFromPicker = () => { fromPickerRef.current?.showPicker?.() || fromPickerRef.current?.click(); };
+  const openToPicker = () => { toPickerRef.current?.showPicker?.() || toPickerRef.current?.click(); };
 
-  const openFromPicker = () => {
-    fromPickerRef.current?.showPicker?.() || fromPickerRef.current?.click();
-  };
-
-  const openToPicker = () => {
-    toPickerRef.current?.showPicker?.() || toPickerRef.current?.click();
-  };
-
-  // Goal management
+  // Goals
   const updateGoal = (goalId, field, value) => {
-    setGoals(prev => prev.map(goal => 
-      goal.id === goalId ? { ...goal, [field]: value } : goal
-    ));
+    setGoals(prev => prev.map(goal => goal.id === goalId ? { ...goal, [field]: value } : goal));
+    // clear that field error
+    setErrors(prev => ({
+      ...prev,
+      goals: {
+        ...prev.goals,
+        [goalId]: { ...(prev.goals[goalId] || {}), [field]: '' }
+      }
+    }));
   };
 
   const addNewGoal = () => {
     const newGoalId = goals.length > 0 ? Math.max(...goals.map(g => g.id)) + 1 : 1;
-    setGoals(prev => [...prev, { 
-      id: newGoalId, 
-      title: '', 
-      current: '', 
-      target: '' 
-    }]);
-    setGoalUnits(prev => [...prev, {
-      id: newGoalId,
-      currentUnit: 'Unit',
-      targetUnit: 'Unit'
-    }]);
+    setGoals(prev => [...prev, { id: newGoalId, title: '', current: '', target: '' }]);
+    setGoalUnits(prev => [...prev, { id: newGoalId, currentUnit: 'Unit', targetUnit: 'Unit' }]);
   };
 
   const removeGoal = (goalId) => {
     if (goals.length > 1) {
       setGoals(prev => prev.filter(goal => goal.id !== goalId));
       setGoalUnits(prev => prev.filter(goalUnit => goalUnit.id !== goalId));
+      setErrors(prev => {
+        const g = { ...prev.goals };
+        delete g[goalId];
+        return { ...prev, goals: g };
+      });
     }
   };
 
-  // Validation
+  // Field-level error helpers
+  const markError = (key, message) => message ? message : '';
+  const markGoalError = (curr, key, message) => ({ ...(curr || {}), [key]: message });
+
+  // Validation -> sets errors and returns boolean
   const validateForm = () => {
-    if (!planTitle.trim()) {
-      toast.error('Please enter plan title');
-      return false;
-    }
-    if (!fromDate || !toDate) {
-      toast.error('Please select both start and end dates');
-      return false;
-    }
-    if (!caloriesTarget || !proteinTarget || !fiberTarget || !waterTarget) {
-      toast.error('Please fill all daily targets');
-      return false;
-    }
-    
-    for (const goal of goals) {
-      if (!goal.title.trim() || !goal.current || !goal.target) {
-        toast.error('Please fill all goal fields');
-        return false;
-      }
-    }
+    const nextErrors = {
+      planTitle: '',
+      fromDate: '',
+      toDate: '',
+      caloriesTarget: '',
+      proteinTarget: '',
+      fiberTarget: '',
+      waterTarget: '',
+      approach: '',
+      goals: {}
+    };
 
-    if (approachTags.length === 0) {
-      toast.error('Please add at least one approach');
+    if (!planTitle.trim()) nextErrors.planTitle = 'Enter plan title';
+    if (!fromDate) nextErrors.fromDate = 'Select start date';
+    if (!toDate) nextErrors.toDate = 'Select end date';
+
+    if (!caloriesTarget) nextErrors.caloriesTarget = 'Enter calories target';
+    if (!proteinTarget) nextErrors.proteinTarget = 'Enter protein target';
+    if (!fiberTarget) nextErrors.fiberTarget = 'Enter fiber target';
+    if (!waterTarget) nextErrors.waterTarget = 'Enter water target';
+
+    if (approachTags.length === 0) nextErrors.approach = 'Add at least one approach';
+
+    goals.forEach(g => {
+      let ge = nextErrors.goals[g.id] || {};
+      if (!g.title.trim()) ge = markGoalError(ge, 'title', 'Enter goal title');
+      if (!g.current) ge = markGoalError(ge, 'current', 'Enter current stat');
+      if (!g.target) ge = markGoalError(ge, 'target', 'Enter target stat');
+      if (Object.keys(ge).length) nextErrors.goals[g.id] = ge;
+    });
+
+    setErrors(nextErrors);
+
+    const hasTopLevel =
+      nextErrors.planTitle || nextErrors.fromDate || nextErrors.toDate ||
+      nextErrors.caloriesTarget || nextErrors.proteinTarget ||
+      nextErrors.fiberTarget || nextErrors.waterTarget || nextErrors.approach;
+
+    const hasGoalLevel = Object.keys(nextErrors.goals).length > 0;
+
+    if (hasTopLevel || hasGoalLevel) {
+      toast.error('Please fix the highlighted fields');
       return false;
     }
-
     return true;
   };
 
-  // Prepare data for storage - UPDATED to combine number + unit as string
+  // Prepare data for storage
   const prepareFormData = () => {
     return {
       plan_title: planTitle,
       plan_start_date: dmyToYmd(fromDate),
       plan_end_date: dmyToYmd(toDate),
-      calories_target: caloriesTarget, // Store as string directly
-      protein_target: proteinTarget,   // Store as string directly
-      fiber_target: fiberTarget,       // Store as string directly
-      water_target: waterTarget,       // Store as string directly
+      calories_target: caloriesTarget,
+      protein_target: proteinTarget,
+      fiber_target: fiberTarget,
+      water_target: waterTarget,
       goal: goals.map(goal => {
         const goalUnit = goalUnits.find(gu => gu.id === goal.id) || { currentUnit: 'Unit', targetUnit: 'Unit' };
         return {
           name: goal.title,
-          current_stat: goal.current + goalUnit.currentUnit, // Combine number + unit as string
-          target_stat: goal.target + goalUnit.targetUnit     // Combine number + unit as string
+          current_stat: `${goal.current}${goalUnit.currentUnit}`,
+          target_stat: `${goal.target}${goalUnit.targetUnit}`
         };
       }),
       approach: approachTags.join(',')
     };
   };
 
-  // Save functions
+  // Save
   const saveToLocalStorage = (isDraft = false) => {
-    if (!isDraft && !validateForm()) {
-      return;
-    }
-
+    if (!isDraft && !validateForm()) return;
     const formData = prepareFormData();
-    if (isDraft) {
-      formData.isDraft = true;
-    }
-
+    if (isDraft) formData.isDraft = true;
     localStorage.setItem('planSummary', JSON.stringify(formData));
-    
-    if (isDraft) {
-      toast.success('Plan saved as draft successfully!');
-    } else {
-      toast.success('Plan saved successfully!');
-      onConfirmNext?.();
-    }
+    if (isDraft) toast.success('Plan saved as draft successfully!');
+    else { toast.success('Plan saved successfully!'); onConfirmNext?.(); }
   };
 
   const handleSaveAsDraft = () => saveToLocalStorage(true);
   const handleConfirmNext = () => saveToLocalStorage(false);
+
+  // Clear individual errors when user types/changes
+  const onChangeAndClear = (setter, key) => (e) => {
+    setter(e.target.value);
+    setErrors(prev => ({ ...prev, [key]: '' }));
+  };
 
   return (
     <div className='w-full'>
@@ -568,16 +581,23 @@ export default function Summary({ onConfirmNext }) {
           <div className="flex gap-5 items-end">
             {/* Name of the plan */}
             <div className="relative flex-1">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={planTitle}
-                onChange={(e) => setPlanTitle(e.target.value)}
-                className="block py-[15px] pl-[19px] pr-[13px] w-full text-[14px] text-[#252525] bg-white rounded-[8px] border border-[#E1E6ED] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" 
-                placeholder=" " 
+                onChange={(e) => { setPlanTitle(e.target.value); setErrors(prev => ({ ...prev, planTitle: '' })); }}
+                className={`block py-[15px] pl-[19px] pr-[13px] w-full text-[14px] text-[#252525] bg-white rounded-[8px] border appearance-none focus:outline-none focus:ring-0
+                  ${errors.planTitle ? 'border-[#DA5747]' : 'border-[#E1E6ED]'} focus:border-blue-600 peer`}
+                placeholder=" "
               />
               <label className="absolute text-[14px] text-[#9CA3AF] duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1">
                 Name of the plan
               </label>
+              {errors.planTitle ? (
+                <div className="flex gap-[5px] items-center mt-1">
+                  <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+                  <span className="text-[#DA5747] text-[10px]">{errors.planTitle}</span>
+                </div>
+              ) : null}
             </div>
 
             {/* Duration */}
@@ -592,7 +612,8 @@ export default function Summary({ onConfirmNext }) {
                   <span className="absolute -top-2 left-4 bg-white px-[9px] text-[12px] font-medium text-[#535359]">
                     From
                   </span>
-                  <div className="flex py-[15px] pl-[19px] pr-[13px] border border-[#E1E6ED] rounded-[8px] bg-white">
+                  <div className={`flex py-[15px] pl-[19px] pr-[13px] rounded-[8px] bg-white
+                    ${errors.fromDate ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'}`}>
                     <input
                       type="text"
                       readOnly
@@ -608,17 +629,24 @@ export default function Summary({ onConfirmNext }) {
                       ref={fromPickerRef}
                       type="date"
                       className="sr-only"
-                      onChange={(e) => setFromDate(ymdToDmy(e.target.value))}
+                      onChange={(e) => { setFromDate(ymdToDmy(e.target.value)); setErrors(prev => ({ ...prev, fromDate: '' })); }}
                     />
                   </div>
+                  {errors.fromDate ? (
+                    <div className="flex gap-[5px] items-center mt-1">
+                      <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+                      <span className="text-[#DA5747] text-[10px]">{errors.fromDate}</span>
+                    </div>
+                  ) : null}
                 </div>
 
                 {/* To */}
                 <div className="relative flex-1">
-                  <span className="absolute -top-2 left-4 bg-white px-[9px] text-[12px] font-medium text-[#535359]">
+                  <span className="absolute -top-2 left-4 bg-white px-[9px] text-[12px] font-medium text-[#53559]">
                     To
                   </span>
-                  <div className="flex py-[15px] pl-[19px] pr-[13px] border border-[#E1E6ED] rounded-[8px] bg-white">
+                  <div className={`flex py-[15px] pl-[19px] pr-[13px] rounded-[8px] bg-white
+                    ${errors.toDate ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'}`}>
                     <input
                       type="text"
                       readOnly
@@ -634,9 +662,15 @@ export default function Summary({ onConfirmNext }) {
                       ref={toPickerRef}
                       type="date"
                       className="sr-only"
-                      onChange={(e) => setToDate(ymdToDmy(e.target.value))}
+                      onChange={(e) => { setToDate(ymdToDmy(e.target.value)); setErrors(prev => ({ ...prev, toDate: '' })); }}
                     />
                   </div>
+                  {errors.toDate ? (
+                    <div className="flex gap-[5px] items-center mt-1">
+                      <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+                      <span className="text-[#DA5747] text-[10px]">{errors.toDate}</span>
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </div>
@@ -644,6 +678,9 @@ export default function Summary({ onConfirmNext }) {
 
           {/* Daily Targets */}
           <div className="mt-[15px]">
+            <div className='px-[9px] pt-[5px] pb-[12px] text-[#252525] text-[12px] leading-normal font-semibold tracking-[-0.24px]'>
+              Nutrition Target
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-[10px]">
               {/* Calories */}
               <div className="relative">
@@ -651,14 +688,21 @@ export default function Summary({ onConfirmNext }) {
                   type="number"
                   min="0"
                   value={caloriesTarget}
-                  onChange={(e) => setCaloriesTarget(e.target.value)}
+                  onChange={onChangeAndClear(setCaloriesTarget, 'caloriesTarget')}
                   placeholder=" "
-                  className="peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white border border-[#E1E6ED] rounded-[8px] outline-none placeholder-transparent focus:border-blue-600"
+                  className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent
+                    ${errors.caloriesTarget ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} focus:border-blue-600`}
                 />
                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
                   Calories Target
                 </label>
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#535359]">kcal</span>
+                {errors.caloriesTarget ? (
+                  <div className="flex gap-[5px] items-center mt-1">
+                    <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+                    <span className="text-[#DA5747] text-[10px]">{errors.caloriesTarget}</span>
+                  </div>
+                ) : null}
               </div>
 
               {/* Protein */}
@@ -668,14 +712,21 @@ export default function Summary({ onConfirmNext }) {
                   min="0"
                   step="0.1"
                   value={proteinTarget}
-                  onChange={(e) => setProteinTarget(e.target.value)}
+                  onChange={onChangeAndClear(setProteinTarget, 'proteinTarget')}
                   placeholder=" "
-                  className="peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white border border-[#E1E6ED] rounded-[8px] outline-none placeholder-transparent focus:border-blue-600"
+                  className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent
+                    ${errors.proteinTarget ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} focus:border-blue-600`}
                 />
                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
                   Protein Target
                 </label>
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#535359]">g</span>
+                {errors.proteinTarget ? (
+                  <div className="flex gap-[5px] items-center mt-1">
+                    <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+                    <span className="text-[#DA5747] text-[10px]">{errors.proteinTarget}</span>
+                  </div>
+                ) : null}
               </div>
 
               {/* Fiber */}
@@ -685,14 +736,21 @@ export default function Summary({ onConfirmNext }) {
                   min="0"
                   step="0.1"
                   value={fiberTarget}
-                  onChange={(e) => setFiberTarget(e.target.value)}
+                  onChange={onChangeAndClear(setFiberTarget, 'fiberTarget')}
                   placeholder=" "
-                  className="peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white border border-[#E1E6ED] rounded-[8px] outline-none placeholder-transparent focus:border-blue-600"
+                  className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent
+                    ${errors.fiberTarget ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} focus:border-blue-600`}
                 />
                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
                   Fiber Target
                 </label>
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#535359]">g</span>
+                {errors.fiberTarget ? (
+                  <div className="flex gap-[5px] items-center mt-1">
+                    <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+                    <span className="text-[#DA5747] text-[10px]">{errors.fiberTarget}</span>
+                  </div>
+                ) : null}
               </div>
 
               {/* Water */}
@@ -702,14 +760,21 @@ export default function Summary({ onConfirmNext }) {
                   min="0"
                   step="50"
                   value={waterTarget}
-                  onChange={(e) => setWaterTarget(e.target.value)}
+                  onChange={onChangeAndClear(setWaterTarget, 'waterTarget')}
                   placeholder=" "
-                  className="peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white border border-[#E1E6ED] rounded-[8px] outline-none placeholder-transparent focus:border-blue-600"
+                  className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent
+                    ${errors.waterTarget ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} focus:border-blue-600`}
                 />
                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
                   Water Target
                 </label>
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#535359]">ml</span>
+                {errors.waterTarget ? (
+                  <div className="flex gap-[5px] items-center mt-1">
+                    <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+                    <span className="text-[#DA5747] text-[10px]">{errors.waterTarget}</span>
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
@@ -717,11 +782,11 @@ export default function Summary({ onConfirmNext }) {
           {/* Goals */}
           {goals.map((goal, index) => {
             const goalUnit = goalUnits.find(gu => gu.id === goal.id) || { currentUnit: 'Unit', targetUnit: 'Unit' };
-            
+            const gErr = errors.goals[goal.id] || {};
             return (
               <div key={goal.id} className="mt-4">
                 <div className='flex justify-between items-center'>
-                  <div className='px-[9px] py-[5px] text-[#252525] text-[12px] leading-normal font-semibold tracking-[-0.24px]'>
+                  <div className='px-[9px] pt-[5px] pb-[12px] text-[#252525] text-[12px] leading-normal font-semibold tracking-[-0.24px]'>
                     Goal {index + 1}
                   </div>
                   {goals.length > 1 && (
@@ -740,17 +805,25 @@ export default function Summary({ onConfirmNext }) {
                       value={goal.title}
                       onChange={(e) => updateGoal(goal.id, 'title', e.target.value)}
                       placeholder=" "
-                      className="peer block w-full py-[15px] pl-[19px] pr-[13px] text-[14px] text-[#252525] bg-white border border-[#E1E6ED] rounded-[8px] outline-none placeholder-transparent focus:border-blue-600"
+                      className={`peer block w-full py-[15px] pl-[19px] pr-[13px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent
+                        ${gErr.title ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} focus:border-blue-600`}
                     />
                     <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
                       Goal Title
                     </label>
+                    {gErr.title ? (
+                      <div className="flex gap-[5px] items-center mt-1">
+                        <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+                        <span className="text-[#DA5747] text-[10px]">{gErr.title}</span>
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="flex gap-10">
                     {/* Current Stat */}
                     <div className="flex flex-col" ref={currentDropdownRef}>
-                      <div className="flex items-center py-[15px] pl-[19px] pr-[15px] border border-[#DA5747] rounded-[8px] bg-white relative">
+                      <div className={`flex items-center py-[15px] pl-[19px] pr-[15px] rounded-[8px] bg-white relative
+                        ${gErr.current ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'}`}>
                         <input
                           type="number"
                           min="0"
@@ -779,15 +852,18 @@ export default function Summary({ onConfirmNext }) {
                           </div>
                         )}
                       </div>
-                      <div className="flex gap-[5px] items-center mt-1">
-                        <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
-                        <span className="text-[#DA5747] text-[10px]">Enter current stat</span>
-                      </div>
+                      {gErr.current ? (
+                        <div className="flex gap-[5px] items-center mt-1">
+                          <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+                          <span className="text-[#DA5747] text-[10px]">{gErr.current}</span>
+                        </div>
+                      ) : null}
                     </div>
 
                     {/* Target Stat */}
                     <div className="flex flex-col" ref={targetDropdownRef}>
-                      <div className="flex items-center py-[15px] pl-[19px] pr-[15px] border border-[#DA5747] rounded-[8px] bg-white relative">
+                      <div className={`flex items-center py-[15px] pl-[19px] pr-[15px] rounded-[8px] bg-white relative
+                        ${gErr.target ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'}`}>
                         <input
                           type="number"
                           min="0"
@@ -816,10 +892,12 @@ export default function Summary({ onConfirmNext }) {
                           </div>
                         )}
                       </div>
-                      <div className="flex gap-[5px] items-center mt-1">
-                        <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
-                        <span className="text-[#DA5747] text-[10px]">Enter target stat</span>
-                      </div>
+                      {gErr.target ? (
+                        <div className="flex gap-[5px] items-center mt-1">
+                          <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+                          <span className="text-[#DA5747] text-[10px]">{gErr.target}</span>
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                 </div>
@@ -841,10 +919,11 @@ export default function Summary({ onConfirmNext }) {
 
       {/* Approaches */}
       <div className='flex flex-col gap-3.5'>
-        <div className='flex justify-between pr-[15px] items-center py-[15px] pl-5 border border-[#E1E6ED] rounded-[8px]'>
+        <div className={`flex justify-between pr-[15px] items-center py-[15px] pl-5 rounded-[8px]
+          ${errors.approach ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} bg-white`}>
           <input
             value={approachInput}
-            onChange={(e) => setApproachInput(e.target.value)}
+            onChange={(e) => { setApproachInput(e.target.value); if (approachTags.length) setErrors(prev => ({ ...prev, approach: '' })); }}
             onKeyDown={handleKeyDown}
             onBlur={addTag}
             placeholder='Enter approach (Ex. Low GI, High Proteins, Calories Deficit)'
@@ -852,6 +931,12 @@ export default function Summary({ onConfirmNext }) {
           />
           <IoIosArrowDown className="text-[#A1A1A1] cursor-pointer" onClick={addTag} />
         </div>
+        {errors.approach ? (
+          <div className="flex gap-[5px] items-center mt-1 pl-5">
+            <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+            <span className="text-[#DA5747] text-[10px]">{errors.approach}</span>
+          </div>
+        ) : null}
 
         <div className="flex flex-wrap gap-2">
           {approachTags.map((tag, idx) => (
@@ -870,13 +955,13 @@ export default function Summary({ onConfirmNext }) {
       {/* Buttons */}
       <div className='py-[23px]'>
         <div className='flex gap-5 justify-end'>
-          <div 
+          <div
             className='px-5 py-[15px] bg-white border border-[#D9D9D9] rounded-[10px] cursor-pointer'
             onClick={handleSaveAsDraft}
           >
             <span className='text-[#308BF9] text-[12px] font-semibold'>Save as draft</span>
           </div>
-          <div 
+          <div
             className='px-5 py-[15px] bg-[#308BF9] rounded-[10px] cursor-pointer'
             onClick={handleConfirmNext}
           >
