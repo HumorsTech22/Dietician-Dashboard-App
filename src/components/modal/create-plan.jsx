@@ -38,8 +38,8 @@ export default function CreatePlanModal({ open, onClose }) {
 
   const options = [
     { value: "auto", label: "Upload Files" },
-    { value: "manual", label: "Manual fill" },
-    { value: "copy", label: "Copy previous plan" },
+    // { value: "manual", label: "Manual fill" },
+    // { value: "copy", label: "Copy previous plan" },
   ];
 
   const handleNext = () => {
@@ -228,17 +228,17 @@ export default function CreatePlanModal({ open, onClose }) {
         </div>
 
         <div className="flex justify-end gap-3 px-8 pb-8">
-          <button
+          {/* <button
             onClick={handleCloseUploadModal}
             className="w-[146px] px-4 py-2 rounded-[10px] bg-gray-300 text-[#252525] text-[12px] font-semibold"
           >
             Previous
-          </button>
+          </button> */}
           <button
             onClick={handleUploadAndRoute}
             className="w-[146px] px-4 py-2 rounded-[10px] bg-[#308BF9] text-white text-[12px] font-semibold"
           >
-            Upload
+            Next
           </button>
         </div>
       </Modal>

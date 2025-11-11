@@ -225,17 +225,13 @@
 
 
 
-
-
-
-
-
-
 "use client";
-import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useState, useRef } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { submitPlanSummaryService } from "../services/authService";
+import Image from "next/image";
+import { setExtractedData } from "@/store/extractedDataSlice";
 
 export default function TestLogInfo({ onConfirmNext }) {
   const [testsAllotted, setTestsAllotted] = useState("");
@@ -243,39 +239,65 @@ export default function TestLogInfo({ onConfirmNext }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
   const [apiResponse, setApiResponse] = useState(null);
-  const [extractedData, setExtractedData] = useState(null);
-  const [progress, setProgress] = useState(0); // ✅ new
 
-  // ✅ get PDF from Redux
+  // ✅ progress state (new)
+  const [progress, setProgress] = useState(0);
+  const rafRef = useRef(null);
+  const startTimeRef = useRef(0);
+  const targetMsRef = useRef(0);
+  const capRef = useRef(95); // how far we go before completion
+  const runningRef = useRef(false);
+
+  const dispatch = useDispatch();
+  const [errors, setErrors] = useState({ testsAllotted: "" });
   const pdfState = useSelector((state) => state.pdf);
   const pdfFile = pdfState?.uploadedFile;
 
-  // ---- PROGRESS EFFECT ----
-  useEffect(() => {
-    let interval;
-    if (isLoading || isExtracting) {
-      setProgress(0);
-      interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            return 100;
-          }
-          return prev + 2; // adjust for speed
-        });
-      }, 100);
-    } else {
-      setProgress(0);
-    }
-    return () => clearInterval(interval);
-  }, [isLoading, isExtracting]);
+  // ---- Progress helpers ----
+  const startProgress = (targetMs = 300000, cap = 98) => {
+    // targetMs: total duration the bar should take to reach ~cap%
+    cancelProgress();
+    startTimeRef.current = Date.now();
+    targetMsRef.current = targetMs;
+    capRef.current = Math.min(99, Math.max(50, cap)); // 50–99
+    runningRef.current = true;
+    setProgress(0);
+
+    const tick = () => {
+      if (!runningRef.current) return;
+      const elapsed = Date.now() - startTimeRef.current;
+      const pct = Math.min(
+        capRef.current,
+        Math.floor((elapsed / targetMsRef.current) * capRef.current)
+      );
+      setProgress(pct);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+  };
+
+  const completeProgress = () => {
+    // animate to 100 quickly
+    runningRef.current = false;
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    setProgress(100);
+  };
+
+  const resetProgress = () => {
+    runningRef.current = false;
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    setProgress(0);
+  };
+
+  const cancelProgress = () => {
+    runningRef.current = false;
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+  };
 
   // ---- Cookie Reader ----
   function getCookie(name) {
     const m = document.cookie.match(
-      new RegExp(
-        "(?:^|; )" + name.replace(/([$?*|{}\]\\^])/g, "\\$1") + "=([^;]*)"
-      )
+      new RegExp("(?:^|; )" + name.replace(/([$?*|{}\\^])/g, "\\$1") + "=([^;]*)")
     );
     return m ? decodeURIComponent(m[1]) : "";
   }
@@ -284,6 +306,7 @@ export default function TestLogInfo({ onConfirmNext }) {
   const handleTestsAllottedChange = (e) => {
     const value = e.target.value;
     setTestsAllotted(value);
+    setErrors((prev) => ({ ...prev, testsAllotted: "" }));
     if (value && !isNaN(value)) {
       const allotted = parseInt(value) || 0;
       const remaining = 10000 - allotted;
@@ -294,43 +317,33 @@ export default function TestLogInfo({ onConfirmNext }) {
   };
 
   const validateForm = () => {
+    let ok = true;
+    const next = { testsAllotted: "" };
     if (!testsAllotted.trim()) {
-      toast.error("Please enter number of tests assigned");
-      return false;
+      next.testsAllotted = "Enter tests assigned";
+      ok = false;
+    } else if (isNaN(testsAllotted) || parseInt(testsAllotted) <= 0) {
+      next.testsAllotted = "Enter a valid positive number";
+      ok = false;
     }
-    if (isNaN(testsAllotted) || parseInt(testsAllotted) <= 0) {
-      toast.error("Please enter a valid number for tests assigned");
-      return false;
-    }
-    return true;
+    setErrors(next);
+    if (!ok) toast.error("Please fix the highlighted fields");
+    return ok;
   };
 
   const saveToLocalStorage = (isDraft = false) => {
-    if (!isDraft && !validateForm()) {
-      return;
-    }
+    if (!isDraft && !validateForm()) return;
     const existingData = localStorage.getItem("planSummary");
     let planSummary = existingData ? JSON.parse(existingData) : {};
-    planSummary = {
-      ...planSummary,
-      test_no_assigned: parseInt(testsAllotted) || 0,
-    };
-    if (isDraft) {
-      planSummary.isDraft = true;
-    }
+    planSummary = { ...planSummary, test_no_assigned: parseInt(testsAllotted) || 0 };
+    if (isDraft) planSummary.isDraft = true;
     localStorage.setItem("planSummary", JSON.stringify(planSummary));
-    if (isDraft) {
-      toast.success("Test log info saved as draft successfully!");
-    } else {
-      toast.success("Test log info saved successfully!");
-    }
+    toast.success(isDraft ? "Test log info saved as draft successfully!" : "Test log info saved successfully!");
   };
 
-  const handleSaveAsDraft = () => {
-    saveToLocalStorage(true);
-  };
+  const handleSaveAsDraft = () => saveToLocalStorage(true);
 
-  // ---- Extract Diet PDF ----
+  // ---- Extract Diet PDF (with time-based progress) ----
   const extractDietPdf = async ({ dieticianId, clientId, dietplanId }) => {
     if (!pdfFile) {
       toast.error("No PDF found in Redux. Please upload a file first.");
@@ -338,7 +351,9 @@ export default function TestLogInfo({ onConfirmNext }) {
     }
     try {
       setIsExtracting(true);
-      toast.message("Extracting PDF… this may take 3–5 minutes. Please wait.");
+      toast.message("Extracting PDF…");
+      // 5 minutes target, stop around 98% until completion
+      startProgress(300000, 98);
 
       const formData = new FormData();
       formData.append("file", pdfFile);
@@ -346,61 +361,69 @@ export default function TestLogInfo({ onConfirmNext }) {
       formData.append("profile_id", clientId || "");
       formData.append("dietplan_id", dietplanId || "");
 
-      const res = await fetch("https://respyr.in/mini/api/extract", {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch("https://respyr.in/mini/api/extract", { method: "POST", body: formData });
 
       if (!res.ok) {
         const txt = await res.text().catch(() => "");
-        throw new Error(
-          `Extractor error (${res.status}): ${txt || "Failed to extract"}`
-        );
+        throw new Error(`Extractor error (${res.status}): ${txt || "Failed to extract"}`);
       }
 
       const json = await res.json();
-      setExtractedData(json);
+      dispatch(setExtractedData(json));
+
+      // finish the bar only after actual completion
+      completeProgress();
       toast.success("PDF extracted successfully.");
       return true;
     } catch (err) {
       console.error("Extractor Error:", err);
       toast.error(err.message || "Failed to extract PDF");
+      resetProgress();
       return false;
     } finally {
       setIsExtracting(false);
+      // optional small delay so users can see 100% briefly
+      setTimeout(() => {
+        if (!isLoading) resetProgress();
+      }, 600);
     }
   };
 
-  // ---- Submit Plan Summary ----
+  // ---- Submit Plan Summary (shorter progress) ----
   const submitPlanSummary = async () => {
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
+
     setIsLoading(true);
+    // submission usually quicker; simulate ~8s to ~90%
+    startProgress(8000, 90);
+
     try {
       const planSummaryData = localStorage.getItem("planSummary");
       if (!planSummaryData) {
         toast.error("No plan summary data found");
+        resetProgress();
         return;
       }
-      const planSummary = JSON.parse(planSummaryData);
 
+      const planSummary = JSON.parse(planSummaryData);
       const urlParams = new URLSearchParams(window.location.search);
       const dietitianId = urlParams.get("dietician_id");
       const clientId = urlParams.get("profile_id");
       const cookieDietician = getCookie("dietician");
-
       const effectiveDieticianId = dietitianId || cookieDietician || "";
       const effectiveClientId = clientId || "";
 
       if (!effectiveDieticianId || !effectiveClientId) {
         toast.error("Missing dietician ID or client ID (URL/cookie)");
+        resetProgress();
         return;
       }
 
       const requestBody = {
-        dietitian_id: effectiveDieticianId,
-        client_id: effectiveClientId,
+        // dietitian_id: effectiveDieticianId,
+        // client_id: effectiveClientId,
+        dietitian_id: "RespyrD31",
+        client_id: "profile31",
         plan_title: planSummary.plan_title || "",
         plan_start_date: planSummary.plan_start_date || "",
         plan_end_date: planSummary.plan_end_date || "",
@@ -418,26 +441,33 @@ export default function TestLogInfo({ onConfirmNext }) {
       setApiResponse(resp);
 
       if (resp?.status) {
+        // complete the "Submitting" bar
+        completeProgress();
         toast.success("Plan summary submitted successfully!");
 
         const dietplanId = resp?.inserted_data?.id || "";
+        // Start the long extracting bar now
         const extractedOk = await extractDietPdf({
           dieticianId: effectiveDieticianId,
           clientId: effectiveClientId,
           dietplanId,
         });
 
-        if (extractedOk) {
-          onConfirmNext?.();
-        }
+        if (extractedOk) onConfirmNext?.();
       } else {
         toast.error(resp?.message || "Failed to submit plan summary");
+        resetProgress();
       }
     } catch (error) {
       console.error("API Error:", error);
       toast.error(error.message || "Failed to submit plan summary");
+      resetProgress();
     } finally {
       setIsLoading(false);
+      // if extracting didn’t start, clear after a short moment
+      setTimeout(() => {
+        if (!isExtracting) resetProgress();
+      }, 600);
     }
   };
 
@@ -454,17 +484,19 @@ export default function TestLogInfo({ onConfirmNext }) {
             Test log info
           </p>
 
-          <div className="w-full  border-b border-[#E1E6ED]"></div>
+          <div className="w-full border-b border-[#E1E6ED]"></div>
 
           <div className="mt-[15px]">
             <div className="flex gap-5 items-end">
+              {/* Tests assigned with inline error */}
               <div className="relative flex-1">
                 <input
                   type="text"
                   id="tests_allotted"
                   value={testsAllotted}
                   onChange={handleTestsAllottedChange}
-                  className="block py-[15px] pl-[19px] pr-[13px] w-full text-[14px] text-[#252525] bg-white rounded-[8px] border border-[#E1E6ED] focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                  className={`block py-[15px] pl-[19px] pr-[13px] w-full text-[14px] text-[#252525] bg-white rounded-[8px] border focus:outline-none focus:ring-0 focus:border-blue-600 peer
+                  ${errors.testsAllotted ? "border-[#DA5747]" : "border-[#E1E6ED]"}`}
                   placeholder=" "
                 />
                 <label
@@ -473,8 +505,23 @@ export default function TestLogInfo({ onConfirmNext }) {
                 >
                   Tests assigned
                 </label>
+
+                {errors.testsAllotted ? (
+                  <div className="flex gap-[5px] items-center mt-1">
+                    <Image
+                      src="/icons/hugeicons_information-circle-redd.png"
+                      alt="info"
+                      width={15}
+                      height={15}
+                    />
+                    <span className="text-[#DA5747] text-[10px]">
+                      {errors.testsAllotted}
+                    </span>
+                  </div>
+                ) : null}
               </div>
 
+              {/* Readonly remaining */}
               <div className="relative flex-1">
                 <input
                   type="text"
@@ -509,7 +556,7 @@ export default function TestLogInfo({ onConfirmNext }) {
                 </span>
               </div>
 
-              {/* ✅ Updated button with progress */}
+              {/* ✅ button with long-running progress */}
               <button
                 type="button"
                 className="relative px-5 py-[15px] bg-[#308BF9] rounded-[10px] cursor-pointer flex items-center justify-center overflow-hidden disabled:opacity-60 w-[180px]"
@@ -518,9 +565,9 @@ export default function TestLogInfo({ onConfirmNext }) {
               >
                 {(isLoading || isExtracting) && (
                   <div
-                    className="absolute left-0 top-0 h-full bg-[#1D6EDC] transition-all duration-500 ease-out"
+                    className="absolute left-0 top-0 h-full bg-[#1D6EDC] transition-all duration-200 ease-out"
                     style={{ width: `${progress}%` }}
-                  ></div>
+                  />
                 )}
 
                 <span className="relative text-white text-[12px] font-semibold z-10">

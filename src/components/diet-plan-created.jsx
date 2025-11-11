@@ -1232,6 +1232,703 @@
 
 
 
+// "use client"
+
+// import { IoIosArrowDown } from "react-icons/io";
+// import { IoIosArrowBack } from "react-icons/io";
+// import { IoIosArrowForward } from "react-icons/io";
+// import { useState, useEffect } from "react";
+// import Image from "next/image";
+// import DietEvent from "./modal/diet-event-popup";
+// import { useSelector } from "react-redux";
+
+// export default function DietPlanCreated() {
+//   const [activeDay, setActiveDay] = useState(0);
+//   const [days, setDays] = useState([]);
+//   const [currentDate, setCurrentDate] = useState(new Date());
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [selectedMeal, setSelectedMeal] = useState(null);
+
+//   const extractedData = useSelector((state) => state.extractedData.data);
+//   console.log("Extracted Data in DietPlanCreated1256:", extractedData);
+
+//   // Diet plan data array
+//   const dietPlanData = [
+//     {
+//       id: 1,
+//       time: "Wake up",
+//       timeRange: "06:00-06:30AM",
+//       foodsCount: "2 food added",
+//       meals: [
+//         {
+//           id: 1,
+//           icon: "/icons/hugeicons_bubble-tea-02.svg",
+//           number: "1",
+//           status: "75% Filled",
+//           statusColor: "#FFECEA",
+//           textColor: "#DA5747",
+//           foodItems: [
+//             {
+//               name: "Carrot + beetroot + fresh turmeric & zinger [ little ] with lemon drops",
+//               details: ["220kcal", "1 cup (250 ml)"]
+//             },
+//             {
+//               name: "Cinnamon water",
+//               details: ["220kcal", "1 cup (250 ml)"]
+//             }
+//           ]
+//         },
+//         {
+//           id: 2,
+//           icon: "/icons/hugeicons_vegetarian-food.svg",
+//           number: "2",
+//           status: "100% Filled",
+//           statusColor: "#E1F6E6",
+//           textColor: "#3FAF58",
+//           foodItems: [
+//             {
+//               name: "Cooked Vegetables",
+//               details: ["1 bowl (250ml)", "leafy green / fruit veg / beans"]
+//             }
+//           ]
+//         }
+//       ]
+//     },
+//     {
+//       id: 2,
+//       time: "Breakfast",
+//       timeRange: "08:00-08:30AM",
+//       foodsCount: "3 food added",
+//       meals: [
+//         {
+//           id: 1,
+//           icon: "/icons/hugeicons_dish-02.svg",
+//           number: "1",
+//           status: "100% Filled",
+//           statusColor: "#E1F6E6",
+//           textColor: "#3FAF58",
+//           foodItems: [
+//             {
+//               name: "Ragi porridge / Sattu / Oats /Cereals",
+//               details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
+//             },
+//             {
+//               name: "North Indian BF with small portions",
+//               details: ["1 piece"]
+//             }
+//           ]
+//         },
+//         {
+//           id: 2,
+//           icon: "/icons/hugeicons_vegetarian-food.svg",
+//           number: "2",
+//           status: "75% Filled",
+//           statusColor: "#FFECEA",
+//           textColor: "#DA5747",
+//           foodItems: [
+//             {
+//               name: "Boiled sprouts / grilled paneer",
+//               details: ["1 bowl (250ml)"]
+//             }
+//           ]
+//         },
+//         {
+//           id: 3,
+//           icon: "/icons/hugeicons_vegetarian-food.svg",
+//           number: "3",
+//           status: "100% Filled",
+//           statusColor: "#E1F6E6",
+//           textColor: "#3FAF58",
+//           foodItems: [
+//             {
+//               name: "Low fat curd",
+//               details: ["1 bowl (250ml)"]
+//             }
+//           ]
+//         }
+//       ]
+//     },
+//     {
+//       id: 3,
+//       time: "Lunch",
+//       timeRange: "01:00-01:30PM",
+//       foodsCount: "3 food added",
+//       meals: [
+//         {
+//           id: 1,
+//           icon: "/icons/hugeicons_dish-02.svg",
+//           number: "1",
+//           status: "100% Filled",
+//           statusColor: "#E1F6E6",
+//           textColor: "#3FAF58",
+//           foodItems: [
+//             {
+//               name: "Rice [regular/ basmati/ brown/ millets ]",
+//               details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
+//             },
+//             {
+//               name: "Wheat/ millet roti",
+//               details: ["1 piece", "without ghee / oil"]
+//             }
+//           ]
+//         },
+//         {
+//           id: 2,
+//           icon: "/icons/hugeicons_vegetarian-food.svg",
+//           number: "2",
+//           status: "100% Filled",
+//           statusColor: "#E1F6E6",
+//           textColor: "#3FAF58",
+//           foodItems: [
+//             {
+//               name: "Cooked Vegetables",
+//               details: ["1 bowl (250ml)", "leafy green / fruit veg / beans"]
+//             },
+//             {
+//               name: "Raw salad / boiled veggies / tossed salad",
+//               details: ["1 piece", "without ghee / oil"]
+//             }
+//           ]
+//         },
+//         {
+//           id: 3,
+//           icon: "/icons/hugeicons_vegetarian-food.svg",
+//           number: "3",
+//           status: "100% Filled",
+//           statusColor: "#E1F6E6",
+//           textColor: "#3FAF58",
+//           foodItems: [
+//             {
+//               name: "Boiled sprouts / grilled paneer",
+//               details: ["1 bowl (250ml)"]
+//             }
+//           ]
+//         }
+//       ]
+//     },
+//     {
+//       id: 4,
+//       time: "Dinner",
+//       timeRange: "07:00-07:30PM",
+//       foodsCount: "3 food added",
+//       options: [
+//         {
+//           id: 1,
+//           name: "Option 1",
+//           meals: [
+//             {
+//               id: 1,
+//               icon: "/icons/hugeicons_dish-02.svg",
+//               number: "1",
+//               status: "75% Filled",
+//               statusColor: "#FFECEA",
+//               textColor: "#DA5747",
+//               foodItems: [
+//                 {
+//                   name: "Rice [regular/ basmati/ brown/ millets]",
+//                   details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
+//                 },
+//                 {
+//                   name: "Wheat/ millet roti",
+//                   details: ["1 piece", "without ghee / oil"]
+//                 }
+//               ]
+//             },
+//             {
+//               id: 2,
+//               icon: "/icons/hugeicons_vegetarian-food.svg",
+//               number: "2",
+//               status: "75% Filled",
+//               statusColor: "#FFECEA",
+//               textColor: "#DA5747",
+//               foodItems: [
+//                 {
+//                   name: "Rice [regular/ basmati/ brown/ millets]",
+//                   details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
+//                 },
+//                 {
+//                   name: "Wheat/ millet roti",
+//                   details: ["1 piece", "without ghee / oil"]
+//                 }
+//               ]
+//             },
+//             {
+//               id: 3,
+//               icon: "/icons/hugeicons_vegetarian-food.svg",
+//               number: "3",
+//               status: "75% Filled",
+//               statusColor: "#FFECEA",
+//               textColor: "#DA5747",
+//               foodItems: [
+//                 {
+//                   name: "Rice [regular/ basmati/ brown/ millets]",
+//                   details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
+//                 },
+//                 {
+//                   name: "Wheat/ millet roti",
+//                   details: ["1 piece", "without ghee / oil"]
+//                 }
+//               ]
+//             }
+//           ]
+//         },
+//         {
+//           id: 2,
+//           name: "Option 2",
+//           meals: [
+//             {
+//               id: 1,
+//               icon: "/icons/hugeicons_dish-02.svg",
+//               number: "1",
+//               status: "100% Filled",
+//               statusColor: "#E1F6E6",
+//               textColor: "#3FAF58",
+//               foodItems: [
+//                 {
+//                   name: "Rice [regular/ basmati/ brown/ millets]",
+//                   details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
+//                 },
+//                 {
+//                   name: "Wheat/ millet roti",
+//                   details: ["1 piece", "without ghee / oil"]
+//                 }
+//               ]
+//             },
+//             {
+//               id: 2,
+//               icon: "/icons/hugeicons_vegetarian-food.svg",
+//               number: "2",
+//               status: "100% Filled",
+//               statusColor: "#E1F6E6",
+//               textColor: "#3FAF58",
+//               foodItems: [
+//                 {
+//                   name: "Rice [regular/ basmati/ brown/ millets]",
+//                   details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
+//                 },
+//                 {
+//                   name: "Wheat/ millet roti",
+//                   details: ["1 piece", "without ghee / oil"]
+//                 }
+//               ]
+//             },
+//             {
+//               id: 3,
+//               icon: "/icons/hugeicons_vegetarian-food.svg",
+//               number: "3",
+//               status: "100% Filled",
+//               statusColor: "#E1F6E6",
+//               textColor: "#3FAF58",
+//               foodItems: [
+//                 {
+//                   name: "Rice [regular/ basmati/ brown/ millets]",
+//                   details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
+//                 },
+//                 {
+//                   name: "Wheat/ millet roti",
+//                   details: ["1 piece", "without ghee / oil"]
+//                 }
+//               ]
+//             }
+//           ]
+//         }
+//       ]
+//     }
+//   ];
+
+//   // Function to generate days array based on current date
+//   const generateDays = (startDate) => {
+//     const newDays = [];
+//     for (let i = 0; i < 5; i++) {
+//       const date = new Date(startDate);
+//       date.setDate(startDate.getDate() + i);
+
+//       const dayNumber = i + 1;
+//       const formattedDate = date.toLocaleDateString('en-US', {
+//         day: '2-digit',
+//         month: 'short'
+//       });
+
+//       newDays.push({
+//         id: i,
+//         day: `Day ${dayNumber}`,
+//         date: formattedDate,
+//         fullDate: new Date(date)
+//       });
+//     }
+//     return newDays;
+//   };
+
+//   // Initialize days on component mount
+//   useEffect(() => {
+//     setDays(generateDays(currentDate));
+//     setActiveDay(0);
+//   }, [currentDate]);
+
+//   // Function to navigate to previous days
+//   const handlePreviousDays = () => {
+//     const newDate = new Date(currentDate);
+//     newDate.setDate(currentDate.getDate() - 5);
+//     setCurrentDate(newDate);
+//   };
+
+//   // Function to navigate to next days
+//   const handleNextDays = () => {
+//     const newDate = new Date(currentDate);
+//     newDate.setDate(currentDate.getDate() + 5);
+//     setCurrentDate(newDate);
+//   };
+
+//   // Function to handle edit button click
+//   const handleEditClick = (meal, section) => {
+//     setSelectedMeal({
+//       meal,
+//       section,
+//       day: days[activeDay]
+//     });
+//     setIsModalOpen(true);
+//   };
+
+//   // Function to close modal
+//   const handleCloseModal = () => {
+//     setIsModalOpen(false);
+//     setSelectedMeal(null);
+//   };
+
+//   // ===== Added helpers (do not change your existing logic) =====
+//   const selectedDayObj = days.find((d) => d.id === activeDay);
+//   const formatDisplayDate = (dateObj) => {
+//     if (!dateObj) return "";
+//     const ddMon = dateObj.toLocaleDateString("en-GB", { day: "2-digit", month: "short" }); // 08 May
+//     const wk = dateObj.toLocaleDateString("en-US", { weekday: "long" }); // Friday
+//     return `${ddMon}, ${wk}`;
+//   };
+//   // ============================================================
+
+//   return (
+//     <>
+//       <div className='w-full max-w-full min-w-0 overflow-x-hidden relative flex flex-col gap-[310px]'>
+
+//         <div className="">
+//           <div className="flex justify-between pl-[15px] pr-[20px]">
+//             <p className='text-[#252525] pb-[18px] pt-[23px] text-[20px] font-semibold leading-[110%] tracking-[0.4px] whitespace-nowrap'>Diet Plan</p>
+//           </div>
+
+//           <div className="flex flex-col gap-[15px]">
+//             <div className="w-full  border-b border-[#E1E6ED]"></div>
+
+//             <div className="flex gap-5">
+//               <div className="w-fit flex justify-center">
+//                 <div className="rounded-l-[10px] border border-[#D9D9D9] pl-4 py-2 pr-2.5 bg-[#F0F0F0] text-center">
+//                   <p className="text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
+//                     Diet Changes
+//                   </p>
+//                 </div>
+//                 <div className="flex rounded-r-[10px] border border-[#D9D9D9] gap-[37px] text-center items-center pl-4 py-2 pr-2.5 bg-white">
+//                   <p className="cursor-pointer text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
+//                     Daily
+//                   </p>
+//                   <IoIosArrowDown className="text-[#A1A1A1] cursor-pointer" />
+//                 </div>
+//               </div>
+
+//               <div className="w-fit flex justify-center">
+//                 <div className="rounded-l-[10px] border border-[#D9D9D9] pl-4 py-2 pr-2.5 bg-[#F0F0F0] text-center">
+//                   <p className="text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
+//                     Type
+//                   </p>
+//                 </div>
+//                 <div className="flex rounded-r-[10px] border border-[#D9D9D9] gap-[37px] text-center items-center pl-4 py-2 pr-2.5 bg-white">
+//                   <p className="cursor-pointer text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
+//                     Not specified
+//                   </p>
+//                   <IoIosArrowDown className="text-[#A1A1A1] cursor-pointer" />
+//                 </div>
+//               </div>
+//             </div>
+
+//             <div className="flex flex-col gap-9 bg-[#F5F7FA] rounded-[15px]">
+//               <div className="flex items-center bg-[#E1E6ED] rounded-[15px] border-4 border-[#F5F7FA]">
+
+//                 <div className="flex justify-between w-[170px] py-[30px] pl-[26px]">
+//                   <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">Select a day</span>
+//                   <IoIosArrowBack
+//                     className="text-[#252525] cursor-pointer"
+//                     onClick={handlePreviousDays}
+//                   />
+//                 </div>
+
+//                 <div className="flex items-center">
+//                   {days.map((day, index) => (
+//                     <div key={day.id} className="flex items-center">
+//                       <div
+//                         className={`flex flex-col w-[165px] gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer ${activeDay === day.id
+//                           ? 'bg-[#308BF9]'
+//                           : 'bg-transparent'
+//                           }`}
+//                         onClick={() => setActiveDay(day.id)}
+//                       >
+//                         <span className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] ${activeDay === day.id ? 'text-white' : 'text-[#252525]'
+//                           }`}>
+//                           {day.day}
+//                         </span>
+//                         <span className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] ${activeDay === day.id ? 'text-white' : 'text-[#252525]'
+//                           }`}>
+//                           {day.date}
+//                         </span>
+//                       </div>
+
+//                       {index < days.length - 1 && (
+//                         <div className="border-white border-r h-8 mx-2"></div>
+//                       )}
+//                     </div>
+//                   ))}
+//                   <IoIosArrowForward
+//                     className="text-[#252525] ml-2 cursor-pointer"
+//                     onClick={handleNextDays}
+//                   />
+//                 </div>
+//               </div>
+
+//               {/* Dynamic header that matches the selected day */}
+//               <div className="flex flex-col gap-2.5 ml-[30px]">
+//                 <span className="text-[#252525] text-[12px] font-normal leading-normal tracking-[-0.24px]">
+//                   {selectedDayObj?.day ?? `Day ${activeDay + 1}`}
+//                 </span>
+//                 <span className="text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]">
+//                   {formatDisplayDate(selectedDayObj?.fullDate)}
+//                 </span>
+//               </div>
+
+//               {/* Render diet plan sections from array */}
+//               {dietPlanData.map((section) => (
+//                 <div key={section.id} className="flex py-5 bg-white rounded-[15px] border-4 border-[#F5F7FA]">
+//                   <div className="flex flex-col gap-[30px] pt-[15px] pl-[15px] pr-2.5 pb-2.5 min-w-[200px]">
+//                     <div className="flex flex-col gap-2.5">
+//                       <span className="text-[#252525] font-semibold leading-[110%] tracking-[-0.48px]">{section.time}</span>
+//                       <span className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px]">{section.timeRange}</span>
+//                     </div>
+
+//                     <div className="w-[81px] py-1.5 px-2 rounded-[20px] bg-[#E1E6ED] text-[#535359] text-[10px] font-normal leading-normal tracking-[-0.2px]">
+//                       {section.foodsCount}
+//                     </div>
+//                   </div>
+
+//                   <div className="flex flex-col py-5 pl-5 gap-[30px] border-l border-l-[#E1E6ED] flex-1">
+//                     {section.meals ? (
+//                       // Regular meals layout
+//                       section.meals.map((meal) => (
+//                         <div key={meal.id} className="flex gap-5 justify-between">
+//                           <div className="flex gap-5 items-start py-[5px]">
+//                             <div className="flex items-center gap-1">
+//                               <Image
+//                                 src={meal.icon}
+//                                 alt={meal.icon}
+//                                 width={24}
+//                                 height={24}
+//                               />
+//                               <span className="text-[#252525] text-[15px] font-bold leading-none tracking-[-0.3px]">{meal.number}</span>
+//                             </div>
+//                             <div
+//                               className="rounded-[21px] p-2 text-[10px] font-semibold leading-[110%] tracking-[-0.2px]"
+//                               style={{ backgroundColor: meal.statusColor, color: meal.textColor }}
+//                             >
+//                               {meal.status}
+//                             </div>
+//                           </div>
+
+//                           <div className="flex gap-[33px] flex-1">
+//                             <div className="flex-1">
+//                               {meal.foodItems.map((foodItem, index) => (
+//                                 <div key={index}>
+//                                   <div className="flex flex-col gap-1">
+//                                     <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">{foodItem.name}</span>
+//                                     <div className="flex gap-[5px]">
+//                                       {foodItem.details.map((detail, detailIndex) => (
+//                                         <span key={detailIndex} className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px]">{detail}</span>
+//                                       ))}
+//                                       <Image
+//                                         src="/icons/hugeicons_information-circle.svg"
+//                                         alt="hugeicons_information-circle"
+//                                         width={12}
+//                                         height={12}
+//                                       />
+//                                     </div>
+//                                   </div>
+
+//                                   {index < meal.foodItems.length - 1 && (
+//                                     <div className="relative flex items-center my-4">
+//                                       <div className="flex-grow border-t border-[#C7C6CE]"></div>
+//                                       <span className="flex-shrink mx-3 text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">or</span>
+//                                       <div className="flex-grow border-t border-[#C7C6CE]"></div>
+//                                     </div>
+//                                   )}
+//                                 </div>
+//                               ))}
+//                             </div>
+
+//                             {/* {meal.id === 1 && (
+//                               <div className="flex flex-col ml-[33px] mb-[44px] mr-2.5 gap-2.5 border border-[#D9D9D9] rounded-[10px] py-[15px] px-5 cursor-pointer"
+//                               onClick={() => handleEditClick(meal, section)}
+//                               >
+//                                 <Image
+//                                   src="/icons/hugeicons_edit-03.svg"
+//                                   alt="hugeicons_edit-03"
+//                                   height={24}
+//                                   width={24}
+//                                 />
+//                                 <span className="text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[0.24px]">Edit</span>
+//                               </div>
+//                             )} */}
+//                           </div>
+//                         </div>
+//                       ))
+//                     ) : (
+//                       // Options layout for dinner section
+//                       <div className="flex flex-col flex-1 py-5 pl-5 gap-8 border-l border-l-[#E1E6ED]">
+//                         {section.options.map((option) => (
+//                           <div key={option.id} className="flex gap-8 w-full">
+//                             <div className="flex-1">
+//                               <div className="flex flex-col gap-5 w-full">
+//                                 <div className="w-full h-[26px] bg-[#E1E6ED] rounded-[5px] py-[9px] pl-5 text-[#535359] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
+//                                   {option.name}
+//                                 </div>
+
+//                                 <div className="flex flex-col gap-[30px]">
+//                                   {option.meals.map((meal) => (
+//                                     <div key={meal.id} className="flex gap-5">
+//                                       <div className="flex gap-5 items-start">
+//                                         <div className="flex gap-1">
+//                                           <Image
+//                                             src={meal.icon}
+//                                             alt={meal.icon}
+//                                             width={24}
+//                                             height={24}
+//                                           />
+//                                           <span className="py-[3px] text-[#252525] text-[15px] font-bold leading-[126%] tracking-[-0.3px]">
+//                                             {meal.number}
+//                                           </span>
+//                                         </div>
+
+//                                         <div
+//                                           className="rounded-[21px] p-2 text-[10px] font-semibold leading-[110%] tracking-[-0.2px]"
+//                                           style={{ backgroundColor: meal.statusColor, color: meal.textColor }}
+//                                         >
+//                                           {meal.status}
+//                                         </div>
+//                                       </div>
+
+//                                       <div className="flex gap-[33px] flex-1">
+//                                         <div className="flex-1">
+//                                           {meal.foodItems.map((foodItem, index) => (
+//                                             <div key={index}>
+//                                               <div className="flex flex-col gap-1">
+//                                                 <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">
+//                                                   {foodItem.name}
+//                                                 </span>
+//                                                 <div className="flex gap-[5px]">
+//                                                   {foodItem.details.map((detail, detailIndex) => (
+//                                                     <span key={detailIndex} className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px]">
+//                                                       {detail}
+//                                                     </span>
+//                                                   ))}
+//                                                   <Image
+//                                                     src="/icons/hugeicons_information-circle.svg"
+//                                                     alt="hugeicons_information-circle"
+//                                                     width={12}
+//                                                     height={12}
+//                                                   />
+//                                                 </div>
+//                                               </div>
+
+//                                               {index < meal.foodItems.length - 1 && (
+//                                                 <div className="relative flex items-center my-4">
+//                                                   <div className="flex-grow border-t border-[#C7C6CE]"></div>
+//                                                   <span className="flex-shrink mx-3 text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
+//                                                     or
+//                                                   </span>
+//                                                   <div className="flex-grow border-t border-[#C7C6CE]"></div>
+//                                                 </div>
+//                                               )}
+//                                             </div>
+//                                           ))}
+//                                         </div>
+//                                       </div>
+//                                     </div>
+//                                   ))}
+//                                 </div>
+//                               </div>
+//                             </div>
+
+//                             {/* {option.id === 1 && (
+//                               <div className="flex flex-col h-[72px] gap-2.5 border border-[#D9D9D9] rounded-[10px] py-[15px] px-5 cursor-pointer self-start"
+//                                 onClick={() => handleEditClick(option.meals[0], section)}
+//                               >
+//                                 <Image
+//                                   src="/icons/hugeicons_edit-03.svg"
+//                                   alt="hugeicons_edit-03"
+//                                   height={24}
+//                                   width={24}
+//                                 />
+//                                 <span className="text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[0.24px]">
+//                                   Edit
+//                                 </span>
+//                               </div>
+//                             )} */}
+//                           </div>
+//                         ))}
+//                       </div>
+//                     )}
+//                   </div>
+//                 </div>
+//               ))}
+
+//             </div>
+
+//             <div>
+//               <div className="w-full border-b border-[#E1E6ED] mt-[30px]"></div>
+
+//               <div className='py-[23px]'>
+//                 <div className='flex gap-5 justify-end'>
+//                   <div className='px-5 py-[15px] bg-white border border-[#D9D9D9] rounded-[10px] text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[-0.24px] cursor-pointer'>
+//                     Save as draft
+//                   </div>
+
+//                   <div className='px-20 py-[15px] bg-[#308BF9] rounded-[10px] text-white text-[12px] font-semibold leading-normal tracking-[-0.24px] cursor-pointer'>
+//                     Confirm & Next
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+
+//           </div>
+
+//         </div>
+//       </div>
+
+//       <DietEvent
+//         open={isModalOpen}
+//         onClose={handleCloseModal}
+//         selectedMeal={selectedMeal}
+//       />
+//     </>
+//   )
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 "use client"
@@ -1242,304 +1939,125 @@ import { IoIosArrowForward } from "react-icons/io";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import DietEvent from "./modal/diet-event-popup";
+import { useSelector } from "react-redux";
 
 export default function DietPlanCreated() {
   const [activeDay, setActiveDay] = useState(0);
   const [days, setDays] = useState([]);
   const [currentDate, setCurrentDate] = useState(new Date());
-    const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
+  const [planSummary, setPlanSummary] = useState(null);
 
-  // Diet plan data array
-  const dietPlanData = [
-    {
-      id: 1,
-      time: "Wake up",
-      timeRange: "06:00-06:30AM",
-      foodsCount: "2 food added",
-      meals: [
-        {
-          id: 1,
-          icon: "/icons/hugeicons_bubble-tea-02.svg",
-          number: "1",
-          status: "75% Filled",
-          statusColor: "#FFECEA",
-          textColor: "#DA5747",
-          foodItems: [
-            {
-              name: "Carrot + beetroot + fresh turmeric & zinger [ little ] with lemon drops",
-              details: ["220kcal", "1 cup (250 ml)"]
-            },
-            {
-              name: "Cinnamon water",
-              details: ["220kcal", "1 cup (250 ml)"]
-            }
-          ]
-        },
-        {
-          id: 2,
-          icon: "/icons/hugeicons_vegetarian-food.svg",
-          number: "2",
-          status: "100% Filled",
-          statusColor: "#E1F6E6",
-          textColor: "#3FAF58",
-          foodItems: [
-            {
-              name: "Cooked Vegetables",
-              details: ["1 bowl (250ml)", "leafy green / fruit veg / beans"]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: 2,
-      time: "Breakfast",
-      timeRange: "08:00-08:30AM",
-      foodsCount: "3 food added",
-      meals: [
-        {
-          id: 1,
-          icon: "/icons/hugeicons_dish-02.svg",
-          number: "1",
-          status: "100% Filled",
-          statusColor: "#E1F6E6",
-          textColor: "#3FAF58",
-          foodItems: [
-            {
-              name: "Ragi porridge / Sattu / Oats /Cereals",
-              details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
-            },
-            {
-              name: "North Indian BF with small portions",
-              details: ["1 piece"]
-            }
-          ]
-        },
-        {
-          id: 2,
-          icon: "/icons/hugeicons_vegetarian-food.svg",
-          number: "2",
-          status: "75% Filled",
-          statusColor: "#FFECEA",
-          textColor: "#DA5747",
-          foodItems: [
-            {
-              name: "Boiled sprouts / grilled paneer",
-              details: ["1 bowl (250ml)"]
-            }
-          ]
-        },
-        {
-          id: 3,
-          icon: "/icons/hugeicons_vegetarian-food.svg",
-          number: "3",
-          status: "100% Filled",
-          statusColor: "#E1F6E6",
-          textColor: "#3FAF58",
-          foodItems: [
-            {
-              name: "Low fat curd",
-              details: ["1 bowl (250ml)"]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: 3,
-      time: "Lunch",
-      timeRange: "01:00-01:30PM",
-      foodsCount: "3 food added",
-      meals: [
-        {
-          id: 1,
-          icon: "/icons/hugeicons_dish-02.svg",
-          number: "1",
-          status: "100% Filled",
-          statusColor: "#E1F6E6",
-          textColor: "#3FAF58",
-          foodItems: [
-            {
-              name: "Rice [regular/ basmati/ brown/ millets ]",
-              details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
-            },
-            {
-              name: "Wheat/ millet roti",
-              details: ["1 piece", "without ghee / oil"]
-            }
-          ]
-        },
-        {
-          id: 2,
-          icon: "/icons/hugeicons_vegetarian-food.svg",
-          number: "2",
-          status: "100% Filled",
-          statusColor: "#E1F6E6",
-          textColor: "#3FAF58",
-          foodItems: [
-            {
-              name: "Cooked Vegetables",
-              details: ["1 bowl (250ml)", "leafy green / fruit veg / beans"]
-            },
-            {
-              name: "Raw salad / boiled veggies / tossed salad",
-              details: ["1 piece", "without ghee / oil"]
-            }
-          ]
-        },
-        {
-          id: 3,
-          icon: "/icons/hugeicons_vegetarian-food.svg",
-          number: "3",
-          status: "100% Filled",
-          statusColor: "#E1F6E6",
-          textColor: "#3FAF58",
-          foodItems: [
-            {
-              name: "Boiled sprouts / grilled paneer",
-              details: ["1 bowl (250ml)"]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: 4,
-      time: "Dinner",
-      timeRange: "07:00-07:30PM",
-      foodsCount: "3 food added",
-      options: [
-        {
-          id: 1,
-          name: "Option 1",
-          meals: [
-            {
-              id: 1,
-              icon: "/icons/hugeicons_dish-02.svg",
-              number: "1",
-              status: "75% Filled",
-              statusColor: "#FFECEA",
-              textColor: "#DA5747",
-              foodItems: [
-                {
-                  name: "Rice [regular/ basmati/ brown/ millets]",
-                  details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
-                },
-                {
-                  name: "Wheat/ millet roti",
-                  details: ["1 piece", "without ghee / oil"]
-                }
-              ]
-            },
-            {
-              id: 2,
-              icon: "/icons/hugeicons_vegetarian-food.svg",
-              number: "2",
-              status: "75% Filled",
-              statusColor: "#FFECEA",
-              textColor: "#DA5747",
-              foodItems: [
-                {
-                  name: "Rice [regular/ basmati/ brown/ millets]",
-                  details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
-                },
-                {
-                  name: "Wheat/ millet roti",
-                  details: ["1 piece", "without ghee / oil"]
-                }
-              ]
-            },
-            {
-              id: 3,
-              icon: "/icons/hugeicons_vegetarian-food.svg",
-              number: "3",
-              status: "75% Filled",
-              statusColor: "#FFECEA",
-              textColor: "#DA5747",
-              foodItems: [
-                {
-                  name: "Rice [regular/ basmati/ brown/ millets]",
-                  details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
-                },
-                {
-                  name: "Wheat/ millet roti",
-                  details: ["1 piece", "without ghee / oil"]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          id: 2,
-          name: "Option 2",
-          meals: [
-            {
-              id: 1,
-              icon: "/icons/hugeicons_dish-02.svg",
-              number: "1",
-              status: "100% Filled",
-              statusColor: "#E1F6E6",
-              textColor: "#3FAF58",
-              foodItems: [
-                {
-                  name: "Rice [regular/ basmati/ brown/ millets]",
-                  details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
-                },
-                {
-                  name: "Wheat/ millet roti",
-                  details: ["1 piece", "without ghee / oil"]
-                }
-              ]
-            },
-            {
-              id: 2,
-              icon: "/icons/hugeicons_vegetarian-food.svg",
-              number: "2",
-              status: "100% Filled",
-              statusColor: "#E1F6E6",
-              textColor: "#3FAF58",
-              foodItems: [
-                {
-                  name: "Rice [regular/ basmati/ brown/ millets]",
-                  details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
-                },
-                {
-                  name: "Wheat/ millet roti",
-                  details: ["1 piece", "without ghee / oil"]
-                }
-              ]
-            },
-            {
-              id: 3,
-              icon: "/icons/hugeicons_vegetarian-food.svg",
-              number: "3",
-              status: "100% Filled",
-              statusColor: "#E1F6E6",
-              textColor: "#3FAF58",
-              foodItems: [
-                {
-                  name: "Rice [regular/ basmati/ brown/ millets]",
-                  details: ["1 bowl (250ml)", "2 tsp soaked chia seeds"]
-                },
-                {
-                  name: "Wheat/ millet roti",
-                  details: ["1 piece", "without ghee / oil"]
-                }
-              ]
-            }
-          ]
-        }
-      ]
+  const extractedData = useSelector((state) => state.extractedData.data);
+
+  // Get plan summary from localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedPlanSummary = localStorage.getItem('planSummary');
+      if (storedPlanSummary) {
+        setPlanSummary(JSON.parse(storedPlanSummary));
+      }
     }
-  ];
+  }, []);
 
-  // Function to generate days array based on current date
+  // Function to get day name from date
+  const getDayName = (date) => {
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    return days[date.getDay()];
+  };
+
+  // Function to get meal data for a specific day - FIXED: Use only dayDate parameter
+  const getMealDataForDay = (dayDate) => {
+    // Check if there's an error in extracted data
+    if (extractedData?.result?.error) {
+      console.error("PDF Extraction Error:", extractedData.result.error);
+      return [];
+    }
+
+    if (!extractedData?.result) {
+      return [];
+    }
+
+    // Get day name from the date
+    const dayName = getDayName(dayDate).toLowerCase();
+
+    const dayData = extractedData.result[dayName];
+
+    if (!dayData?.meals) {
+      return [];
+    }
+
+
+    // Transform the API data to match your component structure
+    return dayData.meals.map((meal, index) => {
+      const timeParts = meal.time.split(' at ');
+      const time = timeParts[0];
+      const timeRange = timeParts[1] || '';
+
+      // Dynamic icon selection based on meal time
+      const getIcon = (mealTime) => {
+        const timeLower = mealTime.toLowerCase();
+        if (timeLower.includes('waking') || timeLower.includes('wake up') || timeLower.includes('early morning')) {
+          return "/icons/hugeicons_bubble-tea-02.svg";
+        } else if (timeLower.includes('breakfast')) {
+          return "/icons/hugeicons_dish-02.svg";
+        } else if (timeLower.includes('lunch')) {
+          return "/icons/hugeicons_dish-02.svg";
+        } else if (timeLower.includes('dinner')) {
+          return "/icons/hugeicons_dish-02.svg";
+        } else if (timeLower.includes('mid morning') || timeLower.includes('evening') || timeLower.includes('snack')) {
+          return "/icons/hugeicons_vegetarian-food.svg";
+        } else {
+          return "/icons/hugeicons_vegetarian-food.svg";
+        }
+      };
+
+      // Create multiple meal sections if there are multiple food items
+      const meals = meal.items.map((item, itemIndex) => ({
+        id: itemIndex + 1,
+        icon: getIcon(time),
+        number: (itemIndex + 1).toString(),
+        status: "100% Filled",
+        statusColor: "#E1F6E6",
+        textColor: "#3FAF58",
+        foodItems: [{
+          name: item.name,
+          details: [
+            item.portion,
+            `${item.calories_kcal}kcal`,
+
+            `Protein: ${item.protein}g`,
+            `Carbs: ${item.carbs}g`,
+            `Fat: ${item.fat}g`
+          ]
+        }],
+        totals: {
+          calories_kcal: item.calories_kcal,
+          protein: item.protein,
+          carbs: item.carbs,
+          fat: item.fat
+        }
+      }));
+
+      return {
+        id: index + 1,
+        time: time,
+        timeRange: timeRange,
+        foodsCount: `${meal.items.length} food${meal.items.length > 1 ? 's' : ''} added`,
+        meals: meals,
+      };
+    });
+  };
+
+  // Function to generate 7 days array based on plan start date
   const generateDays = (startDate) => {
     const newDays = [];
-    for (let i = 0; i < 5; i++) {
-      const date = new Date(startDate);
-      date.setDate(startDate.getDate() + i);
+    const start = new Date(startDate);
+
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(start);
+      date.setDate(start.getDate() + i);
 
       const dayNumber = i + 1;
       const formattedDate = date.toLocaleDateString('en-US', {
@@ -1557,28 +2075,36 @@ export default function DietPlanCreated() {
     return newDays;
   };
 
-  // Initialize days on component mount
+  // Initialize days when plan summary is available
   useEffect(() => {
-    setDays(generateDays(currentDate));
+    let startDate;
+
+    if (planSummary?.plan_start_date) {
+      startDate = new Date(planSummary.plan_start_date);
+    } else {
+      startDate = new Date(currentDate);
+    }
+
+    const generatedDays = generateDays(startDate);
+    setDays(generatedDays);
     setActiveDay(0);
-  }, [currentDate]);
+  }, [planSummary, currentDate]);
 
   // Function to navigate to previous days
   const handlePreviousDays = () => {
     const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() - 5);
+    newDate.setDate(currentDate.getDate() - 7);
     setCurrentDate(newDate);
   };
 
   // Function to navigate to next days
   const handleNextDays = () => {
     const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() + 5);
+    newDate.setDate(currentDate.getDate() + 7);
     setCurrentDate(newDate);
   };
 
-
-    // Function to handle edit button click
+  // Function to handle edit button click
   const handleEditClick = (meal, section) => {
     setSelectedMeal({
       meal,
@@ -1593,6 +2119,42 @@ export default function DietPlanCreated() {
     setIsModalOpen(false);
     setSelectedMeal(null);
   };
+
+  // Get diet plan data for current active day - FIXED: Pass only the date
+  const getDietPlanDataForActiveDay = () => {
+    if (!days[activeDay]?.fullDate) {
+      return [];
+    }
+
+    const currentDay = days[activeDay];
+
+    const meals = getMealDataForDay(currentDay.fullDate);
+
+    return meals;
+  };
+
+  const selectedDayObj = days.find((d) => d.id === activeDay);
+  const formatDisplayDate = (dateObj) => {
+    if (!dateObj) return "";
+    const ddMon = dateObj.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+    const wk = dateObj.toLocaleDateString("en-US", { weekday: "long" });
+    return `${ddMon}, ${wk}`;
+  };
+
+  // Calculate dietPlanData - THIS UPDATES WHEN activeDay CHANGES
+  const dietPlanData = getDietPlanDataForActiveDay();
+
+  // Get day totals for the active day
+  const getDayTotals = () => {
+    if (!extractedData?.result || !days[activeDay]?.fullDate) return null;
+
+    const dayName = getDayName(days[activeDay].fullDate).toLowerCase();
+    const dayData = extractedData.result[dayName];
+
+    return dayData?.totals || null;
+  };
+
+  const dayTotals = getDayTotals();
 
   return (
     <>
@@ -1651,11 +2213,13 @@ export default function DietPlanCreated() {
                   {days.map((day, index) => (
                     <div key={day.id} className="flex items-center">
                       <div
-                        className={`flex flex-col w-[165px] gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer ${activeDay === day.id
-                          ? 'bg-[#308BF9]'
-                          : 'bg-transparent'
+                        className={`flex flex-col w-[140px] gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer ${activeDay === day.id
+                            ? 'bg-[#308BF9]'
+                            : 'bg-white'
                           }`}
-                        onClick={() => setActiveDay(day.id)}
+                        onClick={() => {
+                          setActiveDay(day.id);
+                        }}
                       >
                         <span className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] ${activeDay === day.id ? 'text-white' : 'text-[#252525]'
                           }`}>
@@ -1679,200 +2243,137 @@ export default function DietPlanCreated() {
                 </div>
               </div>
 
+              {/* Dynamic header that matches the selected day */}
               <div className="flex flex-col gap-2.5 ml-[30px]">
-                <span className="text-[#252525] text-[12px] font-normal leading-normal tracking-[-0.24px]">Day 1</span>
-                <span className="text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]">08 May</span>
+                <span className="text-[#252525] text-[12px] font-normal leading-normal tracking-[-0.24px]">
+                  {selectedDayObj?.day ?? `Day ${activeDay + 1}`}
+                </span>
+                <span className="text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]">
+                  {formatDisplayDate(selectedDayObj?.fullDate)}
+                </span>
+
+                {/* Day Totals Display */}
+                {dayTotals ? (
+                  // <div className="flex gap-4 mt-2 p-3 bg-blue-50 rounded-lg">
+                  //   <span className="text-[#252525] text-[12px] font-semibold">
+                  //     Day Totals: 
+                  //   </span>
+                  //   <span className="text-[#252525] text-[12px]">
+                  //     Calories: {dayTotals.calories_kcal}kcal
+                  //   </span>
+                  //   <span className="text-[#252525] text-[12px]">
+                  //     Protein: {dayTotals.protein}g
+                  //   </span>
+                  //   <span className="text-[#252525] text-[12px]">
+                  //     Carbs: {dayTotals.carbs}g
+                  //   </span>
+                  //   <span className="text-[#252525] text-[12px]">
+                  //     Fat: {dayTotals.fat}g
+                  //   </span>
+                  // </div>
+                  ""
+                ) : (
+                  <div className="flex gap-4 mt-2 p-3 bg-gray-100 rounded-lg">
+                    <span className="text-gray-500 text-[12px] font-semibold">
+                      No meal data available for this day
+                    </span>
+                  </div>
+                )}
               </div>
 
-              {/* Render diet plan sections from array */}
-              {dietPlanData.map((section) => (
-                <div key={section.id} className="flex py-5 bg-white rounded-[15px] border-4 border-[#F5F7FA]">
-                  <div className="flex flex-col gap-[30px] pt-[15px] pl-[15px] pr-2.5 pb-2.5 min-w-[200px]">
-                    <div className="flex flex-col gap-2.5">
-                      <span className="text-[#252525] font-semibold leading-[110%] tracking-[-0.48px]">{section.time}</span>
-                      <span className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px]">{section.timeRange}</span>
+              {/* Render diet plan sections from dynamic data - THIS SHOWS FILTERED DATA */}
+              {dietPlanData.length > 0 ? (
+                dietPlanData.map((section) => (
+                  <div key={section.id} className="flex py-5 bg-white rounded-[15px] border-4 border-[#F5F7FA]">
+                    <div className="flex flex-col gap-[30px] pt-[15px] pl-[15px] pr-2.5 pb-2.5 min-w-[200px]">
+                      <div className="flex flex-col gap-2.5">
+                        <span className="text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.48px]">{section.time}</span>
+                        <span className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px]">{section.timeRange}</span>
+                      </div>
+
+                      <div className="max-w-fit py-1.5 px-2 rounded-[20px] bg-[#E1E6ED] text-[#535359] text-[10px] font-normal leading-normal tracking-[-0.2px] whitespace-nowrap">
+                        {section.foodsCount}
+                      </div>
                     </div>
 
-                    <div className="w-[81px] py-1.5 px-2 rounded-[20px] bg-[#E1E6ED] text-[#535359] text-[10px] font-normal leading-normal tracking-[-0.2px]">
-                      {section.foodsCount}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col py-5 pl-5 gap-[30px] border-l border-l-[#E1E6ED] flex-1">
-                    {section.meals ? (
-                      // Regular meals layout
-                      section.meals.map((meal) => (
+                    <div className="flex flex-col py-5 pl-5 gap-[30px] border-l border-l-[#E1E6ED] flex-1">
+                      {section.meals.map((meal) => (
                         <div key={meal.id} className="flex gap-5 justify-between">
                           <div className="flex gap-5 items-start py-[5px]">
                             <div className="flex items-center gap-1">
-                              <Image
+                              {/* <Image
                                 src={meal.icon}
                                 alt={meal.icon}
                                 width={24}
                                 height={24}
-                              />
+                              /> */}
                               <span className="text-[#252525] text-[15px] font-bold leading-none tracking-[-0.3px]">{meal.number}</span>
                             </div>
-                            <div 
+                            {/* <div
                               className="rounded-[21px] p-2 text-[10px] font-semibold leading-[110%] tracking-[-0.2px]"
                               style={{ backgroundColor: meal.statusColor, color: meal.textColor }}
                             >
                               {meal.status}
-                            </div>
+                            </div> */}
                           </div>
 
                           <div className="flex gap-[33px] flex-1">
                             <div className="flex-1">
                               {meal.foodItems.map((foodItem, index) => (
-                                <div key={index}>
+                                <div key={index} className="mb-4 last:mb-0">
                                   <div className="flex flex-col gap-1">
                                     <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">{foodItem.name}</span>
-                                    <div className="flex gap-[5px]">
+                                    <div className="flex flex-wrap gap-[5px]">
                                       {foodItem.details.map((detail, detailIndex) => (
-                                        <span key={detailIndex} className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px]">{detail}</span>
+                                        // <span key={detailIndex} className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px] bg-gray-100 px-2 py-1 rounded">
+                                        //   {detail}
+                                        // </span>
+
+                                        <span
+                                          key={detailIndex}
+                                          className={`text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px] px-2 py-1 rounded ${detailIndex === 0 ? 'bg-white ' : 'bg-gray-100'
+                                            }`}
+                                        >
+                                          {detail}
+                                        </span>
+
                                       ))}
-                                      <Image
+                                      {/* <Image
                                         src="/icons/hugeicons_information-circle.svg"
                                         alt="hugeicons_information-circle"
                                         width={12}
                                         height={12}
-                                      />
+                                      /> */}
                                     </div>
                                   </div>
-
-                                  {index < meal.foodItems.length - 1 && (
-                                    <div className="relative flex items-center my-4">
-                                      <div className="flex-grow border-t border-[#C7C6CE]"></div>
-                                      <span className="flex-shrink mx-3 text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">or</span>
-                                      <div className="flex-grow border-t border-[#C7C6CE]"></div>
-                                    </div>
-                                  )}
                                 </div>
                               ))}
                             </div>
-
-                            {meal.id === 1 && (
-                              <div className="flex flex-col ml-[33px] mb-[44px] mr-2.5 gap-2.5 border border-[#D9D9D9] rounded-[10px] py-[15px] px-5 cursor-pointer"
-                              onClick={() => handleEditClick(meal, section)}
-                              >
-                                <Image
-                                  src="/icons/hugeicons_edit-03.svg"
-                                  alt="hugeicons_edit-03"
-                                  height={24}
-                                  width={24}
-                                />
-                                <span className="text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[0.24px]">Edit</span>
-                              </div>
-                            )}
                           </div>
                         </div>
-                      ))
-                    ) : (
-                      // Options layout for dinner section
-                      <div className="flex flex-col flex-1 py-5 pl-5 gap-8 border-l border-l-[#E1E6ED]">
-                        {section.options.map((option) => (
-                          <div key={option.id} className="flex gap-8 w-full">
-                            <div className="flex-1">
-                              <div className="flex flex-col gap-5 w-full">
-                                <div className="w-full h-[26px] bg-[#E1E6ED] rounded-[5px] py-[9px] pl-5 text-[#535359] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
-                                  {option.name}
-                                </div>
-
-                                <div className="flex flex-col gap-[30px]">
-                                  {option.meals.map((meal) => (
-                                    <div key={meal.id} className="flex gap-5">
-                                      <div className="flex gap-5 items-start">
-                                        <div className="flex gap-1">
-                                          <Image
-                                            src={meal.icon}
-                                            alt={meal.icon}
-                                            width={24}
-                                            height={24}
-                                          />
-                                          <span className="py-[3px] text-[#252525] text-[15px] font-bold leading-[126%] tracking-[-0.3px]">
-                                            {meal.number}
-                                          </span>
-                                        </div>
-
-                                        <div 
-                                          className="rounded-[21px] p-2 text-[10px] font-semibold leading-[110%] tracking-[-0.2px]"
-                                          style={{ backgroundColor: meal.statusColor, color: meal.textColor }}
-                                        >
-                                          {meal.status}
-                                        </div>
-                                      </div>
-
-                                      <div className="flex gap-[33px] flex-1">
-                                        <div className="flex-1">
-                                          {meal.foodItems.map((foodItem, index) => (
-                                            <div key={index}>
-                                              <div className="flex flex-col gap-1">
-                                                <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">
-                                                  {foodItem.name}
-                                                </span>
-                                                <div className="flex gap-[5px]">
-                                                  {foodItem.details.map((detail, detailIndex) => (
-                                                    <span key={detailIndex} className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px]">
-                                                      {detail}
-                                                    </span>
-                                                  ))}
-                                                  <Image
-                                                    src="/icons/hugeicons_information-circle.svg"
-                                                    alt="hugeicons_information-circle"
-                                                    width={12}
-                                                    height={12}
-                                                  />
-                                                </div>
-                                              </div>
-
-                                              {index < meal.foodItems.length - 1 && (
-                                                <div className="relative flex items-center my-4">
-                                                  <div className="flex-grow border-t border-[#C7C6CE]"></div>
-                                                  <span className="flex-shrink mx-3 text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
-                                                    or
-                                                  </span>
-                                                  <div className="flex-grow border-t border-[#C7C6CE]"></div>
-                                                </div>
-                                              )}
-                                            </div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-
-                            {option.id === 1 && (
-                              <div className="flex flex-col h-[72px] gap-2.5 border border-[#D9D9D9] rounded-[10px] py-[15px] px-5 cursor-pointer self-start"
-                                onClick={() => handleEditClick(option.meals[0], section)}
-                              >
-                                <Image
-                                  src="/icons/hugeicons_edit-03.svg"
-                                  alt="hugeicons_edit-03"
-                                  height={24}
-                                  width={24}
-                                />
-                                <span className="text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[0.24px]">
-                                  Edit
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                      ))}
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="flex justify-center items-center py-10">
+                  <span className="text-[#252525] text-[16px] font-normal">
+                    {extractedData?.result?.error
+                      ? `PDF Extraction Error: ${extractedData.result.error}`
+                      : planSummary && extractedData?.result
+                        ? `No diet plan data available for ${selectedDayObj?.day}.`
+                        : 'Loading plan data...'
+                    }
+                  </span>
                 </div>
-              ))}
+              )}
 
             </div>
 
             <div>
               <div className="w-full border-b border-[#E1E6ED] mt-[30px]"></div>
 
-              <div className='py-[23px]'>
+              {/* <div className='py-[23px]'>
                 <div className='flex gap-5 justify-end'>
                   <div className='px-5 py-[15px] bg-white border border-[#D9D9D9] rounded-[10px] text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[-0.24px] cursor-pointer'>
                     Save as draft
@@ -1882,7 +2383,7 @@ export default function DietPlanCreated() {
                     Confirm & Next
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
 
           </div>
@@ -1890,13 +2391,11 @@ export default function DietPlanCreated() {
         </div>
       </div>
 
-
- <DietEvent 
-        open={isModalOpen} 
+      <DietEvent
+        open={isModalOpen}
         onClose={handleCloseModal}
         selectedMeal={selectedMeal}
       />
-
     </>
   )
 }
