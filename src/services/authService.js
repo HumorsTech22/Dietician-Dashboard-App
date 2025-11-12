@@ -32,6 +32,20 @@ export const resetPasswordService = async (email, password) => {
   });
 };
 
+
+export const updateDietPlanStatusService = async (dieticianId) => {
+  return apiFetcher(API_ENDPOINTS.AUTH.DIETPLANSTATUS, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      dietitian_id: dieticianId,
+    }),
+  });
+};
+
+
 export const fetchClientsWithDietPlan = async (dieticianId) => {
   return apiFetcher(API_ENDPOINTS.CLIENT.CLIENTTABLE, {
     method: "POST",
@@ -99,5 +113,33 @@ export const submitPlanSummaryService = async (planData) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(planData),
+  });
+};
+
+
+
+export const fetchClientProfileData = async (dieticianId, profileId) => {
+  return apiFetcher(API_ENDPOINTS.CLIENTPROFILE.CLIENTPROFILEDATA, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      dietician_id: dieticianId,
+      profile_id: profileId,
+    }),
+  });
+};
+
+
+
+
+export const fetchWeeklyAnalysisComplete = async (requestData) => {
+  return apiFetcher(API_ENDPOINTS.MEALANALYSIS.WEEKLYANALYSISCOMPLETE, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(requestData),
   });
 };

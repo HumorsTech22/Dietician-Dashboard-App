@@ -9,7 +9,6 @@ export async function apiFetcher(endpoint, options = {}) {
     });
 
     const data = await res.json();
-    
     if (!res.ok || data.ok === false) {
       const errorMessage = data.error || `Request failed with status ${res.status}`;
       

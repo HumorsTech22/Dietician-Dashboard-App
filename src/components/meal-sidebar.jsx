@@ -73,7 +73,7 @@
 //           <div className="flex flex-col gap-[48px] pl-[15px] pt-[15px] pr-[10px] pb-[10px] rounded-[10px] border-2 border-l-[#D9D9D9] border-t-0 border-b-0 border-r-0 bg-[#F0F5FD] self-stretch">
 //             <div className="flex flex-col gap-2.5">
 //               <span className="text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.48px]">Others</span>
-             
+
 //             </div>
 
 //             <div className="w-[82px] px-2 py-1.5 rounded-[20px] flex items-center bg-[#F5F7FA]">
@@ -185,66 +185,86 @@
 
 
 
-
-
-
-
-
 "use client";
 import React from 'react';
 
-const mealSidebarData = [
-  {
-    id: 1,
-    scoreRange: "0-60",
-    description: "Low Metabolic Compatibility Score",
-    count: "29 food items",
-    borderColor: "border-l-[#DA5747]",
-    scoreColor: "text-[#308BF9]",
-    countBg: "bg-white",
-    gapClass: "gap-[30px]",
-    descriptionColor: "text-[#308BF9]",
-    filter: "low"
-  },
-  {
-    id: 2,
-    scoreRange: "61-79",
-    description: "Moderate Metabolic Compatibility Score",
-    count: "12 food items",
-    borderColor: "border-l-[#FFC412]",
-    scoreColor: "text-[#252525]",
-    countBg: "bg-[#F5F7FA]",
-    gapClass: "gap-[30px]",
-    descriptionColor: "text-[#252525]",
-    filter: "moderate"
-  },
-  {
-    id: 3,
-    scoreRange: "80-100",
-    description: "High Metabolic Compatibility Score",
-    count: "3 food items",
-    borderColor: "border-l-[#3FAF58]",
-    scoreColor: "text-[#252525]",
-    countBg: "bg-[#F5F7FA]",
-    gapClass: "gap-[30px]",
-    descriptionColor: "text-[#252525]",
-    filter: "high"
-  },
-  {
-    id: 4,
-    scoreRange: "Others",
-    description: null,
-    count: "12 food items",
-    borderColor: "border-l-[#D9D9D9]",
-    scoreColor: "text-[#252525]",
-    countBg: "bg-[#F5F7FA]",
-    gapClass: "gap-[48px]",
-    descriptionColor: "text-[#252525]",
-    filter: "others"
-  },
-];
+export default function MealSidebar({
+  activeFilter,
+  onFilterChange,
+  weeklyAnalysisData
+}) {
+  console.log("weeklyAnalysisData251:-", weeklyAnalysisData);
 
-export default function MealSidebar({ activeFilter, onFilterChange }) {
+  // ✅ Normalize input to always be an array
+  const data = Array.isArray(weeklyAnalysisData) ? weeklyAnalysisData : [];
+
+  // ✅ Helpers
+  const hasFood = (x) =>
+    x && typeof x === "object" && typeof x.food === "string" && x.food.trim().length > 0;
+
+  const getScore = (x) => {
+    const s = Number(x?.metabolic_compatibility_score);
+    return Number.isFinite(s) ? s : null; // null => Others
+  };
+
+  // ✅ Buckets (only count items that have a valid "food")
+  const lowFoods = data.filter((x) => hasFood(x) && getScore(x) !== null && getScore(x) <= 60);
+  const moderateFoods = data.filter((x) => hasFood(x) && getScore(x) !== null && getScore(x) >= 61 && getScore(x) <= 79);
+  const highFoods = data.filter((x) => hasFood(x) && getScore(x) !== null && getScore(x) >= 80);
+  const othersFoods = data.filter((x) => hasFood(x) && getScore(x) === null);
+
+  // ✅ Sidebar items with dynamic counts
+  const mealSidebarData = [
+    {
+      id: 1,
+      scoreRange: "0-60",
+      description: "Low Metabolic Compatibility Score",
+      count: `${lowFoods.length} food items`,
+      borderColor: "border-l-[#DA5747]",
+      scoreColor: "text-[#308BF9]",
+      countBg: "bg-white",
+      gapClass: "gap-[30px]",
+      descriptionColor: "text-[#308BF9]",
+      filter: "low",
+    },
+    {
+      id: 2,
+      scoreRange: "61-79",
+      description: "Moderate Metabolic Compatibility Score",
+      count: `${moderateFoods.length} food items`,
+      borderColor: "border-l-[#FFC412]",
+      scoreColor: "text-[#252525]",
+      countBg: "bg-[#F5F7FA]",
+      gapClass: "gap-[30px]",
+      descriptionColor: "text-[#252525]",
+      filter: "moderate",
+    },
+    {
+      id: 3,
+      scoreRange: "80-100",
+      description: "High Metabolic Compatibility Score",
+      count: `${highFoods.length} food items`,
+      borderColor: "border-l-[#3FAF58]",
+      scoreColor: "text-[#252525]",
+      countBg: "bg-[#F5F7FA]",
+      gapClass: "gap-[30px]",
+      descriptionColor: "text-[#252525]",
+      filter: "high",
+    },
+    {
+      id: 4,
+      scoreRange: "Others",
+      description: null,
+      count: `${othersFoods.length} food items`,
+      borderColor: "border-l-[#D9D9D9]",
+      scoreColor: "text-[#252525]",
+      countBg: "bg-[#F5F7FA]",
+      gapClass: "gap-[48px]",
+      descriptionColor: "text-[#252525]",
+      filter: "others",
+    },
+  ];
+
   return (
     <>
       <div className="p-[15px] bg-white rounded-[15px] shadow-lg">
@@ -252,32 +272,31 @@ export default function MealSidebar({ activeFilter, onFilterChange }) {
           {mealSidebarData.map((item) => (
             <div
               key={item.id}
-              onClick={() => onFilterChange(item.filter)}
-              className={`flex flex-col ${item.gapClass} 
-                          pl-[15px] pt-[15px] pr-[10px] pb-[10px] 
-                          rounded-[10px] border-2 
-                          ${item.borderColor} border-t-0 border-b-0 border-r-0 
-                          ${activeFilter === item.filter ? 'bg-[#F0F5FD]' : 'bg-white'} 
+              onClick={() => onFilterChange?.(item.filter)}
+              className={`flex flex-col ${item.gapClass}
+                          pl-[15px] pt-[15px] pr-[10px] pb-[10px]
+                          rounded-[10px] border-2
+                          ${item.borderColor} border-t-0 border-b-0 border-r-0
+                          ${activeFilter === item.filter ? 'bg-[#F0F5FD]' : 'bg-white'}
                           self-stretch cursor-pointer transition-colors duration-200 hover:bg-[#F0F5FD]`}
             >
-          <div className="flex flex-col gap-2.5">
-  <span
-    className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] 
-      ${activeFilter === item.filter ? 'text-[#308BF9]' : 'text-[#252525]'}`}
-  >
-    {item.scoreRange}
-  </span>
+              <div className="flex flex-col gap-2.5">
+                <span
+                  className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px]
+                    ${activeFilter === item.filter ? 'text-[#308BF9]' : 'text-[#252525]'}`}
+                >
+                  {item.scoreRange}
+                </span>
 
-  {item.description && (
-    <span
-      className={`text-[10px] font-normal leading-[110%] tracking-[-0.2px] 
-        ${activeFilter === item.filter ? 'text-[#308BF9]' : 'text-[#252525]'}`}
-    >
-      {item.description}
-    </span>
-  )}
-</div>
-
+                {item.description && (
+                  <span
+                    className={`text-[10px] font-normal leading-[110%] tracking-[-0.2px]
+                      ${activeFilter === item.filter ? 'text-[#308BF9]' : 'text-[#252525]'}`}
+                  >
+                    {item.description}
+                  </span>
+                )}
+              </div>
 
               <div className={`w-fit min-w-[82px] px-2 py-1.5 rounded-[20px] flex items-center ${item.countBg}`}>
                 <p className="text-[#535359] text-[10px] font-normal leading-normal tracking-[-0.2px] whitespace-nowrap">
@@ -291,8 +310,6 @@ export default function MealSidebar({ activeFilter, onFilterChange }) {
     </>
   );
 }
-
-
 
 
 

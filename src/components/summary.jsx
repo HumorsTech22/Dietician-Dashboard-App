@@ -335,8 +335,6 @@
 
 
 
-
-
 "use client"
 import { IoIosArrowDown } from "react-icons/io";
 import { RxCross2 } from "react-icons/rx";
@@ -350,43 +348,55 @@ export default function Summary({ onConfirmNext }) {
   const [approachTags, setApproachTags] = useState([]);
   const [goals, setGoals] = useState([{ id: 1, title: '', current: '', target: '' }]);
   const [goalUnits, setGoalUnits] = useState([{ id: 1, currentUnit: 'Unit', targetUnit: 'Unit' }]);
+  const [isDiabetic, setIsDiabetic] = useState('no');
+  const [dietType, setDietType] = useState('');
+  const [showDietDropdown, setShowDietDropdown] = useState(false);
 
-  // errors: string = message; empty string = no error
+  const dietDropdownRef = useRef(null);
+
   const [errors, setErrors] = useState({
     planTitle: '',
     fromDate: '',
     toDate: '',
+    isDiabetic: '',
+    dietType: '',
     caloriesTarget: '',
     proteinTarget: '',
     fiberTarget: '',
+    carbsTarget: '',
+    fatTarget: '',
     waterTarget: '',
     approach: '',
-    goals: {} // { [goalId]: { title:'', current:'', target:'' } }
+    goals: {}
   });
 
-  // Date states
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const fromPickerRef = useRef(null);
   const toPickerRef = useRef(null);
 
-  // Unit states
   const [showCurrentDropdown, setShowCurrentDropdown] = useState(null);
   const [showTargetDropdown, setShowTargetDropdown] = useState(null);
 
-  // Daily targets
   const [caloriesTarget, setCaloriesTarget] = useState('');
   const [proteinTarget, setProteinTarget] = useState('');
   const [fiberTarget, setFiberTarget] = useState('');
+  const [carbsTarget, setCarbsTarget] = useState('');
+  const [fatTarget, setFatTarget] = useState('');
   const [waterTarget, setWaterTarget] = useState('');
 
-  // Refs
   const currentDropdownRef = useRef(null);
   const targetDropdownRef = useRef(null);
 
-  const unitOptions = ['kg','g','lb','oz','cm','m','inch','ft','%','bpm','cal','kcal'];
+  const unitOptions = ['kg', 'g', 'lb', 'oz', 'cm', 'm', 'inch', 'ft', '%', 'bpm', 'cal', 'kcal'];
 
-  // Click outside handler for dropdowns
+  const validateToDate = (from, to) => {
+    if (!from || !to) return true;
+    const fromDate = new Date(from.split('/').reverse().join('-'));
+    const toDate = new Date(to.split('/').reverse().join('-'));
+    return toDate > fromDate;
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (currentDropdownRef.current && !currentDropdownRef.current.contains(event.target)) {
@@ -395,12 +405,14 @@ export default function Summary({ onConfirmNext }) {
       if (targetDropdownRef.current && !targetDropdownRef.current.contains(event.target)) {
         setShowTargetDropdown(null);
       }
+      if (dietDropdownRef.current && !dietDropdownRef.current.contains(event.target)) {
+        setShowDietDropdown(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Approach tags
   const addTag = () => {
     const t = approachInput.trim();
     if (!t) return;
@@ -411,12 +423,13 @@ export default function Summary({ onConfirmNext }) {
     }
     setApproachInput('');
   };
+
   const removeTag = (i) => setApproachTags(prev => prev.filter((_, idx) => idx !== i));
+
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTag(); }
   };
 
-  // Unit selection
   const handleUnitSelect = (unit, type, goalId) => {
     setGoalUnits(prev => prev.map(goalUnit =>
       goalUnit.id === goalId
@@ -426,27 +439,33 @@ export default function Summary({ onConfirmNext }) {
     if (type === 'currentUnit') setShowCurrentDropdown(null);
     else setShowTargetDropdown(null);
   };
+
   const toggleCurrentDropdown = (goalId) => { setShowCurrentDropdown(goalId); setShowTargetDropdown(null); };
   const toggleTargetDropdown = (goalId) => { setShowTargetDropdown(goalId); setShowCurrentDropdown(null); };
 
-  // Date utils
+  const handleDietSelect = (type) => {
+    setDietType(type);
+    setShowDietDropdown(false);
+    setErrors(prev => ({ ...prev, dietType: '' }));
+  };
+
   const ymdToDmy = (v) => {
     if (!v) return "";
     const [y, m, d] = v.split("-");
     return `${d}/${m}/${y}`;
   };
+
   const dmyToYmd = (v) => {
     if (!v) return "";
     const [d, m, y] = v.split("/");
     return `${y}-${m}-${d}`;
   };
+
   const openFromPicker = () => { fromPickerRef.current?.showPicker?.() || fromPickerRef.current?.click(); };
   const openToPicker = () => { toPickerRef.current?.showPicker?.() || toPickerRef.current?.click(); };
 
-  // Goals
   const updateGoal = (goalId, field, value) => {
     setGoals(prev => prev.map(goal => goal.id === goalId ? { ...goal, [field]: value } : goal));
-    // clear that field error
     setErrors(prev => ({
       ...prev,
       goals: {
@@ -474,19 +493,21 @@ export default function Summary({ onConfirmNext }) {
     }
   };
 
-  // Field-level error helpers
   const markError = (key, message) => message ? message : '';
   const markGoalError = (curr, key, message) => ({ ...(curr || {}), [key]: message });
 
-  // Validation -> sets errors and returns boolean
   const validateForm = () => {
     const nextErrors = {
       planTitle: '',
       fromDate: '',
       toDate: '',
+      isDiabetic: '',
+      dietType: '',
       caloriesTarget: '',
       proteinTarget: '',
       fiberTarget: '',
+      carbsTarget: '',
+      fatTarget: '',
       waterTarget: '',
       approach: '',
       goals: {}
@@ -495,10 +516,18 @@ export default function Summary({ onConfirmNext }) {
     if (!planTitle.trim()) nextErrors.planTitle = 'Enter plan title';
     if (!fromDate) nextErrors.fromDate = 'Select start date';
     if (!toDate) nextErrors.toDate = 'Select end date';
-
+    
+    if (fromDate && toDate && !validateToDate(fromDate, toDate)) {
+      nextErrors.toDate = 'To date must be after From date';
+    }
+    
+    if (!isDiabetic) nextErrors.isDiabetic = 'Please select diabetic status';
+    if (!dietType) nextErrors.dietType = 'Please select diet type';
     if (!caloriesTarget) nextErrors.caloriesTarget = 'Enter calories target';
     if (!proteinTarget) nextErrors.proteinTarget = 'Enter protein target';
     if (!fiberTarget) nextErrors.fiberTarget = 'Enter fiber target';
+    if (!carbsTarget) nextErrors.carbsTarget = 'Enter carbs target';
+    if (!fatTarget) nextErrors.fatTarget = 'Enter fat target';
     if (!waterTarget) nextErrors.waterTarget = 'Enter water target';
 
     if (approachTags.length === 0) nextErrors.approach = 'Add at least one approach';
@@ -515,8 +544,10 @@ export default function Summary({ onConfirmNext }) {
 
     const hasTopLevel =
       nextErrors.planTitle || nextErrors.fromDate || nextErrors.toDate ||
+      nextErrors.isDiabetic || nextErrors.dietType ||
       nextErrors.caloriesTarget || nextErrors.proteinTarget ||
-      nextErrors.fiberTarget || nextErrors.waterTarget || nextErrors.approach;
+      nextErrors.fiberTarget || nextErrors.carbsTarget || nextErrors.fatTarget ||
+      nextErrors.waterTarget || nextErrors.approach;
 
     const hasGoalLevel = Object.keys(nextErrors.goals).length > 0;
 
@@ -527,15 +558,18 @@ export default function Summary({ onConfirmNext }) {
     return true;
   };
 
-  // Prepare data for storage
   const prepareFormData = () => {
     return {
       plan_title: planTitle,
       plan_start_date: dmyToYmd(fromDate),
       plan_end_date: dmyToYmd(toDate),
+      is_diabetic: isDiabetic,
+      diet_type: dietType,
       calories_target: caloriesTarget,
       protein_target: proteinTarget,
       fiber_target: fiberTarget,
+      carbs_target: carbsTarget,
+      fat_target: fatTarget,
       water_target: waterTarget,
       goal: goals.map(goal => {
         const goalUnit = goalUnits.find(gu => gu.id === goal.id) || { currentUnit: 'Unit', targetUnit: 'Unit' };
@@ -549,20 +583,19 @@ export default function Summary({ onConfirmNext }) {
     };
   };
 
-  // Save
   const saveToLocalStorage = (isDraft = false) => {
     if (!isDraft && !validateForm()) return;
     const formData = prepareFormData();
     if (isDraft) formData.isDraft = true;
     localStorage.setItem('planSummary', JSON.stringify(formData));
-    if (isDraft) toast.success('Plan saved as draft successfully!');
+    if (isDraft)
+      ""
     else { toast.success('Plan saved successfully!'); onConfirmNext?.(); }
   };
 
   const handleSaveAsDraft = () => saveToLocalStorage(true);
   const handleConfirmNext = () => saveToLocalStorage(false);
 
-  // Clear individual errors when user types/changes
   const onChangeAndClear = (setter, key) => (e) => {
     setter(e.target.value);
     setErrors(prev => ({ ...prev, [key]: '' }));
@@ -579,7 +612,6 @@ export default function Summary({ onConfirmNext }) {
 
         <div className='mt-[15px]'>
           <div className="flex gap-5 items-end">
-            {/* Name of the plan */}
             <div className="relative flex-1">
               <input
                 type="text"
@@ -600,14 +632,12 @@ export default function Summary({ onConfirmNext }) {
               ) : null}
             </div>
 
-            {/* Duration */}
             <div className="flex-1">
               <span className="px-[9px] text-[#252525] text-[12px] leading-normal font-semibold tracking-[-0.24px]">
                 Duration
               </span>
 
               <div className="flex gap-2 mt-2">
-                {/* From */}
                 <div className="relative flex-1">
                   <span className="absolute -top-2 left-4 bg-white px-[9px] text-[12px] font-medium text-[#535359]">
                     From
@@ -640,49 +670,160 @@ export default function Summary({ onConfirmNext }) {
                   ) : null}
                 </div>
 
-                {/* To */}
-                <div className="relative flex-1">
-                  <span className="absolute -top-2 left-4 bg-white px-[9px] text-[12px] font-medium text-[#53559]">
-                    To
-                  </span>
-                  <div className={`flex py-[15px] pl-[19px] pr-[13px] rounded-[8px] bg-white
-                    ${errors.toDate ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'}`}>
-                    <input
-                      type="text"
-                      readOnly
-                      value={toDate}
-                      onClick={openToPicker}
-                      placeholder="DD/MM/YYYY"
-                      className="w-full outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#9CA3AF] cursor-pointer"
-                    />
-                    <button type="button" onClick={openToPicker} className="cursor-pointer">
-                      <Image src="/icons/hugeicons_calendar-03.svg" alt="calendar" width={20} height={20} />
-                    </button>
-                    <input
-                      ref={toPickerRef}
-                      type="date"
-                      className="sr-only"
-                      onChange={(e) => { setToDate(ymdToDmy(e.target.value)); setErrors(prev => ({ ...prev, toDate: '' })); }}
-                    />
-                  </div>
-                  {errors.toDate ? (
-                    <div className="flex gap-[5px] items-center mt-1">
-                      <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
-                      <span className="text-[#DA5747] text-[10px]">{errors.toDate}</span>
-                    </div>
-                  ) : null}
-                </div>
+            <div className="relative flex-1">
+  <span className="absolute -top-2 left-4 bg-white px-[9px] text-[12px] font-medium text-[#535359]">
+    To
+  </span>
+  <div className={`flex py-[15px] pl-[19px] pr-[13px] rounded-[8px] bg-white
+    ${errors.toDate ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'}`}>
+    <input
+      type="text"
+      readOnly
+      value={toDate}
+      onClick={openToPicker}
+      placeholder="DD/MM/YYYY"
+      className="w-full outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#9CA3AF] cursor-pointer"
+    />
+    <button 
+      type="button" 
+      onClick={openToPicker} 
+      className="cursor-pointer flex items-center justify-center"
+      title="Open calendar"
+    >
+      <Image src="/icons/hugeicons_calendar-03.svg" alt="calendar" width={20} height={20} />
+    </button>
+    <input
+      ref={toPickerRef}
+      type="date"
+      className="sr-only"
+      onChange={(e) => { 
+        const newToDate = ymdToDmy(e.target.value);
+        setToDate(newToDate);
+        
+        if (fromDate && !validateToDate(fromDate, newToDate)) {
+          setErrors(prev => ({ ...prev, toDate: 'To date must be after From date' }));
+        } else {
+          setErrors(prev => ({ ...prev, toDate: '' }));
+        }
+      }}
+    />
+  </div>
+  {errors.toDate ? (
+    <div className="flex gap-[5px] items-center mt-1">
+      <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+      <span className="text-[#DA5747] text-[10px]">{errors.toDate}</span>
+    </div>
+  ) : null}
+</div>
               </div>
             </div>
           </div>
 
-          {/* Daily Targets */}
+          <div className="flex items-center gap-5 mt-[15px]">
+            <div className="flex-1">
+              <div className='px-[9px] pt-[5px] pb-[12px] text-[#252525] text-[12px] leading-normal font-semibold tracking-[-0.24px]'>
+                Choose your diet type
+              </div>
+              <div className="relative" ref={dietDropdownRef}>
+                <div
+                  className={`flex justify-between items-center py-[15px] pl-[19px] pr-[13px] rounded-[8px] bg-white border cursor-pointer
+                    ${errors.dietType ? 'border-[#DA5747]' : 'border-[#E1E6ED]'}`}
+                  onClick={() => setShowDietDropdown(!showDietDropdown)}
+                >
+                  <span className={`text-[14px] ${dietType ? 'text-[#252525]' : 'text-[#9CA3AF]'}`}>
+                    {dietType || 'Select diet type'}
+                  </span>
+                  <IoIosArrowDown className={`text-[#A1A1A1] transition-transform ${showDietDropdown ? 'rotate-180' : ''}`} />
+                </div>
+
+                {showDietDropdown && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#E1E6ED] rounded-[8px] shadow-lg z-10">
+                    <div
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525] border-b border-[#E1E6ED]"
+                      onClick={() => handleDietSelect('Veg')}
+                    >
+                      Veg
+                    </div>
+                    <div
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525] border-b border-[#E1E6ED]"
+                      onClick={() => handleDietSelect('Non-Veg')}
+                    >
+                      Non-Veg
+                    </div>
+                    <div
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525] border-b border-[#E1E6ED]"
+                      onClick={() => handleDietSelect('Eggitarian')}
+                    >
+                      Eggitarian
+                    </div>
+                    <div
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525]"
+                      onClick={() => handleDietSelect('Vegan')}
+                    >
+                      Vegan
+                    </div>
+                  </div>
+                )}
+
+                {errors.dietType && (
+                  <div className="flex gap-[5px] items-center mt-1">
+                    <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+                    <span className="text-[#DA5747] text-[10px]">{errors.dietType}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex-1">
+              <div className="flex items-center">
+              <div className='px-[9px] pt-[5px] pb-[5px] text-[#252525] text-[12px] leading-normal font-semibold tracking-[-0.24px]'>
+                Client is diabetic?
+              </div>
+              <div className="flex gap-6">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="diabetic"
+                    value="yes"
+                    checked={isDiabetic === 'yes'}
+                    onChange={(e) => {
+                      setIsDiabetic(e.target.value);
+                      setErrors(prev => ({ ...prev, isDiabetic: '' }));
+                    }}
+                    className="w-4 h-4 text-[#308BF9] bg-white border-[#D9D9D9] focus:ring-[#308BF9] focus:ring-2"
+                  />
+                  <span className="text-[14px] text-[#252525]">Yes</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="diabetic"
+                    value="no"
+                    checked={isDiabetic === 'no'}
+                    onChange={(e) => {
+                      setIsDiabetic(e.target.value);
+                      setErrors(prev => ({ ...prev, isDiabetic: '' }));
+                    }}
+                    className="w-4 h-4 text-[#308BF9] bg-white border-[#D9D9D9] focus:ring-[#308BF9] focus:ring-2"
+                  />
+                  <span className="text-[14px] text-[#252525]">No</span>
+                </label>
+              </div>
+              </div>
+              {errors.isDiabetic && (
+                <div className="flex gap-[5px] items-center mt-1">
+                  <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+                  <span className="text-[#DA5747] text-[10px]">{errors.isDiabetic}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="mt-[15px]">
             <div className='px-[9px] pt-[5px] pb-[12px] text-[#252525] text-[12px] leading-normal font-semibold tracking-[-0.24px]'>
-              Nutrition Target
+              Nutrition Target (Per day)
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-[10px]">
-              {/* Calories */}
               <div className="relative">
                 <input
                   type="number"
@@ -705,7 +846,6 @@ export default function Summary({ onConfirmNext }) {
                 ) : null}
               </div>
 
-              {/* Protein */}
               <div className="relative">
                 <input
                   type="number"
@@ -729,7 +869,6 @@ export default function Summary({ onConfirmNext }) {
                 ) : null}
               </div>
 
-              {/* Fiber */}
               <div className="relative">
                 <input
                   type="number"
@@ -753,7 +892,52 @@ export default function Summary({ onConfirmNext }) {
                 ) : null}
               </div>
 
-              {/* Water */}
+              <div className="relative">
+                <input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={carbsTarget}
+                  onChange={onChangeAndClear(setCarbsTarget, 'carbsTarget')}
+                  placeholder=" "
+                  className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent
+                    ${errors.carbsTarget ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} focus:border-blue-600`}
+                />
+                <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
+                  Carbs Target
+                </label>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#535359]">g</span>
+                {errors.carbsTarget ? (
+                  <div className="flex gap-[5px] items-center mt-1">
+                    <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+                    <span className="text-[#DA5747] text-[10px]">{errors.carbsTarget}</span>
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="relative">
+                <input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={fatTarget}
+                  onChange={onChangeAndClear(setFatTarget, 'fatTarget')}
+                  placeholder=" "
+                  className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent
+                    ${errors.fatTarget ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} focus:border-blue-600`}
+                />
+                <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
+                  Fat Target
+                </label>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#535359]">g</span>
+                {errors.fatTarget ? (
+                  <div className="flex gap-[5px] items-center mt-1">
+                    <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+                    <span className="text-[#DA5747] text-[10px]">{errors.fatTarget}</span>
+                  </div>
+                ) : null}
+              </div>
+
               <div className="relative">
                 <input
                   type="number"
@@ -779,7 +963,6 @@ export default function Summary({ onConfirmNext }) {
             </div>
           </div>
 
-          {/* Goals */}
           {goals.map((goal, index) => {
             const goalUnit = goalUnits.find(gu => gu.id === goal.id) || { currentUnit: 'Unit', targetUnit: 'Unit' };
             const gErr = errors.goals[goal.id] || {};
@@ -820,7 +1003,6 @@ export default function Summary({ onConfirmNext }) {
                   </div>
 
                   <div className="flex gap-10">
-                    {/* Current Stat */}
                     <div className="flex flex-col" ref={currentDropdownRef}>
                       <div className={`flex items-center py-[15px] pl-[19px] pr-[15px] rounded-[8px] bg-white relative
                         ${gErr.current ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'}`}>
@@ -860,7 +1042,6 @@ export default function Summary({ onConfirmNext }) {
                       ) : null}
                     </div>
 
-                    {/* Target Stat */}
                     <div className="flex flex-col" ref={targetDropdownRef}>
                       <div className={`flex items-center py-[15px] pl-[19px] pr-[15px] rounded-[8px] bg-white relative
                         ${gErr.target ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'}`}>
@@ -907,7 +1088,6 @@ export default function Summary({ onConfirmNext }) {
         </div>
       </div>
 
-      {/* Add Another Goal */}
       <div className='px-5 py-[15px]'>
         <span
           className='text-[#308BF9] font-semibold text-[12px] cursor-pointer'
@@ -917,7 +1097,6 @@ export default function Summary({ onConfirmNext }) {
         </span>
       </div>
 
-      {/* Approaches */}
       <div className='flex flex-col gap-3.5'>
         <div className={`flex justify-between pr-[15px] items-center py-[15px] pl-5 rounded-[8px]
           ${errors.approach ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} bg-white`}>
@@ -952,7 +1131,6 @@ export default function Summary({ onConfirmNext }) {
 
       <div className="w-full border-b border-[#E1E6ED] mt-[30px]"></div>
 
-      {/* Buttons */}
       <div className='py-[23px]'>
         <div className='flex gap-5 justify-end'>
           <div

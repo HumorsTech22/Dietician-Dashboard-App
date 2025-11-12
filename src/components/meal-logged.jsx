@@ -123,26 +123,54 @@
 
 
 
-
-
-
 "use client";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import Image from "next/image";
 import MealSidebar from "./meal-sidebar";
 import MealTracked from "./meal-tracked";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
+import { useSelector } from "react-redux";
+import { fetchWeeklyAnalysisComplete } from "../services/authService"; // Import the API service
 
 export default function MealLogged() {
   const [activeFilter, setActiveFilter] = useState("low");
+
+  // IMPORTANT: store as an array, not null
+  const [weeklyAnalysisData, setWeeklyAnalysisData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const clientProfile = useSelector((state) => state.clientProfile.data);
 
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
   };
 
-  // ====== Week builder logic ======
+  // ===== Derived stats from array =====
+  const dataArr = Array.isArray(weeklyAnalysisData) ? weeklyAnalysisData : [];
+  const totalFoods = dataArr.length;
+
+  const avgScore = totalFoods
+    ? Math.round(
+        dataArr.reduce(
+          (sum, item) => sum + (Number(item.metabolic_compatibility_score) || 0),
+          0
+        ) / totalFoods
+      )
+    : 0;
+
+  const zone =
+    avgScore >= 80 ? "High" : avgScore >= 61 ? "Moderate" : "Low";
+
+  const goalCounts = dataArr.reduce((acc, item) => {
+    const key = item.goal_alignment || "Unknown";
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+
+  // ====== Week builder logic (fallback when no active plan) ======
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth(); // 0-indexed
@@ -160,6 +188,49 @@ export default function MealLogged() {
 
   const [selectedWeekIdx, setSelectedWeekIdx] = useState(currentWeekIdx);
 
+  // Function to fetch weekly analysis data
+  const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const requestBody = {
+        // dietician_id: clientProfile?.dietician_id,
+        // profile_id: clientProfile?.profile_id,
+        dietician_id: "RespyrD01",
+        profile_id: "profile1",
+        start_date: startDate,
+        end_date: endDate,
+        diet_plan_id: dietPlanId,
+      };
+
+      const response = await fetchWeeklyAnalysisComplete(requestBody);
+      // Expecting array at response.api_response.food_level_evaluation
+      const arr = response?.api_response?.food_level_evaluation || [];
+      setWeeklyAnalysisData(arr);
+      // console.log("Weekly Analysis Data:", arr);
+    } catch (err) {
+      setError(err?.message || "Failed to fetch weekly analysis");
+      setWeeklyAnalysisData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch data when week selection changes or clientProfile is available
+  useEffect(() => {
+    if (clientProfile?.plans_summary?.active?.length > 0) {
+      const activePlan = clientProfile.plans_summary.active[0];
+      const startDate = activePlan.plan_start_date;
+      const endDate = activePlan.plan_end_date;
+      const dietPlanId = activePlan.id;
+      fetchWeeklyAnalysis(startDate, endDate, dietPlanId);
+    } else {
+      // No active plan -> keep empty array
+      setWeeklyAnalysisData([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedWeekIdx, clientProfile]);
+
   const fmt = (d) =>
     d.toLocaleDateString("en-GB", {
       day: "2-digit",
@@ -167,7 +238,6 @@ export default function MealLogged() {
       year: "numeric",
     });
   const monthDate = (day) => new Date(year, month, day);
-  // =================================
 
   return (
     <>
@@ -191,6 +261,20 @@ export default function MealLogged() {
 
         <div className="w-full border-b border-[#E1E6ED]"></div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center items-center py-4">
+            <p className="text-[#308BF9]">Loading weekly analysis...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="flex justify-center items-center py-4">
+            <p className="text-red-500">Error: {error}</p>
+          </div>
+        )}
+
         {/* ===== Select Week Section ===== */}
         <div className="flex flex-col gap-9 bg-[#F5F7FA] rounded-[15px]">
           <div className="flex items-center bg-[#E1E6ED] rounded-[15px] border-4 border-[#F5F7FA]">
@@ -203,47 +287,119 @@ export default function MealLogged() {
 
             <div className="flex items-center">
               <div className="flex items-center">
-                {weeks.map((w, idx) => {
-                  const isFuture = idx > currentWeekIdx;
-                  const isSelected = idx === selectedWeekIdx;
+                {clientProfile?.plans_summary?.active?.length > 0 ? (
+                  (() => {
+                    const activePlan = clientProfile.plans_summary.active[0];
+                    const startDate = new Date(activePlan.plan_start_date);
+                    const endDate = new Date(activePlan.plan_end_date);
 
-                  const wrapBase =
-                    "flex flex-col w-full gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px]";
-                  const wrapClass = isFuture
-                    ? `${wrapBase} bg-transparent cursor-not-allowed`
-                    : isSelected
-                    ? `${wrapBase} bg-[#308BF9] cursor-pointer`
-                    : `${wrapBase} bg-transparent cursor-pointer`;
+                    // Calculate total days in the plan
+                    const totalDays =
+                      Math.ceil(
+                        (endDate - startDate) / (1000 * 60 * 60 * 24)
+                      ) + 1;
+                    const totalWeeks = Math.ceil(totalDays / 7);
 
-                  const titleClass = isFuture
-                    ? "text-[#A1A1A1] text-[12px] font-semibold leading-[110%] tracking-[-0.48px] whitespace-nowrap"
-                    : isSelected
-                    ? "text-white text-[12px] font-semibold leading-[110%] tracking-[-0.48px] whitespace-nowrap"
-                    : "text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.48px] whitespace-nowrap";
+                    // Generate weeks based on plan dates
+                    const planWeeks = [];
+                    for (let i = 0; i < totalWeeks; i++) {
+                      const weekStart = new Date(startDate);
+                      weekStart.setDate(startDate.getDate() + i * 7);
 
-                  const dateClass = isFuture
-                    ? "text-[#A1A1A1] text-[10px] font-normal leading-[110%] tracking-[-0.2px] whitespace-nowrap"
-                    : isSelected
-                    ? "text-white text-[10px] font-normal leading-[110%] tracking-[-0.2px] whitespace-nowrap"
-                    : "text-[#252525] text-[10px] font-normal leading-[110%] tracking-[-0.2px] whitespace-nowrap";
+                      const weekEnd = new Date(weekStart);
+                      weekEnd.setDate(weekStart.getDate() + 6);
 
-                  return (
-                    <React.Fragment key={w.label}>
-                      <div
-                        className={wrapClass}
-                        onClick={() => !isFuture && setSelectedWeekIdx(idx)}
-                      >
-                        <span className={titleClass}>{w.label}</span>
-                        <span className={dateClass}>
-                          {fmt(monthDate(w.start))} - {fmt(monthDate(w.end))}
-                        </span>
-                      </div>
-                      {idx !== weeks.length - 1 && (
-                        <div className="border-white border-r h-8 mx-2"></div>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
+                      // Don't let weekEnd exceed the plan end date
+                      if (weekEnd > endDate) {
+                        weekEnd.setTime(endDate.getTime());
+                      }
+
+                      planWeeks.push({
+                        label: `Week ${i + 1}`,
+                        start: weekStart,
+                        end: weekEnd,
+                      });
+                    }
+
+                    return planWeeks.map((w, idx) => {
+                      const isSelected = idx === selectedWeekIdx;
+
+                      const wrapBase =
+                        "flex flex-col w-full gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px]";
+                      const wrapClass = isSelected
+                        ? `${wrapBase} bg-[#308BF9] cursor-pointer`
+                        : `${wrapBase} bg-transparent cursor-pointer`;
+
+                      const titleClass = isSelected
+                        ? "text-white text-[12px] font-semibold leading-[110%] tracking-[-0.48px] whitespace-nowrap"
+                        : "text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.48px] whitespace-nowrap";
+
+                      const dateClass = isSelected
+                        ? "text-white text-[10px] font-normal leading-[110%] tracking-[-0.2px] whitespace-nowrap"
+                        : "text-[#252525] text-[10px] font-normal leading-[110%] tracking-[-0.2px] whitespace-nowrap";
+
+                      return (
+                        <React.Fragment key={w.label}>
+                          <div
+                            className={wrapClass}
+                            onClick={() => setSelectedWeekIdx(idx)}
+                          >
+                            <span className={titleClass}>{w.label}</span>
+                            <span className={dateClass}>
+                              {fmt(w.start)} - {fmt(w.end)}
+                            </span>
+                          </div>
+                          {idx !== planWeeks.length - 1 && (
+                            <div className="border-white border-r h-8 mx-2"></div>
+                          )}
+                        </React.Fragment>
+                      );
+                    });
+                  })()
+                ) : (
+                  // Fallback to original logic if no active plan
+                  weeks.map((w, idx) => {
+                    const isFuture = idx > currentWeekIdx;
+                    const isSelected = idx === selectedWeekIdx;
+
+                    const wrapBase =
+                      "flex flex-col w-full gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px]";
+                    const wrapClass = isFuture
+                      ? `${wrapBase} bg-transparent cursor-not-allowed`
+                      : isSelected
+                      ? `${wrapBase} bg-[#308BF9] cursor-pointer`
+                      : `${wrapBase} bg-transparent cursor-pointer`;
+
+                    const titleClass = isFuture
+                      ? "text-[#A1A1A1] text-[12px] font-semibold leading-[110%] tracking-[-0.48px] whitespace-nowrap"
+                      : isSelected
+                      ? "text-white text-[12px] font-semibold leading-[110%] tracking-[-0.48px] whitespace-nowrap"
+                      : "text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.48px] whitespace-nowrap";
+
+                    const dateClass = isFuture
+                      ? "text-[#A1A1A1] text-[10px] font-normal leading-[110%] tracking-[-0.2px] whitespace-nowrap"
+                      : isSelected
+                      ? "text-white text-[10px] font-normal leading-[110%] tracking-[-0.2px] whitespace-nowrap"
+                      : "text-[#252525] text-[10px] font-normal leading-[110%] tracking-[-0.2px] whitespace-nowrap";
+
+                    return (
+                      <React.Fragment key={w.label}>
+                        <div
+                          className={wrapClass}
+                          onClick={() => !isFuture && setSelectedWeekIdx(idx)}
+                        >
+                          <span className={titleClass}>{w.label}</span>
+                          <span className={dateClass}>
+                            {fmt(monthDate(w.start))} - {fmt(monthDate(w.end))}
+                          </span>
+                        </div>
+                        {idx !== weeks.length - 1 && (
+                          <div className="border-white border-r h-8 mx-2"></div>
+                        )}
+                      </React.Fragment>
+                    );
+                  })
+                )}
               </div>
 
               <IoIosArrowForward className="text-[#252525] ml-2 cursor-pointer" />
@@ -252,11 +408,11 @@ export default function MealLogged() {
         </div>
         {/* ===== End Select Week Section ===== */}
 
-        {/* Stats Row */}
+        {/* Stats Row - now driven by array data */}
         <div className="flex justify-between bg-[#E1E6ED] rounded-[15px] px-5 py-[19px] ml-[59px] mr-[59px]">
           <div className="flex flex-col justify-between w-[170px] bg-white rounded-[8px] py-[19px] pl-5 pr-10">
             <span className="text-[#252525] text-[25px] font-semibold tracking-[-0.5px] leading-[126%]">
-              40
+              {totalFoods}
             </span>
             <p className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[0.2px]">
               Total Foods
@@ -266,7 +422,7 @@ export default function MealLogged() {
           <div className="flex gap-20 bg-white rounded-[8px] py-[19px] px-5">
             <div className="flex flex-col justify-between">
               <span className="text-[#252525] text-[25px] font-semibold tracking-[-0.5px] leading-[126%]">
-                40
+                {goalCounts.Support || 0}
               </span>
               <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[0.2px]">
                 Foods Consumed
@@ -275,10 +431,10 @@ export default function MealLogged() {
 
             <div className="flex flex-col justify-between">
               <span className="text-[#252525] text-[25px] font-semibold tracking-[-0.5px] leading-[126%]">
-                40
+                {goalCounts.Low || 0}
               </span>
               <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[0.2px]">
-                foods missed
+                Foods Missed
               </span>
             </div>
           </div>
@@ -287,11 +443,11 @@ export default function MealLogged() {
             <div className="flex flex-col gap-5">
               <div className="flex items-center gap-2.5">
                 <span className="text-[#252525] text-[18px] font-semibold tracking-[-0.5px] leading-[126%]">
-                  40
+                  {avgScore}
                 </span>
                 <div className="w-px h-4 bg-[#D9D9D9]" />
                 <span className="text-[#252525] text-[18px] font-semibold tracking-[-0.36px] leading-[126%]">
-                  Moderate
+                  {zone}
                 </span>
               </div>
               <div className="flex justify-start">
@@ -308,8 +464,9 @@ export default function MealLogged() {
                     strokeWidth="5"
                     strokeLinecap="round"
                   />
+                  {/* You can map avgScore into this bar width if needed */}
                   <path
-                    d="M3 3H59"
+                    d={`M3 3H${Math.max(3, Math.min(114, Math.round((avgScore / 100) * 111) + 3))}`}
                     stroke="#FFC412"
                     strokeWidth="5"
                     strokeLinecap="round"
@@ -330,19 +487,19 @@ export default function MealLogged() {
           <MealSidebar
             activeFilter={activeFilter}
             onFilterChange={handleFilterChange}
+            weeklyAnalysisData={dataArr} // pass safe array
           />
           <div className="w-full max-h-[600px] overflow-y-auto hide-scrollbar">
-            <MealTracked activeFilter={activeFilter} />
+            <MealTracked
+              activeFilter={activeFilter}
+              weeklyAnalysisData={dataArr} // pass safe array
+            />
           </div>
         </div>
       </div>
     </>
   );
 }
-
-
-
-
 
 
 

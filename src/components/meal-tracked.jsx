@@ -987,230 +987,85 @@
 
 
 
-
-
-
-
 "use client";
 import { useState } from "react";
 import Image from "next/image";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 
-export default function MealTracked({ activeFilter = "all" }) {
+export default function MealTracked({
+  activeFilter = "all",
+  weeklyAnalysisData = [],
+}) {
   const [openItems, setOpenItems] = useState({});
 
-  const allMealItems = [
-    {
-      id: 1,
-      score: 65,
-      level: "Moderate",
-      strokeColor: "#FFC412",
-      strokeWidth: 76,
-      icon: "/icons/hugeicons_bubble-tea-02.svg",
-      name: "Carrot + beetroot + fresh turmeric & zinger [ little ] with lemon drops",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 11,
-      score: 78,
-      level: "Moderate",
-      strokeColor: "#FFC412",
-      strokeWidth: 76,
-      icon: "/icons/hugeicons_bubble-tea-02.svg",
-      name: "Carrot + beetroot + fresh turmeric & zinger [ little ] with lemon drops",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 12,
-      score: 65,
-      level: "Moderate",
-      strokeColor: "#FFC412",
-      strokeWidth: 76,
-      icon: "/icons/hugeicons_bubble-tea-02.svg",
-      name: "Carrot + beetroot + fresh turmeric & zinger [ little ] with lemon drops",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 15,
-      score: 96,
-      level: "High",
-      strokeColor: "#3FAF58",
-      strokeWidth: 117,
-      icon: "/icons/hugeicons_plant-04.svg",
-      name: "Almonds [soaked + de skinned]",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 13,
-      score: 68,
-      level: "Moderate",
-      strokeColor: "#FFC412",
-      strokeWidth: 76,
-      icon: "/icons/hugeicons_bubble-tea-02.svg",
-      name: "Carrot + beetroot + fresh turmeric & zinger [ little ] with lemon drops",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 14,
-      score: 63,
-      level: "Moderate",
-      strokeColor: "#FFC412",
-      strokeWidth: 76,
-      icon: "/icons/hugeicons_bubble-tea-02.svg",
-      name: "Carrot + beetroot + fresh turmeric & zinger [ little ] with lemon drops",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 8,
-      score: 75,
-      level: "Moderate",
-      strokeColor: "#FFC412",
-      strokeWidth: 76,
-      icon: "/icons/hugeicons_bubble-tea-02.svg",
-      name: "Carrot + beetroot + fresh turmeric & zinger [ little ] with lemon drops",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 2,
-      score: 80,
-      level: "High",
-      strokeColor: "#3FAF58",
-      strokeWidth: 94,
-      icon: "/icons/hugeicons_plant-04.svg",
-      name: "Almonds [soaked + de skinned]",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 3,
-      score: 20,
-      level: "Low",
-      strokeColor: "#DA5747",
-      strokeWidth: 23,
-      icon: "/icons/hugeicons_plant-04.svg",
-      name: "Almonds [soaked + de skinned]",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 16,
-      score: 22,
-      level: "Low",
-      strokeColor: "#DA5747",
-      strokeWidth: 23,
-      icon: "/icons/hugeicons_plant-04.svg",
-      name: "Almonds [soaked + de skinned]",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 17,
-      score: 10,
-      level: "Low",
-      strokeColor: "#DA5747",
-      strokeWidth: 23,
-      icon: "/icons/hugeicons_plant-04.svg",
-      name: "Almonds [soaked + de skinned]",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 24,
-      score: 24,
-      level: "Low",
-      strokeColor: "#DA5747",
-      strokeWidth: 23,
-      icon: "/icons/hugeicons_plant-04.svg",
-      name: "Almonds [soaked + de skinned]",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 18,
-      score: 35,
-      level: "Low",
-      strokeColor: "#DA5747",
-      strokeWidth: 23,
-      icon: "/icons/hugeicons_plant-04.svg",
-      name: "Almonds [soaked + de skinned]",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 19,
-      score: 30,
-      level: "Low",
-      strokeColor: "#DA5747",
-      strokeWidth: 23,
-      icon: "/icons/hugeicons_plant-04.svg",
-      name: "Almonds [soaked + de skinned]",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 7,
-      score: 36,
-      level: "Low",
-      strokeColor: "#DA5747",
-      strokeWidth: 23,
-      icon: "/icons/hugeicons_plant-04.svg",
-      name: "Almonds [soaked + de skinned]",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 4,
-      score: null,
-      level: null,
-      strokeColor: null,
-      strokeWidth: 0,
-      icon: null,
-      name: "",
-      calories: "",
-      portion: "",
-      description: "Oats are high in carbohydrates, which can hinder fat loss by maintaining glucose reliance. The fiber content, while generally healthy, may contribute to the high fermentation observed."
-    },
-    {
-      id: 5,
-      score: 100,
-      level: "High",
-      strokeColor: "#3FAF58",
-      strokeWidth: 117,
-      icon: "/icons/hugeicons_plant-04.svg",
-      name: "Almonds [soaked + de skinned]",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    },
-    {
-      id: 6,
-      score: 98,
-      level: "High",
-      strokeColor: "#3FAF58",
-      strokeWidth: 117,
-      icon: "/icons/hugeicons_plant-04.svg",
-      name: "Almonds [soaked + de skinned]",
-      calories: "220kcal",
-      portion: "1 cup (250 ml)",
-    }
-  ];
+  // ===== Helpers =====
+  const splitBrief = (brief = "") => {
+    const parts = brief
+      .replace(/\s+/g, " ")
+      .trim()
+      .split(/(?<=[.?!])\s+/)
+      .filter(Boolean);
+    return {
+      fatGlucoseImpact: parts[0] || "-",
+      liverImpact: parts[1] || "-",
+      gutImpact: parts[2] || "-",
+    };
+  };
+
+  const levelFromScore = (s) => {
+    if (s === null || s === undefined) return null;
+    if (s <= 60) return "Low";
+    if (s <= 79) return "Moderate";
+    return "High";
+  };
+
+  const strokeColorFromLevel = (lvl) => {
+    if (lvl === "High") return "#3FAF58";
+    if (lvl === "Moderate") return "#FFC412";
+    if (lvl === "Low") return "#DA5747";
+    return null;
+  };
+
+  // Convert score (0..100) to SVG end-x for "M3 3H{end}"
+  const strokeWidthFromScore = (s) => {
+    if (s === null || s === undefined) return 0;
+    return Math.round(3 + (Math.max(0, Math.min(100, s)) / 100) * 111); // 3..114
+  };
+
+  // ===== Transform ONLY dynamic API data =====
+  const allMealItems = Array.isArray(weeklyAnalysisData)
+    ? weeklyAnalysisData.map((it, idx) => {
+        const score =
+          typeof it.metabolic_compatibility_score === "number"
+            ? it.metabolic_compatibility_score
+            : null;
+        const level = levelFromScore(score);
+        const { fatGlucoseImpact, liverImpact, gutImpact } = splitBrief(
+          it.brief_intervention || ""
+        );
+        return {
+          id: idx + 1, // internal id; UI will show sequential index anyway
+          score,
+          level,
+          strokeColor: strokeColorFromLevel(level),
+          strokeWidth: strokeWidthFromScore(score),
+          icon: "/icons/hugeicons_plant-04.svg",
+          name: it.food || "-",
+          calories: "-", // not provided by API
+          portion: "-", // not provided by API
+          fatGlucoseImpact,
+          liverImpact,
+          gutImpact,
+          goalAlignment: it.goal_alignment || "-",
+          goalAlignmentNote: it.goal_alignment_note || "-",
+        };
+      })
+    : [];
 
   const categorizeItems = (items) => {
-    const categorized = {
-      low: [],
-      moderate: [],
-      high: [],
-      others: []
-    };
-
-    items.forEach(item => {
-      if (item.score === null) {
+    const categorized = { low: [], moderate: [], high: [], others: [] };
+    items.forEach((item) => {
+      if (item.score === null || item.score === undefined) {
         categorized.others.push(item);
       } else if (item.score >= 0 && item.score <= 60) {
         categorized.low.push(item);
@@ -1220,7 +1075,6 @@ export default function MealTracked({ activeFilter = "all" }) {
         categorized.high.push(item);
       }
     });
-
     return categorized;
   };
 
@@ -1245,34 +1099,38 @@ export default function MealTracked({ activeFilter = "all" }) {
   const filteredItems = getFilteredItems();
 
   const toggleItem = (id) => {
-    setOpenItems(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
+    setOpenItems((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const MealItem = ({ item }) => (
+  const MealItem = ({ item, index }) => (
     <div className="flex flex-col gap-5 p-[15px] rounded-[15px] bg-[#FFFFFF]">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center">
-          {item.icon && (
+          {/* {item.icon && (
             <Image src={item.icon} alt="Food icon" width={24} height={24} />
-          )}
-          <div className="py-[3px] px-[9px]">
+          )} */}
+          {/* <div className="py-[3px] px-[9px]">
             <span className="text-[#252525] text-[15px] font-bold tracking-[-0.3px] leading-[126%]">
-              {item.id}
+              {index + 1}
             </span>
-          </div>
+          </div> */}
         </div>
 
         <div className="flex flex-1 justify-between">
           <div className="flex flex-col gap-1">
+            <div className="flex gap-3 items-center">
+             <div className="py-[3px] px-[9px]">
+            <span className="text-[#252525] text-[15px] font-bold tracking-[-0.3px] leading-[126%]">
+              {index + 1}
+            </span>
+          </div>
             <div>
               <p className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">
                 {item.name}
               </p>
             </div>
-            <div className="flex items-center gap-[5px]">
+            </div>
+            {/* <div className="flex items-center gap-[5px]">
               <span className="text-[#252525] text-[10px] not-italic font-normal leading-normal tracking-[-0.2px]">
                 {item.calories}
               </span>
@@ -1288,7 +1146,7 @@ export default function MealTracked({ activeFilter = "all" }) {
                   className="cursor-pointer"
                 />
               )}
-            </div>
+            </div> */}
           </div>
 
           <div className="flex gap-3 items-center px-5 py-[15px] rounded-[8px] bg-[#F5F7FA]">
@@ -1299,7 +1157,7 @@ export default function MealTracked({ activeFilter = "all" }) {
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center gap-2.5">
                 <span className="text-[#252525] text-[12px] font-semibold tracking-[-0.24px] leading-[126%]">
-                  {item.score || "-"}
+                  {item.score ?? "-"}
                 </span>
                 <div className="w-px h-4 bg-[#D9D9D9]" />
                 <span className="text-[#252525] text-[12px] font-semibold tracking-[-0.24px] leading-[126%]">
@@ -1315,9 +1173,19 @@ export default function MealTracked({ activeFilter = "all" }) {
                   viewBox="0 0 117 6"
                   fill="none"
                 >
-                  <path d="M3 3H114" stroke="#D9D9D9" strokeWidth="5" strokeLinecap="round" />
-                  {item.strokeColor && (
-                    <path d={`M3 3H${item.strokeWidth}`} stroke={item.strokeColor} strokeWidth="5" strokeLinecap="round" />
+                  <path
+                    d="M3 3H114"
+                    stroke="#D9D9D9"
+                    strokeWidth="5"
+                    strokeLinecap="round"
+                  />
+                  {item.strokeColor && item.strokeWidth > 3 && (
+                    <path
+                      d={`M3 3H${item.strokeWidth}`}
+                      stroke={item.strokeColor}
+                      strokeWidth="5"
+                      strokeLinecap="round"
+                    />
                   )}
                 </svg>
               </div>
@@ -1326,10 +1194,10 @@ export default function MealTracked({ activeFilter = "all" }) {
         </div>
       </div>
 
-      {item.score !== null && (
+      {item.score !== null && item.score !== undefined && (
         <div className="flex items-center w-full">
           <div className="flex-1 h-px bg-[#D9D9D9]" />
-          <div 
+          <div
             className="flex items-center gap-[5px] ml-2 cursor-pointer"
             onClick={() => toggleItem(item.id)}
           >
@@ -1345,68 +1213,81 @@ export default function MealTracked({ activeFilter = "all" }) {
         </div>
       )}
 
-      {openItems[item.id] && item.score !== null && (
-        <>
-          <div className="flex flex-col gap-5">
-            <div className="flex gap-3 items-center ml-[25px] mr-[67px]">
-              <p className="w-[118px] text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">Fat/Glucose Impact</p>
-              <div>
-                <span className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]">Protein stabilizes glycemia (29%) and supports fat oxidation (71%)</span>
+      {openItems[item.id] &&
+        item.score !== null &&
+        item.score !== undefined && (
+          <>
+            <div className="flex flex-col gap-5">
+              <div className="flex gap-3 items-center ml:[25px] mr:[67px] ml-[25px] mr-[67px]">
+                <p className="w-[118px] text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">
+                  Fat/Glucose Impact
+                </p>
+                <div>
+                  <span className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]">
+                    {item.fatGlucoseImpact || "-"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex gap-3 items-center ml-[25px] mr-[67px]">
+                <p className="w-[118px] text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">
+                  Liver Impact
+                </p>
+                <div>
+                  <span className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]">
+                    {item.liverImpact || "-"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex gap-3 items-center ml-[25px] mr-[67px]">
+                <p className="w-[118px] text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">
+                  Gut Impact
+                </p>
+                <div>
+                  <span className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]">
+                    {item.gutImpact || "-"}
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="flex gap-3 items-center ml-[25px] mr-[67px]">
-              <p className="w-[118px] text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">Liver Impact</p>
-              <div>
-                <span className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]">Keep free sugars low; protect detox pathways (detox ~70%)</span>
+            <div className="flex gap-8 items-start pl-2.5 pr-4 pt-4 pb-[18px] bg-[#F0F5FD] rounded-[10px]">
+              <div className="flex gap-[5px] items-center max-w-[118px]">
+                <Image
+                  src="/icons/hugeicons_award-01.svg"
+                  alt="Award"
+                  width={15}
+                  height={15}
+                />
+                <span className="bg-gradient-to-r from-[#308BF9] to-[#1C5293] bg-clip-text text-transparent font-bold text-[12px] tracking-[-0.24px]">
+                  Goal Alignment
+                </span>
+              </div>
+              <div className="flex-1">
+                <p className="text-[#252525] text-[10px] font-normal leading-[126%] tracking-[-0.2px]">
+                  <span className="font-semibold">{item.goalAlignment}</span>
+                  {item.goalAlignment && item.goalAlignmentNote ? ": " : " "}
+                  {item.goalAlignmentNote || "-"}
+                </p>
               </div>
             </div>
-
-            <div className="flex gap-3 items-center ml-[25px] mr-[67px]">
-              <p className="w-[118px] text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">Gut Impact</p>
-              <div>
-                <span className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]">Gentle choice — supports absorption (~59%) with lower fermentation (~27%)</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-8 items-start pl-2.5 pr-4 pt-4 pb-[18px] bg-[#F0F5FD] rounded-[10px]">
-            <div className="flex gap-[5px] items-center max-w-[118px]">
-              <Image src="/icons/hugeicons_award-01.svg" alt="Award" width={15} height={15} />
-              <span className="bg-gradient-to-r from-[#308BF9] to-[#1C5293] bg-clip-text text-transparent font-bold text-[12px] tracking-[-0.24px]">
-                Goal Alignment
-              </span>
-            </div>
-            <div className="flex-1">
-              <p className="text-[#252525] text-[10px] font-normal leading-[126%] tracking-[-0.2px]">
-                Oats are high in carbohydrates, which can hinder fat loss by maintaining glucose reliance. The fiber content, while generally healthy, may contribute to the high fermentation observed.
-              </p>
-            </div>
-          </div>
-        </>
-      )}
-
-      {item.score === null && (
-        <div className="flex gap-3 w-full">
-          <div className="flex items-start py-2 w-[118px] px-[9px]">
-            <span className="text-[#535359] text-[10px] font-semibold tracking-[-0.2px] leading-[110%]">Description</span>
-          </div>
-          <div className="flex">
-            <span className="text-[#252525] text-[10px] font-normal leading-[126%] tracking-[-0.2px]">
-              {item.description}
-            </span>
-          </div>
-        </div>
-      )}
+          </>
+        )}
     </div>
   );
 
-  const OthersItem = ({ item }) => (
-    <div key={item.id} className="flex flex-col gap-5 p-[15px] rounded-[15px] bg-[#E1E6ED]">
+  const OthersItem = ({ item, index }) => (
+    <div
+      key={index}
+      className="flex flex-col gap-5 p-[15px] rounded-[15px] bg-[#E1E6ED]"
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center">
           <div className="flex flex-col gap-1 py-[3px] px-[9px]">
-            <span className="text-[#252525] text-[12px] font-semibold tracking-[-0.24px] leading-[126%]">Other</span>
+            <span className="text-[#252525] text-[12px] font-semibold tracking-[-0.24px] leading-[126%]">
+              Other
+            </span>
             <div className="h-[15px]"></div>
           </div>
         </div>
@@ -1428,28 +1309,32 @@ export default function MealTracked({ activeFilter = "all" }) {
             </span>
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center gap-2.5">
-                <span className="text-[#252525] text-[12px] font-semibold tracking-[-0.24px] leading-[126%]">-</span>
+                <span className="text-[#252525] text-[12px] font-semibold tracking-[-0.24px] leading-[126%]">
+                  -
+                </span>
                 <div className="w-px h-4 bg-[#D9D9D9]" />
-                <span className="text-[#252525] text-[12px] font-semibold tracking-[-0.24px] leading-[126%]">-</span>
+                <span className="text-[#252525] text-[12px] font-semibold tracking-[-0.24px] leading-[126%]">
+                  -
+                </span>
               </div>
               <div className="flex justify-start">
-                <svg xmlns="http://www.w3.org/2000/svg" width="117" height="6" viewBox="0 0 117 6" fill="none">
-                  <path d="M3 3H114" stroke="#D9D9D9" strokeWidth="5" strokeLinecap="round" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="117"
+                  height="6"
+                  viewBox="0 0 117 6"
+                  fill="none"
+                >
+                  <path
+                    d="M3 3H114"
+                    stroke="#D9D9D9"
+                    strokeWidth="5"
+                    strokeLinecap="round"
+                  />
                 </svg>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="flex gap-3 w-full">
-        <div className="flex items-start py-2 w-[118px] px-[9px]">
-          <span className="text-[#535359] text-[10px] font-semibold tracking-[-0.2px] leading-[110%]">Description</span>
-        </div>
-        <div className="flex">
-          <span className="text-[#252525] text-[10px] font-normal leading-[126%] tracking-[-0.2px]">
-            {item.description}
-          </span>
         </div>
       </div>
     </div>
@@ -1458,12 +1343,14 @@ export default function MealTracked({ activeFilter = "all" }) {
   return (
     <>
       <div className="w-full flex flex-col gap-3">
-        {filteredItems.map(item => (
-          item.score === null ? 
-            <OthersItem key={item.id} item={item} /> : 
-            <MealItem key={item.id} item={item} />
-        ))}
-        
+        {filteredItems.map((item, index) =>
+          item.score === null || item.score === undefined ? (
+            <OthersItem key={index} item={item} index={index} />
+          ) : (
+            <MealItem key={index} item={item} index={index} />
+          )
+        )}
+
         {filteredItems.length === 0 && (
           <div className="flex justify-center items-center p-8 rounded-[15px] bg-white">
             <span className="text-[#535359] text-[14px] font-normal">
@@ -1475,11 +1362,6 @@ export default function MealTracked({ activeFilter = "all" }) {
     </>
   );
 }
-
-
-
-
-
 
 
 
