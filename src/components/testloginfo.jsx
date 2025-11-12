@@ -420,10 +420,10 @@ export default function TestLogInfo({ onConfirmNext }) {
       }
 
       const requestBody = {
-        // dietitian_id: effectiveDieticianId,
-        // client_id: effectiveClientId,
-        dietitian_id: "RespyrD31",
-        client_id: "profile31",
+       dietitian_id: effectiveDieticianId,
+       client_id: effectiveClientId,
+        // dietitian_id: "RespyrD31",
+        // client_id: "profile31",
         plan_title: planSummary.plan_title || "",
         plan_start_date: planSummary.plan_start_date || "",
         plan_end_date: planSummary.plan_end_date || "",

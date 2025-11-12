@@ -103,19 +103,21 @@ export default function Preview() {
             className="hidden"
           />
           
-          {/* Re-upload button */}
-          <div 
-            className='flex gap-1.5 px-5 py-[15px] border border-[#D9D9D9] rounded-[10px] cursor-pointer hover:bg-gray-50 transition-colors'
-            onClick={handleReuploadClick}
-          >
-            <Image
-              src="/icons/hugeicons_rotate-01.svg"
-              alt='hugeicons_rotate-01'
-              width={20}
-              height={20}
-            />
-            <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Re-upload</span>
-          </div>
+          {/* Re-upload button - Only show when activePanel is 'summary' */}
+          {activePanel === 'summary' && (
+            <div 
+              className='flex gap-1.5 px-5 py-[15px] border border-[#D9D9D9] rounded-[10px] cursor-pointer hover:bg-gray-50 transition-colors'
+              onClick={handleReuploadClick}
+            >
+              <Image
+                src="/icons/hugeicons_rotate-01.svg"
+                alt='hugeicons_rotate-01'
+                width={20}
+                height={20}
+              />
+              <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Re-upload</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -133,45 +135,45 @@ export default function Preview() {
 
                   {/* Plan summary tile */}
                   <div
-                    className='flex gap-[52px] justify-between py-5 pl-[23px] pr-[15px] rounded-[5px] items-center bg-white cursor-pointer'
+                    className={`flex gap-[52px] justify-between py-5 pl-[23px] pr-[15px] rounded-[5px] items-center cursor-pointer ${activePanel === 'summary' ? 'bg-white' : ''}`}
                     onClick={() => setActivePanel('summary')}
                   >
                     <div className='flex gap-2.5 items-center'>
                       <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] whitespace-nowrap'>Plan summary</span>
-                      <div className='flex gap-[5px] items-center rounded-[20px] bg-[#DA5747] px-3 py-1.5'>
+                      {/* <div className='flex gap-[5px] items-center rounded-[20px] bg-[#DA5747] px-3 py-1.5'>
                         <span className='text-white text-[12px] font-semibold leading-normal tracking-[-0.2px]'>2</span>
                         <span className='text-white text-[12px] font-semibold leading-normal tracking-[-0.2px]'>Pending</span>
-                      </div>
+                      </div> */}
                     </div>
                     <IoIosArrowForward className='w-[20px] h-[20px] text-[#252525]' />
                   </div>
 
                   {/* Tests log info tile */}
                   <div
-                    className='flex justify-between py-5 pl-[23px] pr-[15px] rounded-[5px] items-center cursor-pointer'
+                    className={`flex justify-between py-5 pl-[23px] pr-[15px] rounded-[5px] items-center cursor-pointer ${activePanel === 'testlog' ? 'bg-white' : ''}`}
                     onClick={() => setActivePanel('testlog')}
                   >
                     <div className='flex gap-2.5 items-center'>
                       <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] whitespace-nowrap'>Tests log info</span>
-                      <div className='flex gap-[5px] items-center rounded-[20px] bg-[#3FAF58] px-3 py-1.5'>
+                      {/* <div className='flex gap-[5px] items-center rounded-[20px] bg-[#3FAF58] px-3 py-1.5'>
                         <Image src="/icons/verified.svg" alt='verified.svg' width={18} height={18} />
                         <span className='text-white text-[12px] font-semibold leading-normal tracking-[-0.2px]'>ready</span>
-                      </div>
+                      </div> */}
                     </div>
                     <IoIosArrowForward className='w-[20px] h-[20px] text-[#252525]' />
                   </div>
 
                   {/* Diet plan tile */}
                   <div
-                    className='flex justify-between py-5 pl-[23px] pr-[15px] rounded-[5px] items-center cursor-pointer'
+                    className={`flex justify-between py-5 pl-[23px] pr-[15px] rounded-[5px] items-center cursor-pointer ${activePanel === 'dietplan' ? 'bg-white' : ''}`}
                     onClick={() => setActivePanel('dietplan')}
                   >
                     <div className='flex gap-2.5 items-center'>
                       <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] whitespace-nowrap'>Diet plan</span>
-                      <div className='flex gap-[5px] items-center rounded-[20px] bg-[#3FAF58] px-3 py-1.5'>
+                      {/* <div className='flex gap-[5px] items-center rounded-[20px] bg-[#3FAF58] px-3 py-1.5'>
                         <Image src="/icons/verified.svg" alt='verified.svg' width={18} height={18} />
                         <span className='text-white text-[12px] font-semibold leading-normal tracking-[-0.2px]'>ready</span>
-                      </div>
+                      </div> */}
                     </div>
                     <IoIosArrowForward className='w-[20px] h-[20px] text-[#252525]' />
                   </div>
@@ -194,10 +196,10 @@ export default function Preview() {
                   >
                     <div className='flex gap-2.5 items-center'>
                       <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] whitespace-nowrap'>Plan summary</span>
-                      <div className='flex gap-[5px] items-center rounded-[20px] bg-[#DA5747] px-3 py-1.5'>
+                      {/* <div className='flex gap-[5px] items-center rounded-[20px] bg-[#DA5747] px-3 py-1.5'>
                         <span className='text-white text-[12px] font-semibold leading-normal tracking-[-0.2px]'>2</span>
                         <span className='text-white text-[12px] font-semibold leading-normal tracking-[-0.2px]'>Pending</span>
-                      </div>
+                      </div> */}
                     </div>
                     <IoIosArrowForward className='w-[20px] h-[20px] text-[#252525]' />
                   </div>
@@ -208,10 +210,10 @@ export default function Preview() {
                   >
                     <div className='flex gap-2.5 items-center'>
                       <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] whitespace-nowrap'>Tests log info</span>
-                      <div className='flex gap-[5px] items-center rounded-[20px] bg-[#3FAF58] px-3 py-1.5'>
+                      {/* <div className='flex gap-[5px] items-center rounded-[20px] bg-[#3FAF58] px-3 py-1.5'>
                         <Image src="/icons/verified.svg" alt='verified.svg' width={18} height={18} />
                         <span className='text-white text-[12px] font-semibold leading-normal tracking-[-0.2px]'>ready</span>
-                      </div>
+                      </div> */}
                     </div>
                     <IoIosArrowForward className='w-[20px] h-[20px] text-[#252525]' />
                   </div>
@@ -222,10 +224,10 @@ export default function Preview() {
                   >
                     <div className='flex gap-2.5 items-center'>
                       <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] whitespace-nowrap'>Diet plan</span>
-                      <div className='flex gap-[5px] items-center rounded-[20px] bg-[#3FAF58] px-3 py-1.5'>
+                      {/* <div className='flex gap-[5px] items-center rounded-[20px] bg-[#3FAF58] px-3 py-1.5'>
                         <Image src="/icons/verified.svg" alt='verified.svg' width={18} height={18} />
                         <span className='text-white text-[12px] font-semibold leading-normal tracking-[-0.2px]'>ready</span>
-                      </div>
+                      </div> */}
                     </div>
                     <IoIosArrowForward className='w-[20px] h-[20px] text-[#252525]' />
                   </div>

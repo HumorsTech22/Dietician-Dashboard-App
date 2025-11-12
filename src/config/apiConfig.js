@@ -10,6 +10,7 @@ export const API_ENDPOINTS = {
     LOGIN: "/humors_app/app_final/dieticianapp/web/api/dietician_login.php",
     SEND_OTP: "/humors_app/app_final/dieticianapp/web/api/send_diatitian_otp.php",
     RESET_PASSWORD: "/humors_app/app_final/dieticianapp/web/api/update_diatitian_password.php",
+    DIETPLANSTATUS:"/dietitian/api/web/update_diet_plan_status.php"
   },
   CLIENT:{
     CLIENTTABLE:"/dietitian/api/web/get_clients_with_diet_plan.php"
@@ -20,7 +21,14 @@ export const API_ENDPOINTS = {
   },
   PLAN:{
     PLANSUMMARYFORM:"/dietitian/api/web/insert_diet_plan_strategy.php"
+  },
+  CLIENTPROFILE:{
+    CLIENTPROFILEDATA:"/dietitian/api/web/get_client_data.php"
+  },
+  MEALANALYSIS:{
+ WEEKLYANALYSISCOMPLETE:"/dietitian/api/web/weekly_analysis_complete.php"
   }
+ 
   
   
 };

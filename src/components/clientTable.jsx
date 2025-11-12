@@ -380,7 +380,8 @@ export default function ClientTable({ showUserProfile = true, showDailyStatusHea
 }) {
 
   const [search, setSearch] = useState("");
-    const router = useRouter();
+     const router = useRouter();
+
 
   // Helper function to format date
   const formatDate = (dateString) => {
@@ -538,6 +539,7 @@ export default function ClientTable({ showUserProfile = true, showDailyStatusHea
 
 
   const handleRowClick = (client) => {
+  
     const params = new URLSearchParams({
         dietician_id: client.dieticianId,
       profile_id: client.profileId
