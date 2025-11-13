@@ -110,7 +110,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { fetchClientsWithDietPlan } from "@/services/authService";
 
-// Thunk: call your service (body: { dietician_id: "Respyrd01" })
+
 export const getClientsForDietician = createAsyncThunk(
   "clients/getClientsForDietician",
   async ({ dieticianId }, { rejectWithValue }) => {

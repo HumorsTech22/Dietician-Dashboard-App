@@ -143,3 +143,31 @@ export const fetchWeeklyAnalysisComplete = async (requestData) => {
     body: JSON.stringify(requestData),
   });
 };
+
+
+export const fetchDashboardTableCards = async (dieticianId) => {
+  return apiFetcher(API_ENDPOINTS.DASHBOARD.TABLECARDS, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      dietician_id: dieticianId,
+    }),
+  });
+};
+
+
+
+export const fetchTestAnalytics = async (dieticianId, date = "") => {
+  return apiFetcher(API_ENDPOINTS.DASHBOARD.TESTANALYTICS, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      dietitian_id: dieticianId,
+      date: date,
+    }),
+  });
+};
