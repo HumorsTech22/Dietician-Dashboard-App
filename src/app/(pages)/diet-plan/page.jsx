@@ -1,4 +1,4 @@
-
+"use client";
 import { ClientProfile } from "@/components/client-profile";
 import CreateDietPlan from "@/components/create-diet-plan";
 
