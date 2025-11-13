@@ -334,7 +334,6 @@
 
 
 
-
 "use client"
 import { IoIosArrowDown } from "react-icons/io";
 import { RxCross2 } from "react-icons/rx";
@@ -389,6 +388,72 @@ export default function Summary({ onConfirmNext }) {
   const targetDropdownRef = useRef(null);
 
   const unitOptions = ['kg', 'g', 'lb', 'oz', 'cm', 'm', 'inch', 'ft', '%', 'bpm', 'cal', 'kcal'];
+
+  // Load data from localStorage on component mount
+  useEffect(() => {
+    loadFromLocalStorage();
+  }, []);
+
+  const loadFromLocalStorage = () => {
+    try {
+      const savedData = localStorage.getItem('planSummary');
+      if (savedData) {
+        const data = JSON.parse(savedData);
+        
+        // Set basic fields
+        setPlanTitle(data.plan_title || '');
+        setFromDate(ymdToDmy(data.plan_start_date) || '');
+        setToDate(ymdToDmy(data.plan_end_date) || '');
+        setIsDiabetic(data.is_diabetic || 'no');
+        setDietType(data.diet_type || '');
+        setCaloriesTarget(data.calories_target || '');
+        setProteinTarget(data.protein_target || '');
+        setFiberTarget(data.fiber_target || '');
+        setCarbsTarget(data.carbs_target || '');
+        setFatTarget(data.fat_target || '');
+        setWaterTarget(data.water_target || '');
+        
+        // Set approach tags
+        if (data.approach) {
+          setApproachTags(data.approach.split(','));
+        }
+        
+        // Set goals
+        if (data.goal && data.goal.length > 0) {
+          const loadedGoals = [];
+          const loadedGoalUnits = [];
+          
+          data.goal.forEach((goalItem, index) => {
+            const goalId = index + 1;
+            
+            // Extract numeric value and unit from current_stat and target_stat
+            const currentMatch = goalItem.current_stat?.match(/(\d*\.?\d*)(.*)/) || ['', '', 'Unit'];
+            const targetMatch = goalItem.target_stat?.match(/(\d*\.?\d*)(.*)/) || ['', '', 'Unit'];
+            
+            loadedGoals.push({
+              id: goalId,
+              title: goalItem.name || '',
+              current: currentMatch[1] || '',
+              target: targetMatch[1] || ''
+            });
+            
+            loadedGoalUnits.push({
+              id: goalId,
+              currentUnit: currentMatch[2] || 'Unit',
+              targetUnit: targetMatch[2] || 'Unit'
+            });
+          });
+          
+          setGoals(loadedGoals);
+          setGoalUnits(loadedGoalUnits);
+        }
+        
+        //toast.success('Data loaded from saved draft');
+      }
+    } catch (error) {
+      console.error('Error loading from localStorage:', error);
+    }
+  };
 
   const validateToDate = (from, to) => {
     if (!from || !to) return true;
@@ -516,11 +581,11 @@ export default function Summary({ onConfirmNext }) {
     if (!planTitle.trim()) nextErrors.planTitle = 'Enter plan title';
     if (!fromDate) nextErrors.fromDate = 'Select start date';
     if (!toDate) nextErrors.toDate = 'Select end date';
-    
+
     if (fromDate && toDate && !validateToDate(fromDate, toDate)) {
       nextErrors.toDate = 'To date must be after From date';
     }
-    
+
     if (!isDiabetic) nextErrors.isDiabetic = 'Please select diabetic status';
     if (!dietType) nextErrors.dietType = 'Please select diet type';
     if (!caloriesTarget) nextErrors.caloriesTarget = 'Enter calories target';
@@ -589,8 +654,13 @@ export default function Summary({ onConfirmNext }) {
     if (isDraft) formData.isDraft = true;
     localStorage.setItem('planSummary', JSON.stringify(formData));
     if (isDraft)
+      //toast.success('Draft saved successfully!');
+    ""
+    else { 
+      //toast.success('Plan saved successfully!'); 
       ""
-    else { toast.success('Plan saved successfully!'); onConfirmNext?.(); }
+      onConfirmNext?.(); 
+    }
   };
 
   const handleSaveAsDraft = () => saveToLocalStorage(true);
@@ -604,9 +674,12 @@ export default function Summary({ onConfirmNext }) {
   return (
     <div className='w-full'>
       <div className='pt-[23px]'>
-        <p className='text-[#252525] pb-[18px] pt-[23px] text-[20px] font-semibold leading-[110%] tracking-[0.4px] whitespace-nowrap'>
-          Plan Summary
-        </p>
+        <div className='flex justify-between items-center'>
+          <p className='text-[#252525] pb-[18px] pt-[23px] text-[20px] font-semibold leading-[110%] tracking-[0.4px] whitespace-nowrap'>
+            Plan Summary
+          </p>
+       
+        </div>
 
         <div className="w-full border-b border-[#E1E6ED]"></div>
 
@@ -670,51 +743,51 @@ export default function Summary({ onConfirmNext }) {
                   ) : null}
                 </div>
 
-            <div className="relative flex-1">
-  <span className="absolute -top-2 left-4 bg-white px-[9px] text-[12px] font-medium text-[#535359]">
-    To
-  </span>
-  <div className={`flex py-[15px] pl-[19px] pr-[13px] rounded-[8px] bg-white
+                <div className="relative flex-1">
+                  <span className="absolute -top-2 left-4 bg-white px-[9px] text-[12px] font-medium text-[#535359]">
+                    To
+                  </span>
+                  <div className={`flex py-[15px] pl-[19px] pr-[13px] rounded-[8px] bg-white
     ${errors.toDate ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'}`}>
-    <input
-      type="text"
-      readOnly
-      value={toDate}
-      onClick={openToPicker}
-      placeholder="DD/MM/YYYY"
-      className="w-full outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#9CA3AF] cursor-pointer"
-    />
-    <button 
-      type="button" 
-      onClick={openToPicker} 
-      className="cursor-pointer flex items-center justify-center"
-      title="Open calendar"
-    >
-      <Image src="/icons/hugeicons_calendar-03.svg" alt="calendar" width={20} height={20} />
-    </button>
-    <input
-      ref={toPickerRef}
-      type="date"
-      className="sr-only"
-      onChange={(e) => { 
-        const newToDate = ymdToDmy(e.target.value);
-        setToDate(newToDate);
-        
-        if (fromDate && !validateToDate(fromDate, newToDate)) {
-          setErrors(prev => ({ ...prev, toDate: 'To date must be after From date' }));
-        } else {
-          setErrors(prev => ({ ...prev, toDate: '' }));
-        }
-      }}
-    />
-  </div>
-  {errors.toDate ? (
-    <div className="flex gap-[5px] items-center mt-1">
-      <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
-      <span className="text-[#DA5747] text-[10px]">{errors.toDate}</span>
-    </div>
-  ) : null}
-</div>
+                    <input
+                      type="text"
+                      readOnly
+                      value={toDate}
+                      onClick={openToPicker}
+                      placeholder="DD/MM/YYYY"
+                      className="w-full outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#9CA3AF] cursor-pointer"
+                    />
+                    <button
+                      type="button"
+                      onClick={openToPicker}
+                      className="cursor-pointer flex items-center justify-center"
+                      title="Open calendar"
+                    >
+                      <Image src="/icons/hugeicons_calendar-03.svg" alt="calendar" width={20} height={20} />
+                    </button>
+                    <input
+                      ref={toPickerRef}
+                      type="date"
+                      className="sr-only"
+                      onChange={(e) => {
+                        const newToDate = ymdToDmy(e.target.value);
+                        setToDate(newToDate);
+
+                        if (fromDate && !validateToDate(fromDate, newToDate)) {
+                          setErrors(prev => ({ ...prev, toDate: 'To date must be after From date' }));
+                        } else {
+                          setErrors(prev => ({ ...prev, toDate: '' }));
+                        }
+                      }}
+                    />
+                  </div>
+                  {errors.toDate ? (
+                    <div className="flex gap-[5px] items-center mt-1">
+                      <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+                      <span className="text-[#DA5747] text-[10px]">{errors.toDate}</span>
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </div>
           </div>
@@ -776,39 +849,39 @@ export default function Summary({ onConfirmNext }) {
 
             <div className="flex-1">
               <div className="flex items-center">
-              <div className='px-[9px] pt-[5px] pb-[5px] text-[#252525] text-[12px] leading-normal font-semibold tracking-[-0.24px]'>
-                Client is diabetic?
-              </div>
-              <div className="flex gap-6">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="diabetic"
-                    value="yes"
-                    checked={isDiabetic === 'yes'}
-                    onChange={(e) => {
-                      setIsDiabetic(e.target.value);
-                      setErrors(prev => ({ ...prev, isDiabetic: '' }));
-                    }}
-                    className="w-4 h-4 text-[#308BF9] bg-white border-[#D9D9D9] focus:ring-[#308BF9] focus:ring-2"
-                  />
-                  <span className="text-[14px] text-[#252525]">Yes</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="diabetic"
-                    value="no"
-                    checked={isDiabetic === 'no'}
-                    onChange={(e) => {
-                      setIsDiabetic(e.target.value);
-                      setErrors(prev => ({ ...prev, isDiabetic: '' }));
-                    }}
-                    className="w-4 h-4 text-[#308BF9] bg-white border-[#D9D9D9] focus:ring-[#308BF9] focus:ring-2"
-                  />
-                  <span className="text-[14px] text-[#252525]">No</span>
-                </label>
-              </div>
+                <div className='px-[9px] pt-[5px] pb-[5px] text-[#252525] text-[12px] leading-normal font-semibold tracking-[-0.24px]'>
+                  Client is diabetic?
+                </div>
+                <div className="flex gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="diabetic"
+                      value="yes"
+                      checked={isDiabetic === 'yes'}
+                      onChange={(e) => {
+                        setIsDiabetic(e.target.value);
+                        setErrors(prev => ({ ...prev, isDiabetic: '' }));
+                      }}
+                      className="w-4 h-4 text-[#308BF9] bg-white border-[#D9D9D9] focus:ring-[#308BF9] focus:ring-2"
+                    />
+                    <span className="text-[14px] text-[#252525]">Yes</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="diabetic"
+                      value="no"
+                      checked={isDiabetic === 'no'}
+                      onChange={(e) => {
+                        setIsDiabetic(e.target.value);
+                        setErrors(prev => ({ ...prev, isDiabetic: '' }));
+                      }}
+                      className="w-4 h-4 text-[#308BF9] bg-white border-[#D9D9D9] focus:ring-[#308BF9] focus:ring-2"
+                    />
+                    <span className="text-[14px] text-[#252525]">No</span>
+                  </label>
+                </div>
               </div>
               {errors.isDiabetic && (
                 <div className="flex gap-[5px] items-center mt-1">

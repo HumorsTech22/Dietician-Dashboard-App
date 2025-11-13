@@ -222,11 +222,8 @@
 
 
 
-
-
-
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { submitPlanSummaryService } from "../services/authService";
@@ -240,26 +237,47 @@ export default function TestLogInfo({ onConfirmNext }) {
   const [isExtracting, setIsExtracting] = useState(false);
   const [apiResponse, setApiResponse] = useState(null);
 
-  // ✅ progress state (new)
+  // ✅ progress state
   const [progress, setProgress] = useState(0);
   const rafRef = useRef(null);
   const startTimeRef = useRef(0);
   const targetMsRef = useRef(0);
-  const capRef = useRef(95); // how far we go before completion
+  const capRef = useRef(95);
   const runningRef = useRef(false);
 
   const dispatch = useDispatch();
   const [errors, setErrors] = useState({ testsAllotted: "" });
-  const pdfState = useSelector((state) => state.pdf);
-  const pdfFile = pdfState?.uploadedFile;
+
+  // Load data from localStorage on component mount
+  useEffect(() => {
+    loadFromLocalStorage();
+  }, []);
+
+  const loadFromLocalStorage = () => {
+    try {
+      const savedData = localStorage.getItem("planSummary");
+      if (savedData) {
+        const data = JSON.parse(savedData);
+        
+        // Set tests allotted from localStorage
+        if (data.test_no_assigned) {
+          setTestsAllotted(data.test_no_assigned.toString());
+          const allotted = parseInt(data.test_no_assigned) || 0;
+          const remaining = 10000 - allotted;
+          setTestRemaining(remaining >= 0 ? remaining : 0);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading from localStorage:', error);
+    }
+  };
 
   // ---- Progress helpers ----
   const startProgress = (targetMs = 300000, cap = 98) => {
-    // targetMs: total duration the bar should take to reach ~cap%
     cancelProgress();
     startTimeRef.current = Date.now();
     targetMsRef.current = targetMs;
-    capRef.current = Math.min(99, Math.max(50, cap)); // 50–99
+    capRef.current = Math.min(99, Math.max(50, cap));
     runningRef.current = true;
     setProgress(0);
 
@@ -277,7 +295,6 @@ export default function TestLogInfo({ onConfirmNext }) {
   };
 
   const completeProgress = () => {
-    // animate to 100 quickly
     runningRef.current = false;
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     setProgress(100);
@@ -338,22 +355,70 @@ export default function TestLogInfo({ onConfirmNext }) {
     planSummary = { ...planSummary, test_no_assigned: parseInt(testsAllotted) || 0 };
     if (isDraft) planSummary.isDraft = true;
     localStorage.setItem("planSummary", JSON.stringify(planSummary));
-    toast.success(isDraft ? "Test log info saved as draft successfully!" : "Test log info saved successfully!");
   };
 
   const handleSaveAsDraft = () => saveToLocalStorage(true);
 
-  // ---- Extract Diet PDF (with time-based progress) ----
+  // ---- Extract Diet PDF ----
   const extractDietPdf = async ({ dieticianId, clientId, dietplanId }) => {
-    if (!pdfFile) {
-      toast.error("No PDF found in Redux. Please upload a file first.");
+    // Get PDF from localStorage
+    const savedPdf = localStorage.getItem('uploadedPdfFile');
+    
+    if (!savedPdf) {
+      toast.error("No PDF found. Please upload a file first.");
       return false;
     }
+
     try {
       setIsExtracting(true);
       toast.message("Extracting PDF…");
-      // 5 minutes target, stop around 98% until completion
       startProgress(300000, 98);
+
+      const pdfData = JSON.parse(savedPdf);
+      console.log("PDF Data from localStorage:", pdfData);
+
+      let pdfFile;
+
+      // Always prioritize base64 data over blob URL
+      if (pdfData.data && pdfData.data.startsWith('data:application/pdf')) {
+        // Convert base64 data URL to File object
+        const response = await fetch(pdfData.data);
+        const blob = await response.blob();
+        pdfFile = new File([blob], pdfData.name || "diet_plan.pdf", {
+          type: "application/pdf"
+        });
+        console.log("PDF created from base64 data");
+      } else if (pdfData.blobUrl) {
+        // Fallback: try blob URL but with better error handling
+        try {
+          console.log("Attempting to use blob URL:", pdfData.blobUrl);
+          const response = await fetch(pdfData.blobUrl);
+          if (!response.ok) {
+            throw new Error(`Blob URL fetch failed with status: ${response.status}`);
+          }
+          const blob = await response.blob();
+          pdfFile = new File([blob], pdfData.name || "diet_plan.pdf", {
+            type: "application/pdf"
+          });
+          console.log("PDF created from blob URL");
+        } catch (blobError) {
+          console.error("Blob URL failed:", blobError);
+          throw new Error("Blob URL is no longer valid. Please re-upload the PDF file.");
+        }
+      } else {
+        throw new Error("No valid PDF data found in storage. Please re-upload the PDF file.");
+      }
+
+      // Validate the created file
+      if (!pdfFile || pdfFile.size === 0) {
+        throw new Error("Created PDF file is empty or invalid");
+      }
+
+      console.log("PDF File ready for upload:", {
+        name: pdfFile.name,
+        size: pdfFile.size,
+        type: pdfFile.type
+      });
 
       const formData = new FormData();
       formData.append("file", pdfFile);
@@ -361,7 +426,15 @@ export default function TestLogInfo({ onConfirmNext }) {
       formData.append("profile_id", clientId || "");
       formData.append("dietplan_id", dietplanId || "");
 
-      const res = await fetch("https://respyr.in/mini/api/extract", { method: "POST", body: formData });
+      // Log FormData contents for debugging
+      for (let [key, value] of formData.entries()) {
+        console.log(`FormData: ${key} =`, value);
+      }
+
+      const res = await fetch("https://respyr.in/mini/api/extract", {
+        method: "POST",
+        body: formData
+      });
 
       if (!res.ok) {
         const txt = await res.text().catch(() => "");
@@ -371,7 +444,6 @@ export default function TestLogInfo({ onConfirmNext }) {
       const json = await res.json();
       dispatch(setExtractedData(json));
 
-      // finish the bar only after actual completion
       completeProgress();
       toast.success("PDF extracted successfully.");
       return true;
@@ -382,19 +454,17 @@ export default function TestLogInfo({ onConfirmNext }) {
       return false;
     } finally {
       setIsExtracting(false);
-      // optional small delay so users can see 100% briefly
       setTimeout(() => {
         if (!isLoading) resetProgress();
       }, 600);
     }
   };
 
-  // ---- Submit Plan Summary (shorter progress) ----
+  // ---- Submit Plan Summary ----
   const submitPlanSummary = async () => {
     if (!validateForm()) return;
 
     setIsLoading(true);
-    // submission usually quicker; simulate ~8s to ~90%
     startProgress(8000, 90);
 
     try {
@@ -420,10 +490,8 @@ export default function TestLogInfo({ onConfirmNext }) {
       }
 
       const requestBody = {
-       dietitian_id: effectiveDieticianId,
-       client_id: effectiveClientId,
-        // dietitian_id: "RespyrD31",
-        // client_id: "profile31",
+        dietitian_id: effectiveDieticianId,
+        client_id: effectiveClientId,
         plan_title: planSummary.plan_title || "",
         plan_start_date: planSummary.plan_start_date || "",
         plan_end_date: planSummary.plan_end_date || "",
@@ -437,23 +505,27 @@ export default function TestLogInfo({ onConfirmNext }) {
         status: "active",
       };
 
+      console.log("Submitting plan summary:", requestBody);
+
       const resp = await submitPlanSummaryService(requestBody);
       setApiResponse(resp);
 
       if (resp?.status) {
-        // complete the "Submitting" bar
         completeProgress();
         toast.success("Plan summary submitted successfully!");
 
         const dietplanId = resp?.inserted_data?.id || "";
-        // Start the long extracting bar now
+        console.log("Diet plan ID received:", dietplanId);
+        
         const extractedOk = await extractDietPdf({
           dieticianId: effectiveDieticianId,
           clientId: effectiveClientId,
           dietplanId,
         });
 
-        if (extractedOk) onConfirmNext?.();
+        if (extractedOk) {
+          onConfirmNext?.();
+        }
       } else {
         toast.error(resp?.message || "Failed to submit plan summary");
         resetProgress();
@@ -464,7 +536,6 @@ export default function TestLogInfo({ onConfirmNext }) {
       resetProgress();
     } finally {
       setIsLoading(false);
-      // if extracting didn’t start, clear after a short moment
       setTimeout(() => {
         if (!isExtracting) resetProgress();
       }, 600);
@@ -472,17 +543,66 @@ export default function TestLogInfo({ onConfirmNext }) {
   };
 
   const handleConfirmNext = () => {
+    // Check if PDF exists in localStorage
+    const savedPdf = localStorage.getItem('uploadedPdfFile');
+    if (!savedPdf) {
+      toast.error("Please upload a PDF file before proceeding.");
+      return;
+    }
+
+    // Validate PDF data structure
+    try {
+      const pdfData = JSON.parse(savedPdf);
+      if (!pdfData.data && !pdfData.blobUrl) {
+        toast.error("Invalid PDF data. Please re-upload the PDF file.");
+        return;
+      }
+    } catch (error) {
+      toast.error("Corrupted PDF data. Please re-upload the PDF file.");
+      return;
+    }
+
     saveToLocalStorage(false);
     submitPlanSummary();
   };
+
+  // Debug function to check stored PDF
+  const debugStoredPdf = () => {
+    const savedPdf = localStorage.getItem('uploadedPdfFile');
+    if (savedPdf) {
+      try {
+        const parsed = JSON.parse(savedPdf);
+        console.log("📄 Stored PDF Debug:", {
+          hasBlobUrl: !!parsed.blobUrl,
+          hasData: !!parsed.data,
+          dataType: parsed.data ? typeof parsed.data : 'none',
+          dataStartsWith: parsed.data ? parsed.data.substring(0, 30) + '...' : 'none',
+          name: parsed.name,
+          size: parsed.size,
+          type: parsed.type
+        });
+      } catch (error) {
+        console.error("❌ Error parsing stored PDF:", error);
+      }
+    } else {
+      console.log("❌ No PDF found in localStorage");
+    }
+  };
+
+  // Call debug on component mount
+  useEffect(() => {
+    debugStoredPdf();
+  }, []);
 
   return (
     <>
       <div className="flex-1 flex-col gap-[310px] h-full">
         <div className="pt-[23px] pb-[18px] ">
-          <p className="text-[#252525] pb-[18px] pt-[23px] text-[20px] font-semibold leading-[110%] tracking-[0.4px] whitespace-nowrap">
-            Test log info
-          </p>
+          <div className="flex justify-between items-center">
+            <p className="text-[#252525] pb-[18px] pt-[23px] text-[20px] font-semibold leading-[110%] tracking-[0.4px] whitespace-nowrap">
+              Test log info
+            </p>
+          </div>
 
           <div className="w-full border-b border-[#E1E6ED]"></div>
 
@@ -556,7 +676,6 @@ export default function TestLogInfo({ onConfirmNext }) {
                 </span>
               </div>
 
-              {/* ✅ button with long-running progress */}
               <button
                 type="button"
                 className="relative px-5 py-[15px] bg-[#308BF9] rounded-[10px] cursor-pointer flex items-center justify-center overflow-hidden disabled:opacity-60 w-[180px]"

@@ -528,8 +528,6 @@
 
 
 
-
-
 "use client"
 
 import React, { useState, useEffect } from 'react'
@@ -554,15 +552,14 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
     const clientProfileFromRedux = useSelector((state) => state.clientProfile.data);
     
     const [clientData, setClientData] = useState(null);
-    console.log("clientData552:-", clientData);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPlan, setSelectedPlan] = useState("");
     const [showUploadModal, setShowUploadModal] = useState(false);
 
     // Get parameters from URL
-    const dieticianId = searchParams?.get('dietician_id') || 'RespyrD02';
-    const profileId = searchParams?.get('profile_id') || 'profile2';
+    const dieticianId = searchParams?.get('dietician_id') || '';
+    const profileId = searchParams?.get('profile_id') || '';
 
     const hideClientBits = (pathname || '').toLowerCase().includes('testlog-info')
         || (pathname || '').toLowerCase().includes('plan-summary')
@@ -585,7 +582,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                     setClientData(response.data);
                     dispatch(setClientProfile(response.data)); 
                 } else {
-                    toast.error("Failed to load client data");
+                    //toast.error("Failed to load client data");
                      dispatch(setClientProfileError("Failed to load client data"));
                 }
             } catch (error) {
@@ -628,6 +625,14 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
     };
 
     const goals = activePlan ? parseGoals(activePlan.goal) : [];
+
+    // Function to handle Create Plan button click
+    const handleCreatePlanClick = () => {
+        // Clear localStorage when creating a new plan
+        localStorage.clear();
+       
+        setIsModalOpen(true);
+    };
 
     if (loading && !hideClientBits) {
         return (
@@ -906,7 +911,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     <div className='flex mx-2.5 bg-[#F5F7FA] rounded-[15px] whitespace-nowrap py-[13px] pl-[30px] pr-[15px] gap-[80px] items-center'>
                                         <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">No plan</span>
                                         <button className='flex gap-[15px] px-[18px] py-[9px] bg-[#308BF9] rounded-[5px]'
-                                            onClick={() => setIsModalOpen(true)}
+                                            onClick={handleCreatePlanClick}
                                         >
                                             <GoPlus className='text-white w-[15px] h-[15px] cursor-pointer' />
                                             <span className='text-white text-[12px] font-semibold leading-[110%] tracking-[-0.24px] cursor-pointer'>Create Plan</span>

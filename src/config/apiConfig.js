@@ -27,6 +27,11 @@ export const API_ENDPOINTS = {
   },
   MEALANALYSIS:{
  WEEKLYANALYSISCOMPLETE:"/dietitian/api/web/weekly_analysis_complete.php"
+  },
+  DASHBOARD:{
+    TABLECARDS:"/dietitian/api/web/test_statistic_by_dietitian.php",
+    TESTANALYTICS:"/dietitian/api/web/get_test_analytics.php"
+ 
   }
  
   

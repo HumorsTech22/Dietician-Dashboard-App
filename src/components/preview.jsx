@@ -7,23 +7,43 @@ import CreateDietPlan from './create-diet-plan';
 import Summary from './summary';
 import TestLogInfo from './testloginfo';
 import DietPlanCreated from './diet-plan-created';
-import { useSelector, useDispatch } from 'react-redux';
-import { setUploadedFile } from '@/store/pdfSlice';
+
 import { toast } from 'sonner';
 
 export default function Preview() {
   const pathname = (usePathname() || '').toLowerCase();
-  const dispatch = useDispatch();
+
   const fileInputRef = useRef(null);
 
   const isDietPlan = pathname.includes('/dietplan') || pathname.endsWith('/diet-plan');
   const hideActions = pathname.includes('/testlog-info');
   const hideTestLogOnPlanSummary = pathname.includes('/plan-summary') || pathname.endsWith('/plansummary');
 
-  const pdfData = useSelector((state) => state.pdf);
+const [pdfData, setPdfData] = useState({ fileName: '', blobUrl: '' });
 
   const [activePanel, setActivePanel] = useState('summary');
 
+
+
+  // NEW CODE ADDED:
+useEffect(() => {
+  const loadPdfFromLocalStorage = () => {
+    try {
+      const storedFileData = localStorage.getItem('uploadedPdfFile');
+      if (storedFileData) {
+        const parsedData = JSON.parse(storedFileData);
+        setPdfData({
+          fileName: parsedData.name || 'please_upload.pdf',
+          blobUrl: parsedData.blobUrl || ''
+        });
+      }
+    } catch (error) {
+      console.error('Error loading PDF from localStorage:', error);
+    }
+  };
+
+  loadPdfFromLocalStorage();
+}, []);
 
 
   // Cleanup blob URLs on component unmount
@@ -35,43 +55,68 @@ export default function Preview() {
     };
   }, [pdfData.blobUrl]);
 
-  const handleReupload = (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+const handleReupload = (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
 
-    if (file.type !== "application/pdf") {
-      toast.error("Please upload a valid PDF file");
-      return;
+  if (file.type !== "application/pdf") {
+    toast.error("Please upload a valid PDF file");
+    return;
+  }
+
+  // File size validation (3MB max)
+  if (file.size > 3 * 1024 * 1024) {
+    toast.error("File size must be less than 3MB");
+    return;
+  }
+
+  try {
+    // Clean up previous blob URL if exists
+    if (pdfData.blobUrl) {
+      URL.revokeObjectURL(pdfData.blobUrl);
     }
 
-    try {
-      // Clean up previous blob URL if exists
-      if (pdfData.blobUrl) {
-        URL.revokeObjectURL(pdfData.blobUrl);
-      }
-
-      // Create new blob URL
-      const newBlobUrl = URL.createObjectURL(file);
+    // Create new blob URL
+    const newBlobUrl = URL.createObjectURL(file);
+    
+    // Store file in localStorage
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const fileData = {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        lastModified: file.lastModified,
+        data: event.target.result,
+        blobUrl: newBlobUrl
+      };
       
-      // Dispatch action to update Redux state with new file
-      dispatch(
-        setUploadedFile({
-          file: file,
-          blobUrl: newBlobUrl,
-          fileName: file.name,
-        })
-      );
+      localStorage.setItem('uploadedPdfFile', JSON.stringify(fileData));
+      
+      // Update local state
+      setPdfData({
+        fileName: file.name,
+        blobUrl: newBlobUrl
+      });
 
       toast.success(`File re-uploaded: ${file.name}`);
       
       // Reset the file input to allow re-uploading the same file
       event.target.value = '';
-
-    } catch (error) {
-      console.error("Error during re-upload:", error);
+    };
+    
+    reader.onerror = function(error) {
+      console.error("Error reading file:", error);
       toast.error("Failed to re-upload file");
-    }
-  };
+    };
+    
+    reader.readAsDataURL(file);
+
+  } catch (error) {
+    console.error("Error during re-upload:", error);
+    toast.error("Failed to re-upload file");
+  }
+};
 
   const handleReuploadClick = () => {
     fileInputRef.current?.click();
@@ -110,7 +155,7 @@ export default function Preview() {
               onClick={handleReuploadClick}
             >
               <Image
-                src="/icons/hugeicons_rotate-01.svg"
+                src="/icons/hugeicons_rotate-01.svg"  
                 alt='hugeicons_rotate-01'
                 width={20}
                 height={20}

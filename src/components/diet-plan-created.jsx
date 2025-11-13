@@ -2168,7 +2168,7 @@ export default function DietPlanCreated() {
           <div className="flex flex-col gap-[15px]">
             <div className="w-full  border-b border-[#E1E6ED]"></div>
 
-            <div className="flex gap-5">
+            {/* <div className="flex gap-5">
               <div className="w-fit flex justify-center">
                 <div className="rounded-l-[10px] border border-[#D9D9D9] pl-4 py-2 pr-2.5 bg-[#F0F0F0] text-center">
                   <p className="text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
@@ -2196,7 +2196,7 @@ export default function DietPlanCreated() {
                   <IoIosArrowDown className="text-[#A1A1A1] cursor-pointer" />
                 </div>
               </div>
-            </div>
+            </div> */}
 
             <div className="flex flex-col gap-9 bg-[#F5F7FA] rounded-[15px]">
               <div className="flex items-center bg-[#E1E6ED] rounded-[15px] border-4 border-[#F5F7FA]">

@@ -1252,7 +1252,7 @@ export default function MealTracked({
               </div>
             </div>
 
-            <div className="flex gap-8 items-start pl-2.5 pr-4 pt-4 pb-[18px] bg-[#F0F5FD] rounded-[10px]">
+            <div className="flex items-center gap-8  pl-2.5 pr-4 pt-4 pb-[18px] bg-[#F0F5FD] rounded-[10px]">
               <div className="flex gap-[5px] items-center max-w-[118px]">
                 <Image
                   src="/icons/hugeicons_award-01.svg"
@@ -1352,9 +1352,9 @@ export default function MealTracked({
         )}
 
         {filteredItems.length === 0 && (
-          <div className="flex justify-center items-center p-8 rounded-[15px] bg-white">
-            <span className="text-[#535359] text-[14px] font-normal">
-              No items found for this category.
+          <div className="flex justify-center items-center p-8 rounded-[15px]">
+            <span className="text-[#C0CAD8] text-[20px] font-semibold leading-[110%] tracking-[-0.4px]">
+              No data available
             </span>
           </div>
         )}
