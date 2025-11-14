@@ -741,7 +741,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                             <div className='flex flex-col pb-[48px] gap-5 bg-[#FFFFFF] rounded-[15px] overflow-y-auto max-h-[calc(16.75*64px)] hide-scrollbar'>
                                 <div className="flex flex-col items-center gap-5 mt-[55px]">
                                     {/* Avatar */}
-                                    <div className="bg-[#F0F0F0] rounded-full p-2.5 flex items-center justify-center">
+                                    <div className="rounded-full p-2.5 flex items-center justify-center">
                                         {clientData?.profile_image_url ? (
                                             <Image
                                                 src={clientData.profile_image_url}

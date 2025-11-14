@@ -8,230 +8,246 @@ import { fetchTestAnalytics } from "../services/authService";
 import { cookieManager } from "../lib/cookies";
 
 export default function TestMonitor() {
-    const [selectedDate, setSelectedDate] = useState("");
-    const [showCalendar, setShowCalendar] = useState(false);
-    const [testAnalyticsData, setTestAnalyticsData] = useState(null);
-    console.log("testAnalyticsData14:-", testAnalyticsData);
-    const [loading, setLoading] = useState(false);
-    const datePickerRef = useRef(null); 
-    const calendarRef = useRef(null);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [testAnalyticsData, setTestAnalyticsData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [dieticianId, setDieticianId] = useState("");   
 
-    const dieticianId = "Respyrd01";
-    console.log("dieticianId25:-", dieticianId);
+  const datePickerRef = useRef(null);
+  const calendarRef = useRef(null);
 
-    // Format date as "Today, 12 April 2025"
-    const formatDate = (dateString) => {
-        if (!dateString) {
-            const today = new Date();
-            const day = today.getDate();
-            const month = today.toLocaleString('en-US', { month: 'long' });
-            const year = today.getFullYear();
-            return `Today, ${day} ${month} ${year}`;
-        }
+  // 👇 Get dietician_id from "dietician" cookie on mount
+  useEffect(() => {
+    const dieticianCookie = cookieManager.getJSON("dietician");
 
-        const date = new Date(dateString);
-        const day = date.getDate();
-        const month = date.toLocaleString('en-US', { month: 'long' });
-        const year = date.getFullYear();
-        return `${day} ${month} ${year}`;
-    };
+    if (dieticianCookie && dieticianCookie.dietician_id) {
+      setDieticianId(dieticianCookie.dietician_id);
+    } else {
+      console.warn("No dietician cookie found or dietician_id missing");
+    }
+  }, []);
 
-    // Fetch test analytics data
-    const fetchTestAnalyticsData = async (date = "") => {
-        if (!dieticianId) return;
-        
-        setLoading(true);
-        try {
-            const response = await fetchTestAnalytics(dieticianId, date);
-            setTestAnalyticsData(response);
-        } catch (error) {
-            console.error("Error fetching test analytics:", error);
-            setTestAnalyticsData(null);
-        } finally {
-            setLoading(false);
-        }
-    };
+  // Format date as "Today, 12 April 2025"
+  const formatDate = (dateString) => {
+    if (!dateString) {
+      const today = new Date();
+      const day = today.getDate();
+      const month = today.toLocaleString('en-US', { month: 'long' });
+      const year = today.getFullYear();
+      return `Today, ${day} ${month} ${year}`;
+    }
 
-    // Calculate totals from analytics data for selected date
-    const calculateTotals = () => {
-        if (!testAnalyticsData?.days || testAnalyticsData.days.length === 0) {
-            return { tested: 0, notTested: 0 };
-        }
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleString('en-US', { month: 'long' });
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  };
 
-        // If no date is selected, use the latest available data
-        if (!selectedDate) {
-            const latestDay = testAnalyticsData.days[testAnalyticsData.days.length - 1];
-            return {
-                tested: latestDay.tested_clients || 0,
-                notTested: latestDay.not_tested_clients || 0
-            };
-        }
+  // Fetch test analytics data
+  const fetchTestAnalyticsData = async (date = "") => {
+    if (!dieticianId) return; // wait until cookie is loaded
 
-        // Find data for the selected date
-        const selectedDayData = testAnalyticsData.days.find(day => day.date === selectedDate);
-        
-        if (selectedDayData) {
-            return {
-                tested: selectedDayData.tested_clients || 0,
-                notTested: selectedDayData.not_tested_clients || 0
-            };
-        } else {
-            // No data found for selected date
-            return { tested: 0, notTested: 0 };
-        }
-    };
+    setLoading(true);
+    try {
+    //   const response = await fetchTestAnalytics(dieticianId, date);
+        const response = await fetchTestAnalytics("Respyrd01", date);
+      setTestAnalyticsData(response);
+    } catch (error) {
+      console.error("Error fetching test analytics:", error);
+      setTestAnalyticsData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // Get filtered data for DashboardGraph based on selected date
-    const getFilteredGraphData = () => {
-        if (!testAnalyticsData?.days) return null;
+  // Calculate totals from analytics data for selected date
+  const calculateTotals = () => {
+    if (!testAnalyticsData?.days || testAnalyticsData.days.length === 0) {
+      return { tested: 0, notTested: 0 };
+    }
 
-        // If no date selected, return all data
-        if (!selectedDate) {
-            return testAnalyticsData;
-        }
+    // If no date is selected, use the latest available data
+    if (!selectedDate) {
+      const latestDay = testAnalyticsData.days[testAnalyticsData.days.length - 1];
+      return {
+        tested: latestDay.tested_clients || 0,
+        notTested: latestDay.not_tested_clients || 0
+      };
+    }
 
-        // Filter data for the selected date only
-        const filteredDay = testAnalyticsData.days.find(day => day.date === selectedDate);
-        
-        if (filteredDay) {
-            return {
-                ...testAnalyticsData,
-                days: [filteredDay]
-            };
-        } else {
-            // Return empty data structure if no data for selected date
-            return {
-                ...testAnalyticsData,
-                days: []
-            };
-        }
-    };
+    // Find data for the selected date
+    const selectedDayData = testAnalyticsData.days.find(day => day.date === selectedDate);
 
-    const totals = calculateTotals();
-    const filteredGraphData = getFilteredGraphData();
+    if (selectedDayData) {
+      return {
+        tested: selectedDayData.tested_clients || 0,
+        notTested: selectedDayData.not_tested_clients || 0
+      };
+    } else {
+      // No data found for selected date
+      return { tested: 0, notTested: 0 };
+    }
+  };
 
-    // Open calendar picker
-    const openCalendar = () => {
-        if (datePickerRef.current) {
-            if (datePickerRef.current.showPicker) {
-                datePickerRef.current.showPicker();
-            } else {
-                datePickerRef.current.click();
-            }
-        }
-    };
+  // Get filtered data for DashboardGraph based on selected date
+  const getFilteredGraphData = () => {
+    if (!testAnalyticsData?.days) return null;
 
-    // Handle date selection
-    const handleDateChange = (e) => {
-        const newDate = e.target.value;
-        setSelectedDate(newDate);
+    // If no date selected, return all data
+    if (!selectedDate) {
+      return testAnalyticsData;
+    }
+
+    // Filter data for the selected date only
+    const filteredDay = testAnalyticsData.days.find(day => day.date === selectedDate);
+
+    if (filteredDay) {
+      return {
+        ...testAnalyticsData,
+        days: [filteredDay]
+      };
+    } else {
+      // Return empty data structure if no data for selected date
+      return {
+        ...testAnalyticsData,
+        days: []
+      };
+    }
+  };
+
+  const totals = calculateTotals();
+  const filteredGraphData = getFilteredGraphData();
+
+  // Open calendar picker
+  const openCalendar = () => {
+    if (datePickerRef.current) {
+      if (datePickerRef.current.showPicker) {
+        datePickerRef.current.showPicker();
+      } else {
+        datePickerRef.current.click();
+      }
+    }
+  };
+
+  // Handle date selection
+  const handleDateChange = (e) => {
+    const newDate = e.target.value;
+    setSelectedDate(newDate);
+    setShowCalendar(false);
+    // We don't need to fetch new data, we'll filter the existing data
+  };
+
+  // Close calendar when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (calendarRef.current && !calendarRef.current.contains(event.target)) {
         setShowCalendar(false);
-        // We don't need to fetch new data, we'll filter the existing data
+      }
     };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-    // Close calendar when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (calendarRef.current && !calendarRef.current.contains(event.target)) {
-                setShowCalendar(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+  // Fetch data when dieticianId is available or changes
+  useEffect(() => {
+    if (dieticianId) {
+      fetchTestAnalyticsData(""); // Fetch all data initially
+    }
+  }, [dieticianId]);
 
-    // Fetch data on component mount and when dieticianId changes
-    useEffect(() => {
-        if (dieticianId) {
-            fetchTestAnalyticsData(""); // Fetch all data initially
-        }
-    }, [dieticianId]);
+  return (
+    <>
+      <div className="border border-[#E1E6ED] rounded-[10px] px-[15px] pt-[30px]">
+        <div className="flex justify-between pb-[23px] border-b border-[#E1E6ED]">
+          <span className="text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]">
+            Test Analytics
+          </span>
 
-    return (
-        <>
-            <div className="border border-[#E1E6ED] rounded-[10px] px-[15px] pt-[30px]">
-                <div className="flex justify-between pb-[23px] border-b border-[#E1E6ED]">
-                    <span className="text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]">Test Analytics</span>
-
-                    <div className="flex gap-5 items-center relative" ref={calendarRef}>
-                        <span className="text-[#A1A1A1] text-[12px] font-normal leading-normal tracking-[-0.24px]">
-                            {formatDate(selectedDate)}
-                        </span>
-                        <div
-                            className="cursor-pointer"
-                            onClick={openCalendar}
-                        >
-                            <Image
-                                src="/icons/hugeicons_calendar-03.svg"
-                                alt="hugeicons_calendar-03.svg"
-                                width={24}
-                                height={24}
-                            />
-                        </div>
-
-                        {/* Hidden native date input */}
-                        <input
-                            ref={datePickerRef}
-                            type="date"
-                            className="sr-only"
-                            onChange={handleDateChange}
-                        />
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-[18px]">
-                    <span className="pl-3.5 text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] mt-[30px]">Tests Tracking</span>
-
-                    <div className="flex gap-5">
-                        <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 w-full">
-                            <div className="flex gap-[5px]">
-                                <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
-                                    Client Tracked
-                                </span>
-                            </div>
-                            {loading ? (
-                                <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">...</span>
-                            ) : (
-                                <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">
-                                    {totals.tested}
-                                </span>
-                            )}
-                        </div>
-
-                        <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 w-full">
-                            <div className="w-[333px] flex gap-[69px]">
-                                <div className="flex gap-[5px]">
-                                    <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
-                                        Client Not tracked
-                                    </span>
-                                </div>
-                                <div className="flex gap-2.5">
-                                    <span className="text-[#308BF9] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] whitespace-nowrap">
-                                        Send Reminder
-                                    </span>
-                                    <IoIosArrowForward className="text-[#308BF9]" />
-                                </div>
-                            </div>
-                            {loading ? (
-                                <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">...</span>
-                            ) : (
-                                <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">
-                                    {totals.notTested}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mt-[34px]">
-                    <DashboardGraph testAnalyticsData={filteredGraphData} />
-                </div>
-
-                <div className="flex flex-col gap-[26px]">
-                    <span className="mt-10 ml-3.5 text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">Tests Results</span>
-                    <ClientRisk hideDietGoal={true} />
-                </div>
+          <div className="flex gap-5 items-center relative" ref={calendarRef}>
+            <span className="text-[#A1A1A1] text-[12px] font-normal leading-normal tracking-[-0.24px]">
+              {formatDate(selectedDate)}
+            </span>
+            <div
+              className="cursor-pointer"
+              onClick={openCalendar}
+            >
+              <Image
+                src="/icons/hugeicons_calendar-03.svg"
+                alt="hugeicons_calendar-03.svg"
+                width={24}
+                height={24}
+              />
             </div>
-        </>
-    )
+
+            {/* Hidden native date input */}
+            <input
+              ref={datePickerRef}
+              type="date"
+              className="sr-only"
+              onChange={handleDateChange}
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-[18px]">
+          <span className="pl-3.5 text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] mt-[30px]">
+            Tests Tracking
+          </span>
+
+          <div className="flex gap-5">
+            <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 w-full">
+              <div className="flex gap-[5px]">
+                <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
+                  Client Tracked
+                </span>
+              </div>
+              {loading ? (
+                <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">...</span>
+              ) : (
+                <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">
+                  {totals.tested}
+                </span>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 w-full">
+              <div className="w-[333px] flex gap-[69px]">
+                <div className="flex gap-[5px]">
+                  <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
+                    Client Not tracked
+                  </span>
+                </div>
+                <div className="flex gap-2.5">
+                  <span className="text-[#308BF9] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] whitespace-nowrap">
+                    Send Reminder
+                  </span>
+                  <IoIosArrowForward className="text-[#308BF9]" />
+                </div>
+              </div>
+              {loading ? (
+                <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">...</span>
+              ) : (
+                <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">
+                  {totals.notTested}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-[34px]">
+          <DashboardGraph testAnalyticsData={filteredGraphData} />
+        </div>
+
+        <div className="flex flex-col gap-[26px]">
+          <span className="mt-10 ml-3.5 text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">
+            Tests Results
+          </span>
+          <ClientRisk hideDietGoal={true} />
+        </div>
+      </div>
+    </>
+  );
 }

@@ -282,12 +282,12 @@ export default function DashboardCard({ activeTab }) {
             <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
               Tests Remaining
             </span>
-            <div className="flex gap-2.5">
+            {/* <div className="flex gap-2.5">
               <span className="text-[#308BF9] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] whitespace-nowrap">
                 Purchase more
               </span>
               <IoIosArrowForward className="text-[#308BF9]" />
-            </div>
+            </div> */}
           </div>
           <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">
             {loading ? "..." : (dashboardData?.remaining_tests || 0)}
