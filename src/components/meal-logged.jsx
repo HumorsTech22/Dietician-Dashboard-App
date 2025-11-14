@@ -108,9 +108,6 @@
 // };
 
 
-
-
-
 "use client";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
@@ -355,19 +352,27 @@ export default function MealLogged() {
                   const effectiveIdx =
                     selectedWeekIdx === null ? currentWeekIdx : selectedWeekIdx;
 
-                  // If a plan exists, disable weeks that are fully outside plan range
+                  const today = new Date();
+                  
+                  // If a plan exists, disable weeks that are fully outside plan range OR are future weeks
                   let isDisabled = false;
                   if (clientProfile?.plans_summary?.active?.length > 0) {
-                    const activePlan =
-                      clientProfile.plans_summary.active[0];
+                    const activePlan = clientProfile.plans_summary.active[0];
                     const planStart = new Date(activePlan.plan_start_date);
                     const planEnd = new Date(activePlan.plan_end_date);
                     const range = getWeekDateRange(idx);
 
                     if (range) {
-                      if (range.end < planStart || range.start > planEnd) {
+                      // Disable if outside plan range OR if it's a future week
+                      if (range.end < planStart || range.start > planEnd || range.start > today) {
                         isDisabled = true;
                       }
+                    }
+                  } else {
+                    // For fallback (no plan), disable future weeks
+                    const range = getWeekDateRange(idx);
+                    if (range && range.start > today) {
+                      isDisabled = true;
                     }
                   }
 
@@ -431,7 +436,17 @@ export default function MealLogged() {
         ) : dataArr.length === 0 ? (
           <div className="flex justify-center items-center py-8">
             <span className="text-[#C0CAD8] text-[20px] font-semibold leading-[110%] tracking-[-0.4px] text-center">
-              Analysis will be generated after each week.
+              {(() => {
+                const weekIdxToUse = selectedWeekIdx === null ? currentWeekIdx : selectedWeekIdx;
+                const range = getWeekDateRange(weekIdxToUse);
+                const today = new Date();
+                
+                if (range && range.end < today) {
+                  return `No Data Found for ${fmt(range.start)} - ${fmt(range.end)}`;
+                } else {
+                  return "Analysis will be generated after each week.";
+                }
+              })()}
             </span>
           </div>
         ) : (
@@ -535,9 +550,6 @@ export default function MealLogged() {
     </>
   );
 }
-
-
-
 
 
 

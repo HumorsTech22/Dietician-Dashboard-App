@@ -193,12 +193,11 @@ export default function MealSidebar({
   onFilterChange,
   weeklyAnalysisData
 }) {
-  console.log("weeklyAnalysisData251:-", weeklyAnalysisData);
 
-  // ✅ Normalize input to always be an array
+
   const data = Array.isArray(weeklyAnalysisData) ? weeklyAnalysisData : [];
 
-  // ✅ Helpers
+
   const hasFood = (x) =>
     x && typeof x === "object" && typeof x.food === "string" && x.food.trim().length > 0;
 

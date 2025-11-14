@@ -47,6 +47,7 @@ export default function Header() {
     const handleLogout = () => {
     try {
       cookieManager.clearAuth();
+      localStorage.clear()
       setIsDropdownOpen(false);
       
       // Redirect to login page
@@ -55,7 +56,7 @@ export default function Header() {
     } catch (error) {
       console.error("Error during logout:", error);
     }
-  };
+   };
 
 
   return (
