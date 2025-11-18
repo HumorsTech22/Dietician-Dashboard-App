@@ -538,19 +538,22 @@ import { GoPlus } from "react-icons/go";
 import { IoIosArrowForward } from "react-icons/io";
 import { toast } from "sonner";
 import Link from 'next/link';
+import { cookieManager } from '../lib/cookies';
 import { usePathname, useSearchParams } from "next/navigation";
 import CreatePlanModal from './modal/create-plan';
 import { fetchClientProfileData } from '../services/authService';
 import { useDispatch, useSelector } from 'react-redux';
 import { setClientProfile, clearClientProfile, setClientProfileLoading, setClientProfileError } from '@/store/clientProfileSlice';
 
-export const ClientProfile = ({ showPlanDetails = true, showOverview = true, showPlanSelection = true, showPlanHistoryMargin = true }) => {
+export const ClientProfile = ({ showPlanDetails = true, showOverview = true, showPlanSelection = true, showPlanHistoryMargin = true
+
+}) => {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-     const dispatch = useDispatch();
+    const dispatch = useDispatch();
     const clientProfileFromRedux = useSelector((state) => state.clientProfile.data);
-    
+
     const [clientData, setClientData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -558,7 +561,8 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
     const [showUploadModal, setShowUploadModal] = useState(false);
 
     // Get parameters from URL
-    const dieticianId = searchParams?.get('dietician_id') || '';
+   const dieticianCookie = cookieManager.getJSON('dietician');
+   const dieticianId = searchParams?.get('dietician_id') || dieticianCookie?.dietician_id || ''
     const profileId = searchParams?.get('profile_id') || '';
 
     const hideClientBits = (pathname || '').toLowerCase().includes('testlog-info')
@@ -577,18 +581,18 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
             try {
                 setLoading(true);
                 const response = await fetchClientProfileData(dieticianId, profileId);
-                
+
                 if (response.success && response.data) {
                     setClientData(response.data);
-                    dispatch(setClientProfile(response.data)); 
+                    dispatch(setClientProfile(response.data));
                 } else {
                     //toast.error("Failed to load client data");
-                     dispatch(setClientProfileError("Failed to load client data"));
+                    dispatch(setClientProfileError("Failed to load client data"));
                 }
             } catch (error) {
                 console.error("Error fetching client profile:", error);
                 toast.error("Error loading client data");
-                 dispatch(setClientProfileError(error?.message || "Error loading client data"));
+                dispatch(setClientProfileError(error?.message || "Error loading client data"));
             } finally {
                 setLoading(false);
             }
@@ -626,11 +630,22 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
 
     const goals = activePlan ? parseGoals(activePlan.goal) : [];
 
+    const hasAnyPlans =
+        !!(
+            clientData?.plans_summary &&
+            (
+                (clientData.plans_summary.active && clientData.plans_summary.active.length > 0) ||
+                (clientData.plans_summary.completed && clientData.plans_summary.completed.length > 0) ||
+                (clientData.plans_summary.not_started && clientData.plans_summary.not_started.length > 0)
+            )
+        );
+
+
     // Function to handle Create Plan button click
     const handleCreatePlanClick = () => {
         // Clear localStorage when creating a new plan
         localStorage.clear();
-       
+
         setIsModalOpen(true);
     };
 
@@ -685,10 +700,10 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                         </div>
 
                         <div className='flex gap-[5px] items-center'>
-                            <IoChevronBackSharp className='w-[20px] h-[20px] cursor-pointer' />
+                            <IoChevronBackSharp className='w-[15px] h-[15px] cursor-pointer' />
                             {isPlanHistoryPage ? (
                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>
-                                    Plan History({clientData?.plans_count?.total || 2})
+                                    Plan History({clientData?.plans_count?.total})
                                 </span>
                             ) : (
                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>
@@ -802,13 +817,23 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     <div className='mx-2.5 pt-5  rounded-[15px] mt-[17px] bg-[#F5F7FA]'>
                                         <div className='flex items-center justify-between ml-[30px] mr-[17px] '>
                                             <span className="text-[#3FAF58] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">Active</span>
-                                            <Image
-                                                src="/icons/hugeicons_pencil-edit-02.svg"
-                                                alt='hugeicons_pencil'
-                                                height={24}
-                                                width={24}
-                                                className='cursor-pointer'
-                                            />
+                                            {/* <Link
+                                                href={{
+                                                    pathname: './plansummary',
+                                                    query: {
+                                                        dietician_id: cookieManager.getJSON('dietician')?.dietician_id || '',
+                                                        profile_id: profileId || ''
+                                                    }
+                                                }}
+                                            >
+                                                <Image
+                                                    src="/icons/hugeicons_pencil-edit-02.svg"
+                                                    alt='hugeicons_pencil'
+                                                    height={24}
+                                                    width={24}
+                                                    className='cursor-pointer'
+                                                />
+                                            </Link> */}
 
                                         </div>
 
@@ -927,7 +952,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                                 Mobile number
                                             </span>
                                             <span className='text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px]'>
-                                                {clientData?.phone_no && clientData.phone_no !== 'NA' ? clientData.phone_no : '+91 3872173120'}
+                                                {clientData?.phone_no && clientData.phone_no !== 'NA' ? clientData.phone_no : 'N/A'}
                                             </span>
                                         </div>
 
@@ -938,7 +963,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                             width={15}
                                             height={15}
                                             className='cursor-pointer'
-                                            onClick={() => copyToClipboard(clientData?.phone_no && clientData.phone_no !== 'NA' ? clientData.phone_no : "+91 3872173120")}
+                                            onClick={() => copyToClipboard(clientData?.phone_no && clientData.phone_no !== 'N/A' ? clientData.phone_no : "N/A")}
                                         />
 
                                     </div>
@@ -950,7 +975,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                                 Email
                                             </span>
                                             <span className='text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px]'>
-                                                {clientData?.email && clientData.email !== 'NA' ? clientData.email : 'sparsh@gmail.com'}
+                                                {clientData?.email && clientData.email !== 'NA' ? clientData.email : 'N/A'}
                                             </span>
                                         </div>
 
@@ -960,7 +985,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                             width={15}
                                             height={15}
                                             className='cursor-pointer'
-                                            onClick={() => copyToClipboard(clientData?.email && clientData.email !== 'NA' ? clientData.email : "sparsh@gmail.com")}
+                                            onClick={() => copyToClipboard(clientData?.email && clientData.email !== 'NA' ? clientData.email : "N/A")}
                                         />
 
                                     </div>
@@ -973,7 +998,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                                 Reference ID
                                             </span>
                                             <span className='text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px]'>
-                                                {clientData?.profile_id || '58128376790'}
+                                                {clientData?.profile_id || 'N/A'}
                                             </span>
                                         </div>
 
@@ -985,7 +1010,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                             className='cursor-pointer'
 
 
-                                            onClick={() => copyToClipboard(clientData?.profile_id || "58128376790")}
+                                            onClick={() => copyToClipboard(clientData?.profile_id || "N/A")}
                                         />
 
                                     </div>
@@ -999,7 +1024,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                         )}
 
 
-                        {showPlanDetails && (
+                        {showPlanDetails && hasAnyPlans && (
                             <div className={`bg-white rounded-[15px] px-[22px] py-10 whitespace-nowrap ${showOverview ? "" : (showPlanHistoryMargin ? "mt-[30px]" : "")
                                 }`}>
                                 <div className='flex justify-between items-center'>
@@ -1021,9 +1046,17 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
 
 
                                 <div className='flex flex-col gap-[30px]'>
-                                    {/* Active Plans */}
                                     {clientData?.plans_summary?.active?.map((plan, index) => (
-                                        <div key={`active-${index}`} className='flex flex-col '>
+                                        <Link
+                                            key={`active-${index}`}
+                                            href={{
+                                                pathname: '/planhistory',
+                                                query: {
+                                                    profile_id: profileId
+                                                }
+                                            }}
+                                            className='flex flex-col'
+                                        >
                                             <div className='flex gap-[25px] justify-between '>
                                                 <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] cursor-pointer'>{plan.plan_title}</span>
                                                 <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px] cursor-pointer'>
@@ -1047,13 +1080,21 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                                     <span className='text-[#3FAF58] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Active</span>
                                                 </div>
                                             </div>
-
-                                        </div>
+                                        </Link>
                                     ))}
 
                                     {/* Completed Plans */}
                                     {clientData?.plans_summary?.completed?.map((plan, index) => (
-                                        <div key={`completed-${index}`} className='flex flex-col '>
+                                        <Link
+                                            key={`completed-${index}`}
+                                            href={{
+                                                pathname: '/planhistory',
+                                                query: {
+                                                    profile_id: profileId
+                                                }
+                                            }}
+                                            className='flex flex-col'
+                                        >
                                             <div className='flex gap-[25px] justify-between'>
                                                 <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>{plan.plan_title}</span>
                                                 <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>
@@ -1077,60 +1118,60 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                                     <span className='text-[#3FAF58] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Finished</span>
                                                 </div>
                                             </div>
-
-                                        </div>
+                                        </Link>
                                     ))}
 
                                     {/* Fallback to original data if no API data */}
                                     {(!clientData?.plans_summary?.active?.length && !clientData?.plans_summary?.completed?.length) && (
-                                        <>
-                                            <div className='flex flex-col '>
-                                                <div className='flex gap-[25px] justify-between '>
-                                                    <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] cursor-pointer'>1-Month Plan</span>
-                                                    <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px] cursor-pointer'>05 July-05 Aug</span>
-                                                </div>
+                                        // <>
+                                        //     <div className='flex flex-col '>
+                                        //         <div className='flex gap-[25px] justify-between '>
+                                        //             <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] cursor-pointer'>1-Month Plan</span>
+                                        //             <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px] cursor-pointer'>05 July-05 Aug</span>
+                                        //         </div>
 
-                                                <div className='flex justify-between'>
-                                                    <div>
-                                                        <span className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize'>Updated 05 Jul, 12:30pm</span>
-                                                    </div>
-                                                    <div className='flex gap-[3px] items-center'>
-                                                        <Image
-                                                            src="/icons/verified.svg"
-                                                            alt='verified'
-                                                            width={12}
-                                                            height={12}
-                                                        />
-                                                        <span className='text-[#3FAF58] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Finished</span>
-                                                    </div>
-                                                </div>
+                                        //         <div className='flex justify-between'>
+                                        //             <div>
+                                        //                 <span className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize'>Updated 05 Jul, 12:30pm</span>
+                                        //             </div>
+                                        //             <div className='flex gap-[3px] items-center'>
+                                        //                 <Image
+                                        //                     src="/icons/verified.svg"
+                                        //                     alt='verified'
+                                        //                     width={12}
+                                        //                     height={12}
+                                        //                 />
+                                        //                 <span className='text-[#3FAF58] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Finished</span>
+                                        //             </div>
+                                        //         </div>
 
-                                            </div>
+                                        //     </div>
 
 
-                                            <div className='flex flex-col '>
-                                                <div className='flex gap-[25px] justify-between'>
-                                                    <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>1-Month Plan</span>
-                                                    <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>05 July-05 Aug</span>
-                                                </div>
+                                        //     <div className='flex flex-col '>
+                                        //         <div className='flex gap-[25px] justify-between'>
+                                        //             <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>1-Month Plan</span>
+                                        //             <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>05 July-05 Aug</span>
+                                        //         </div>
 
-                                                <div className='flex justify-between'>
-                                                    <div>
-                                                        <span className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize'>Updated 05 Jul, 12:30pm</span>
-                                                    </div>
-                                                    <div className='flex gap-[3px] items-center'>
-                                                        <Image
-                                                            src="/icons/close icon.svg"
-                                                            alt='close icon'
-                                                            width={12}
-                                                            height={12}
-                                                        />
-                                                        <span className='text-[#A1A1A1] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Cancelled</span>
-                                                    </div>
-                                                </div>
+                                        //         <div className='flex justify-between'>
+                                        //             <div>
+                                        //                 <span className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize'>Updated 05 Jul, 12:30pm</span>
+                                        //             </div>
+                                        //             <div className='flex gap-[3px] items-center'>
+                                        //                 <Image
+                                        //                     src="/icons/close icon.svg"
+                                        //                     alt='close icon'
+                                        //                     width={12}
+                                        //                     height={12}
+                                        //                 />
+                                        //                 <span className='text-[#A1A1A1] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Cancelled</span>
+                                        //             </div>
+                                        //         </div>
 
-                                            </div>
-                                        </>
+                                        //     </div>
+                                        // </>
+                                        <p className='text-[18px] text-[#252525]'>No Data found</p>
                                     )}
                                 </div>
 

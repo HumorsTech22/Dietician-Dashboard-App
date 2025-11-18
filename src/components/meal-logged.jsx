@@ -122,8 +122,13 @@ import { fetchWeeklyAnalysisComplete } from "../services/authService";
 export default function MealLogged() {
   const [activeFilter, setActiveFilter] = useState("low");
   const [weeklyAnalysisData, setWeeklyAnalysisData] = useState([]);
+  console.log("weeklyAnalysisData125:-", weeklyAnalysisData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  // Add state for visible weeks pagination
+  const [visibleWeekStart, setVisibleWeekStart] = useState(0);
+  const visibleWeeksCount = 5; // Show 5 weeks at a time
 
   const clientProfile = useSelector((state) => state.clientProfile.data);
 
@@ -257,14 +262,13 @@ export default function MealLogged() {
       const requestBody = {
         dietician_id: clientProfile?.dietician_id,
         profile_id: clientProfile?.profile_id,
-        // dietician_id: "Respyrd01",
-        // profile_id: "profile1",
         start_date: startDate,
         end_date: endDate,
         diet_plan_id: dietPlanId,
       };
 
       const response = await fetchWeeklyAnalysisComplete(requestBody);
+      console.log("response274:-", response);
       const arr = response?.api_response?.food_level_evaluation || [];
       setWeeklyAnalysisData(arr);
     } catch (err) {
@@ -306,6 +310,29 @@ export default function MealLogged() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientProfile, selectedWeekIdx]);
 
+  // ===== Pagination functions =====
+  const handleNextWeeks = () => {
+    if (visibleWeekStart + visibleWeeksCount < weeks.length) {
+      setVisibleWeekStart(visibleWeekStart + 1);
+    }
+  };
+
+  const handlePrevWeeks = () => {
+    if (visibleWeekStart > 0) {
+      setVisibleWeekStart(visibleWeekStart - 1);
+    }
+  };
+
+  // Get visible weeks for display
+  const visibleWeeks = weeks.slice(
+    visibleWeekStart, 
+    visibleWeekStart + visibleWeeksCount
+  );
+
+  // Check if arrows should be enabled
+  const canGoNext = visibleWeekStart + visibleWeeksCount < weeks.length;
+  const canGoPrev = visibleWeekStart > 0;
+
   return (
     <>
       <div className="flex flex-col gap-[25px] mt-[42px] bg-[#F5F7FA] rounded-[15px] pt-[25px] pl-[30px] pr-7 pb-2.5">
@@ -342,12 +369,17 @@ export default function MealLogged() {
               <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] whitespace-nowrap">
                 Select a Week
               </span>
-              <IoIosArrowBack className="text-[#252525] cursor-pointer" />
+              <IoIosArrowBack 
+                className={`${canGoPrev ? "text-[#252525] cursor-pointer" : "text-[#A1A1A1] cursor-not-allowed"}`}
+                onClick={canGoPrev ? handlePrevWeeks : undefined}
+              />
             </div>
 
             <div className="flex items-center">
               <div className="flex items-center">
-                {weeks.map((w, idx) => {
+                {visibleWeeks.map((w, idx) => {
+                  const actualIndex = visibleWeekStart + idx;
+                  
                   // Effective selected index (auto-select current week if user hasn't clicked)
                   const effectiveIdx =
                     selectedWeekIdx === null ? currentWeekIdx : selectedWeekIdx;
@@ -360,7 +392,7 @@ export default function MealLogged() {
                     const activePlan = clientProfile.plans_summary.active[0];
                     const planStart = new Date(activePlan.plan_start_date);
                     const planEnd = new Date(activePlan.plan_end_date);
-                    const range = getWeekDateRange(idx);
+                    const range = getWeekDateRange(actualIndex);
 
                     if (range) {
                       // Disable if outside plan range OR if it's a future week
@@ -370,13 +402,13 @@ export default function MealLogged() {
                     }
                   } else {
                     // For fallback (no plan), disable future weeks
-                    const range = getWeekDateRange(idx);
+                    const range = getWeekDateRange(actualIndex);
                     if (range && range.start > today) {
                       isDisabled = true;
                     }
                   }
 
-                  const isSelected = idx === effectiveIdx && !isDisabled;
+                  const isSelected = actualIndex === effectiveIdx && !isDisabled;
 
                   const wrapBase =
                     "flex flex-col w-full gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px]";
@@ -403,7 +435,7 @@ export default function MealLogged() {
                       <div
                         className={wrapClass}
                         onClick={() => {
-                          if (!isDisabled) setSelectedWeekIdx(idx);
+                          if (!isDisabled) setSelectedWeekIdx(actualIndex);
                         }}
                       >
                         <span className={titleClass}>{w.label}</span>
@@ -412,7 +444,7 @@ export default function MealLogged() {
                           {fmt(w.endDate)}
                         </span>
                       </div>
-                      {idx !== weeks.length - 1 && (
+                      {idx !== visibleWeeks.length - 1 && (
                         <div className="border-white border-r h-8 mx-2"></div>
                       )}
                     </React.Fragment>
@@ -420,7 +452,10 @@ export default function MealLogged() {
                 })}
               </div>
 
-              <IoIosArrowForward className="text-[#252525] ml-2 cursor-pointer" />
+              <IoIosArrowForward 
+                className={`ml-2 ${canGoNext ? "text-[#252525] cursor-pointer" : "text-[#A1A1A1] cursor-not-allowed"}`}
+                onClick={canGoNext ? handleNextWeeks : undefined}
+              />
             </div>
           </div>
         </div>
@@ -444,7 +479,7 @@ export default function MealLogged() {
                 if (range && range.end < today) {
                   return `No Data Found for ${fmt(range.start)} - ${fmt(range.end)}`;
                 } else {
-                  return "Analysis will be generated after each week.";
+                  return `Analysis will be generated after ${fmt(range.start)} - ${fmt(range.end)}`;
                 }
               })()}
             </span>
@@ -550,6 +585,8 @@ export default function MealLogged() {
     </>
   );
 }
+
+
 
 
 

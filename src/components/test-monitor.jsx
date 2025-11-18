@@ -51,8 +51,8 @@ export default function TestMonitor() {
 
     setLoading(true);
     try {
-    //   const response = await fetchTestAnalytics(dieticianId, date);
-        const response = await fetchTestAnalytics("Respyrd01", date);
+   const response = await fetchTestAnalytics(dieticianId, date);
+        //const response = await fetchTestAnalytics("Respyrd01", date);
       setTestAnalyticsData(response);
     } catch (error) {
       console.error("Error fetching test analytics:", error);

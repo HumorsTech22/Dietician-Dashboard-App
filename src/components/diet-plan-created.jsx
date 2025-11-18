@@ -1948,8 +1948,20 @@ export default function DietPlanCreated() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [planSummary, setPlanSummary] = useState(null);
+  console.log("planSummary1951:-", planSummary);
+  const [allDays, setAllDays] = useState([]);
+const [windowStartIndex, setWindowStartIndex] = useState(0);
+
+const VISIBLE_COUNT = 7;
+
 
   const extractedData = useSelector((state) => state.extractedData.data);
+
+  const visibleDays = allDays.slice(
+  windowStartIndex,
+  windowStartIndex + VISIBLE_COUNT
+);
+
 
   // Get plan summary from localStorage
   useEffect(() => {
@@ -2051,58 +2063,65 @@ export default function DietPlanCreated() {
   };
 
   // Function to generate 7 days array based on plan start date
-  const generateDays = (startDate) => {
-    const newDays = [];
-    const start = new Date(startDate);
+ const generateAllDays = (startDate, endDate) => {
+  const list = [];
+  const start = new Date(startDate);
+  const end = new Date(endDate);
 
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(start);
-      date.setDate(start.getDate() + i);
+  const daysDiff =
+    Math.floor((end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
 
-      const dayNumber = i + 1;
-      const formattedDate = date.toLocaleDateString('en-US', {
-        day: '2-digit',
-        month: 'short'
-      });
+  for (let i = 0; i < daysDiff; i++) {
+    const date = new Date(start);
+    date.setDate(start.getDate() + i);
 
-      newDays.push({
-        id: i,
-        day: `Day ${dayNumber}`,
-        date: formattedDate,
-        fullDate: new Date(date)
-      });
-    }
-    return newDays;
-  };
+    list.push({
+      id: i,
+      day: `Day ${i + 1}`,
+      date: date.toLocaleDateString("en-US", {
+        day: "2-digit",
+        month: "short"
+      }),
+      fullDate: date
+    });
+  }
 
-  // Initialize days when plan summary is available
-  useEffect(() => {
-    let startDate;
+  return list;
+};
 
-    if (planSummary?.plan_start_date) {
-      startDate = new Date(planSummary.plan_start_date);
-    } else {
-      startDate = new Date(currentDate);
-    }
 
-    const generatedDays = generateDays(startDate);
-    setDays(generatedDays);
-    setActiveDay(0);
-  }, [planSummary, currentDate]);
+ useEffect(() => {
+  if (!planSummary) return;
+
+  const start = new Date(planSummary.plan_start_date);
+  const end = new Date(planSummary.plan_end_date);
+
+  const generated = generateAllDays(start, end);
+  setAllDays(generated);
+
+  // always reset window to first 7
+  setWindowStartIndex(0);
+  setActiveDay(0);
+}, [planSummary]);
+
 
   // Function to navigate to previous days
-  const handlePreviousDays = () => {
-    const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() - 7);
-    setCurrentDate(newDate);
-  };
+const handlePreviousDays = () => {
+  if (windowStartIndex === 0) return; // can't go backward
+
+  setWindowStartIndex((prev) => Math.max(prev - VISIBLE_COUNT, 0));
+  setActiveDay(windowStartIndex - VISIBLE_COUNT);
+};
 
   // Function to navigate to next days
-  const handleNextDays = () => {
-    const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() + 7);
-    setCurrentDate(newDate);
-  };
+const handleNextDays = () => {
+  if (windowStartIndex + VISIBLE_COUNT >= allDays.length) return; // can't go beyond
+
+  setWindowStartIndex((prev) =>
+    Math.min(prev + VISIBLE_COUNT, allDays.length - VISIBLE_COUNT)
+  );
+  setActiveDay(windowStartIndex + VISIBLE_COUNT);
+};
 
   // Function to handle edit button click
   const handleEditClick = (meal, section) => {
@@ -2122,18 +2141,18 @@ export default function DietPlanCreated() {
 
   // Get diet plan data for current active day - FIXED: Pass only the date
   const getDietPlanDataForActiveDay = () => {
-    if (!days[activeDay]?.fullDate) {
+    if (!allDays[activeDay]?.fullDate) {
       return [];
     }
 
-    const currentDay = days[activeDay];
+    const currentDay = allDays[activeDay];
 
     const meals = getMealDataForDay(currentDay.fullDate);
 
     return meals;
   };
 
-  const selectedDayObj = days.find((d) => d.id === activeDay);
+ const selectedDayObj = allDays.find((d) => d.id === activeDay);
   const formatDisplayDate = (dateObj) => {
     if (!dateObj) return "";
     const ddMon = dateObj.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
@@ -2144,15 +2163,15 @@ export default function DietPlanCreated() {
   // Calculate dietPlanData - THIS UPDATES WHEN activeDay CHANGES
   const dietPlanData = getDietPlanDataForActiveDay();
 
-  // Get day totals for the active day
-  const getDayTotals = () => {
-    if (!extractedData?.result || !days[activeDay]?.fullDate) return null;
+// Get day totals for the active day
+const getDayTotals = () => {
+  if (!extractedData?.result || !allDays[activeDay]?.fullDate) return null;
 
-    const dayName = getDayName(days[activeDay].fullDate).toLowerCase();
-    const dayData = extractedData.result[dayName];
+  const dayName = getDayName(allDays[activeDay].fullDate).toLowerCase();
+  const dayData = extractedData.result[dayName];
 
-    return dayData?.totals || null;
-  };
+  return dayData?.totals || null;
+};
 
   const dayTotals = getDayTotals();
 
@@ -2210,32 +2229,34 @@ export default function DietPlanCreated() {
                 </div>
 
                 <div className="flex items-center">
-                  {days.map((day, index) => (
-                    <div key={day.id} className="flex items-center">
-                      <div
-                        className={`flex flex-col w-[140px] gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer ${activeDay === day.id
-                            ? 'bg-[#308BF9]'
-                            : 'bg-white'
-                          }`}
-                        onClick={() => {
-                          setActiveDay(day.id);
-                        }}
-                      >
-                        <span className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] ${activeDay === day.id ? 'text-white' : 'text-[#252525]'
-                          }`}>
-                          {day.day}
-                        </span>
-                        <span className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] ${activeDay === day.id ? 'text-white' : 'text-[#252525]'
-                          }`}>
-                          {day.date}
-                        </span>
-                      </div>
+              
+{visibleDays.map((day, index) => (
+  <div key={day.id} className="flex items-center">
+    <div
+      className={`flex flex-col w-[140px] gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer ${
+        activeDay === day.id ? 'bg-[#308BF9]' : 'bg-white'
+      }`}
+      onClick={() => {
+        setActiveDay(day.id);
+      }}
+    >
+      <span className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] ${
+        activeDay === day.id ? 'text-white' : 'text-[#252525]'
+      }`}>
+        {day.day}
+      </span>
+      <span className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] ${
+        activeDay === day.id ? 'text-white' : 'text-[#252525]'
+      }`}>
+        {day.date}
+      </span>
+    </div>
 
-                      {index < days.length - 1 && (
-                        <div className="border-white border-r h-8 mx-2"></div>
-                      )}
-                    </div>
-                  ))}
+    {index < visibleDays.length - 1 && (
+      <div className="border-white border-r h-8 mx-2"></div>
+    )}
+  </div>
+))}
                   <IoIosArrowForward
                     className="text-[#252525] ml-2 cursor-pointer"
                     onClick={handleNextDays}
