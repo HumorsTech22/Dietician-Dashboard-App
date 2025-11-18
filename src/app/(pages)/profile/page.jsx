@@ -2,10 +2,12 @@
 import { ClientProfile } from "@/components/client-profile";
 import NoPlans from "@/components/no-plans";
 import { ResultEvaluation } from "@/components/result-evaluation";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 export default function Profile() {
     const showNoPlans = true;
+
+
     return (
         <>
 

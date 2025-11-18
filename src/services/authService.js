@@ -91,7 +91,7 @@ export const fetchScoresInsight = async (dieticianId, profileId, date) => {
         date: date,
       }),
     });
-    
+
     return response;
   } catch (error) {
     // If it's the "no data" error, return a special object instead of throwing

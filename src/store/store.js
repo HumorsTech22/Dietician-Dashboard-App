@@ -4,6 +4,7 @@ import clientsReducer from "./clientSlice";
 import pdfReducer  from "./pdfSlice";
 import extractedDataReducer from "./extractedDataSlice";
 import clientProfileReducer from "./clientProfileSlice";
+import scoresInsightReducer from "./scoresInsightSlice"
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
       pdf: pdfReducer,
       extractedData: extractedDataReducer,
        clientProfile: clientProfileReducer,
+       scoresInsight: scoresInsightReducer,
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -22,10 +24,4 @@ export const store = configureStore({
     }),
 
 });
-
-
-
-
-
-
 

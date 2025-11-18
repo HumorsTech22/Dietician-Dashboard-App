@@ -683,10 +683,6 @@
 
 
 
-
-
-
-
 "use client"
 import { useMemo, useState, useEffect } from "react"
 import { IoIosArrowDown } from "react-icons/io";
@@ -694,11 +690,20 @@ import Image from "next/image";
 import Graph from "./graph";
 import { fetchScoreTrend, fetchScoresInsight } from "../services/authService";
 import { useSearchParams } from "next/navigation";
+import { cookieManager } from "../lib/cookies";
+import { useDispatch } from "react-redux";
+import { setScoresInsight } from "../store/scoresInsightSlice";
+
+
 
 export default function Trends({ selectedDate }) {
+  const dispatch = useDispatch();
   const searchParams = useSearchParams();
-  const dieticianId = searchParams.get('dietician_id');
+  //const dieticianId = searchParams.get('dietician_id');
+  const dieticianData = cookieManager.getJSON('dietician');
+  const dieticianId = dieticianData?.dietician_id;
   const profileId = searchParams.get('profile_id');
+
 
   const [active, setActive] = useState("Gut Fermentation")
   const [firstTimeRange, setFirstTimeRange] = useState("Weekly")
@@ -765,11 +770,49 @@ export default function Trends({ selectedDate }) {
   }, [dieticianId, profileId]);
 
   // Fetch scores insight data when selectedDate changes
+  // useEffect(() => {
+  //   const fetchScoresData = async () => {
+  //     if (!dieticianId || !profileId || !selectedDate) return;
+
+  //     const formattedDate = formatDateToYYYYMMDD(selectedDate);
+  //     if (!formattedDate) {
+  //       console.error("Invalid date format, cannot fetch scores insight");
+  //       return;
+  //     }
+
+  //     setScoresLoading(true);
+  //     try {
+  //     const response = await fetchScoresInsight(dieticianId, profileId, formattedDate);
+  //   //const response = await fetchScoresInsight("RespyrD02", "profile2", "2025-11-15");
+
+  //       if (response.noData) {
+  //         setScoresInsightData(null);
+  //         dispatch(setScoresInsight(null));
+  //       } else if (response && response.latest_test) {
+  //         setScoresInsightData(response);
+  //         dispatch(setScoresInsight(response));
+  //       } else {
+  //         setScoresInsightData(null);
+  //         dispatch(setScoresInsight(null));
+  //       }
+  //     } catch (err) {
+  //       console.error("Error fetching scores insight:", err);
+  //       setScoresInsightData(null);
+  //       dispatch(setScoresInsight(null));
+  //     } finally {
+  //       setScoresLoading(false);
+  //     }
+  //   };
+
+  //   fetchScoresData();
+  // }, [dieticianId, profileId, selectedDate, dispatch]);
+
+
+
   useEffect(() => {
     const fetchScoresData = async () => {
       if (!dieticianId || !profileId || !selectedDate) return;
 
-      // Format the date to YYYY-MM-DD
       const formattedDate = formatDateToYYYYMMDD(selectedDate);
       if (!formattedDate) {
         console.error("Invalid date format, cannot fetch scores insight");
@@ -778,25 +821,48 @@ export default function Trends({ selectedDate }) {
 
       setScoresLoading(true);
       try {
-        const response = await fetchScoresInsight(dieticianId, profileId, formattedDate);
+        const response = await fetchScoresInsight(
+          dieticianId,
+          profileId,
+          formattedDate
+        );
 
-        if (response.noData) {
+        if (response?.noData) {
           setScoresInsightData(null);
+          dispatch(setScoresInsight(null));
+
+
         } else if (response && response.latest_test) {
           setScoresInsightData(response);
+          dispatch(setScoresInsight(response));
+
+          // 👇 Save full response in sessionStorage
+          sessionStorage.setItem("scoresInsight", JSON.stringify(response));
+
         } else {
           setScoresInsightData(null);
+          dispatch(setScoresInsight(null));
+
+          // 👇 SessionStorage update
+          sessionStorage.setItem("scoresInsight", "null");
         }
       } catch (err) {
         console.error("Error fetching scores insight:", err);
         setScoresInsightData(null);
+        dispatch(setScoresInsight(null));
+
+        sessionStorage.setItem("scoresInsight", "null");
       } finally {
         setScoresLoading(false);
       }
     };
 
     fetchScoresData();
-  }, [dieticianId, profileId, selectedDate]);
+  }, [dieticianId, profileId, selectedDate, dispatch]);
+
+
+
+
 
 
   // Get active marker based on tab
@@ -830,6 +896,122 @@ export default function Trends({ selectedDate }) {
   };
 
   const activeMarker = getActiveMarker();
+
+const getMarkersForScoreType = (scoreType) => {
+  switch (scoreType) {
+    case "absorptive":
+    case "detoxification":
+      return [
+        { position: "0%", label: "0" },
+        { position: "50%", label: "50" },
+        { position: "80%", label: "80" },
+        { position: "100%", label: "100" }
+      ];
+
+    case "fermentative":
+      return [
+        { position: "0%", label: "0" },
+        { position: "30%", label: "30" },
+        { position: "35%", label: "35" },
+        { position: "100%", label: "100" }
+      ];
+
+    case "fat":
+      return [
+        { position: "0%", label: "0" },
+        { position: "70%", label: "70" },
+        { position: "80%", label: "80" },
+        { position: "100%", label: "100" }
+      ];
+
+    case "glucose":
+      return [
+        { position: "0%", label: "0" },
+        { position: "40%", label: "40" },
+        { position: "60%", label: "60" },
+        { position: "100%", label: "100" }
+      ];
+
+    case "hepatic_stress":
+      return [
+        { position: "0%", label: "0" },
+        { position: "30%", label: "30" },
+        { position: "60%", label: "60" },
+        { position: "100%", label: "100" }
+      ];
+
+    default:
+      return [
+        { position: "0%", label: "0" },
+        { position: "100%", label: "100" }
+      ];
+  }
+};
+
+const getZoneSegmentsForScoreType = (scoreType) => {
+  switch (scoreType) {
+    // ==============================
+    // GUT FERMENTATION
+    // ==============================
+    // Good <30, Fair 30–35, Poor >35
+    case "fermentative":
+      return [
+        { color: "#3FAF58", width: "30%" }, // 0–30  → Good
+        { color: "#FFC412", width: "5%" },  // 30–35 → Fair
+        { color: "#DA5747", width: "65%" }  // 35–100 → Poor
+      ];
+
+    // NEW: Absorptive - Good >80, Fair 50-79.99, Poor <50
+    case "absorptive":
+      return [
+        { color: "#DA5747", width: "50%" }, // 0–50  → Poor
+        { color: "#FFC412", width: "30%" }, // 50–80 → Fair
+        { color: "#3FAF58", width: "20%" }  // 80–100 → Good
+      ];
+
+    // ==============================
+    // GLUCOSE -Vs- FAT
+    // ==============================
+
+    // Fat: Poor <70, Fair 70–79.99, Good >80
+    case "fat":
+      return [
+        { color: "#DA5747", width: "70%" }, // 0–70  → Poor
+        { color: "#FFC412", width: "10%" }, // 70–80 → Fair
+        { color: "#3FAF58", width: "20%" }  // 80–100 → Good
+      ];
+
+    // Glucose: Good <40, Fair 40–60, Poor >60
+    case "glucose":
+      return [
+        { color: "#3FAF58", width: "40%" }, // 0–40  → Good
+        { color: "#FFC412", width: "20%" }, // 40–60 → Fair
+        { color: "#DA5747", width: "40%" }  // 60–100 → Poor
+      ];
+
+    // Hepatic Stress: Good <30, Fair 30–60, Poor >60
+    case "hepatic_stress":
+      return [
+        { color: "#3FAF58", width: "30%" }, // 0–30  → Good
+        { color: "#FFC412", width: "30%" }, // 30–60 → Fair
+        { color: "#DA5747", width: "40%" }  // 60–100 → Poor
+      ];
+
+    // NEW: Detoxification - Good >80, Fair 50-79.99, Poor <50
+    case "detoxification":
+      return [
+        { color: "#DA5747", width: "50%" }, // 0–50  → Poor
+        { color: "#FFC412", width: "30%" }, // 50–80 → Fair
+        { color: "#3FAF58", width: "20%" }  // 80–100 → Good
+      ];
+
+    default:
+      return [
+        { color: "#E1E6ED", width: "100%" }
+      ];
+  }
+};
+
 
   // Get progress bar configuration from scores insight data
   const getProgressBarConfigs = () => {
@@ -869,27 +1051,69 @@ export default function Trends({ selectedDate }) {
         }
       };
 
-      const getProgressColors = (score) => {
-        if (score >= 80) {
-          return [
-            { color: "#3FAF58", width: "30%" },
-            { color: "#FFC412", width: "40%" },
-            { color: "#DA5747", width: "30%" }
-          ];
-        } else if (score >= 60) {
-          return [
-            { color: "#FFC412", width: "30%" },
-            { color: "#3FAF58", width: "40%" },
-            { color: "#DA5747", width: "30%" }
-          ];
-        } else {
-          return [
-            { color: "#DA5747", width: "30%" },
-            { color: "#FFC412", width: "40%" },
-            { color: "#3FAF58", width: "30%" }
-          ];
-        }
-      };
+     // ⭐ Score-type based color logic
+const getProgressColors = (score, scoreType) => {
+  let zoneColor = "#3FAF58"; // default good
+
+  switch (scoreType) {
+    // ==============================
+    // GUT FERMENTATION
+    // ==============================
+
+    case "absorptive": // NEW: Good >80, Fair 50-79.99, Poor <50
+      if (score > 80) zoneColor = "#3FAF58";
+      else if (score >= 50 && score <= 79.99) zoneColor = "#FFC412";
+      else zoneColor = "#DA5747";
+      break;
+
+    case "fermentative": // Good <30, Fair 30–35, Poor >35
+      if (score > 35) zoneColor = "#DA5747";
+      else if (score >= 30 && score <= 35) zoneColor = "#FFC412";
+      else zoneColor = "#3FAF58";
+      break;
+
+    // ==============================
+    // GLUCOSE VS FAT
+    // ==============================
+
+    case "fat": // Good >80, Fair 70–79.99, Poor <70
+      if (score < 70) zoneColor = "#DA5747";
+      else if (score >= 70 && score < 80) zoneColor = "#FFC412";
+      else zoneColor = "#3FAF58";
+      break;
+
+    case "glucose": // Good <40, Fair 40–60, Poor >60
+      if (score > 60) zoneColor = "#DA5747";
+      else if (score >= 40 && score <= 60) zoneColor = "#FFC412";
+      else zoneColor = "#3FAF58";
+      break;
+
+    // ==============================
+    // LIVER HEPTIC
+    // ==============================
+
+    case "hepatic_stress": // Good <30, Fair 30–60, Poor >60
+      if (score > 60) zoneColor = "#DA5747";
+      else if (score >= 30 && score <= 60) zoneColor = "#FFC412";
+      else zoneColor = "#3FAF58";
+      break;
+
+    case "detoxification": // NEW: Good >80, Fair 50-79.99, Poor <50
+      if (score > 80) zoneColor = "#3FAF58";
+      else if (score >= 50 && score <= 79.99) zoneColor = "#FFC412";
+      else zoneColor = "#DA5747";
+      break;
+
+    default:
+      zoneColor = "#3FAF58";
+  }
+
+  // Always return one full-length bar with one color
+  return [
+    { color: zoneColor, width: "100%" }
+  ];
+};
+
 
       // Return different data based on active tab
       switch (active) {
@@ -897,13 +1121,9 @@ export default function Trends({ selectedDate }) {
           return [
             {
               percentage: scores.absorptive || 0,
-              colors: getProgressColors(scores.absorptive || 0),
-              markers: [
-                { position: "0%", label: "0" },
-                { position: "30%", label: "60" },
-                { position: "70%", label: "80" },
-                { position: "100%", label: "100" }
-              ],
+          colors: getZoneSegmentsForScoreType("absorptive"),
+
+            markers: getMarkersForScoreType("absorptive"),
               status: metabolismData.absorption?.zone || "N/A",
               statusColor: getZoneColor(metabolismData.absorption?.zone),
               interpretation: metabolismData.absorption?.interpretation || "No interpretation available",
@@ -911,13 +1131,8 @@ export default function Trends({ selectedDate }) {
             },
             {
               percentage: scores.fermentative || 0,
-              colors: getProgressColors(scores.fermentative || 0),
-              markers: [
-                { position: "0%", label: "0" },
-                { position: "30%", label: "60" },
-                { position: "70%", label: "80" },
-                { position: "100%", label: "100" }
-              ],
+               colors: getZoneSegmentsForScoreType("fermentative"),
+             markers: getMarkersForScoreType("fermentative"),
               status: metabolismData.fermentation?.zone || "N/A",
               statusColor: getZoneColor(metabolismData.fermentation?.zone),
               interpretation: metabolismData.fermentation?.interpretation || "No interpretation available",
@@ -929,13 +1144,8 @@ export default function Trends({ selectedDate }) {
           return [
             {
               percentage: scores.fat || 0,
-              colors: getProgressColors(scores.fat || 0),
-              markers: [
-                { position: "0%", label: "0" },
-                { position: "30%", label: "60" },
-                { position: "70%", label: "80" },
-                { position: "100%", label: "100" }
-              ],
+              colors: getZoneSegmentsForScoreType("fat"),
+             markers: getMarkersForScoreType("fat"),
               status: metabolismData.fat_metabolism?.zone || "N/A",
               statusColor: getZoneColor(metabolismData.fat_metabolism?.zone),
               interpretation: metabolismData.fat_metabolism?.interpretation || "No interpretation available",
@@ -943,13 +1153,8 @@ export default function Trends({ selectedDate }) {
             },
             {
               percentage: scores.glucose || 0,
-              colors: getProgressColors(scores.glucose || 0),
-              markers: [
-                { position: "0%", label: "0" },
-                { position: "30%", label: "60" },
-                { position: "70%", label: "80" },
-                { position: "100%", label: "100" }
-              ],
+              colors: getZoneSegmentsForScoreType("glucose"),
+             markers: getMarkersForScoreType("glucose"),
               status: metabolismData.glucose_metabolism?.zone || "N/A",
               statusColor: getZoneColor(metabolismData.glucose_metabolism?.zone),
               interpretation: metabolismData.glucose_metabolism?.interpretation || "No interpretation available",
@@ -961,13 +1166,8 @@ export default function Trends({ selectedDate }) {
           return [
             {
               percentage: scores.hepatic_stress || 0,
-              colors: getProgressColors(scores.hepatic_stress || 0),
-              markers: [
-                { position: "0%", label: "0" },
-                { position: "30%", label: "60" },
-                { position: "70%", label: "80" },
-                { position: "100%", label: "100" }
-              ],
+               colors: getZoneSegmentsForScoreType("hepatic_stress"),
+            markers: getMarkersForScoreType("hepatic_stress"),
               status: metabolismData.hepatic_stress?.zone || "N/A",
               statusColor: getZoneColor(metabolismData.hepatic_stress?.zone),
               interpretation: metabolismData.hepatic_stress?.interpretation || "No interpretation available",
@@ -975,13 +1175,8 @@ export default function Trends({ selectedDate }) {
             },
             {
               percentage: scores.detoxification || 0,
-              colors: getProgressColors(scores.detoxification || 0),
-              markers: [
-                { position: "0%", label: "0" },
-                { position: "30%", label: "60" },
-                { position: "70%", label: "80" },
-                { position: "100%", label: "100" }
-              ],
+              colors: getZoneSegmentsForScoreType("detoxification"),
+             markers: getMarkersForScoreType("detoxification"),
               status: metabolismData.detoxification?.zone || "N/A",
               statusColor: getZoneColor(metabolismData.detoxification?.zone),
               interpretation: metabolismData.detoxification?.interpretation || "No interpretation available",
@@ -998,47 +1193,66 @@ export default function Trends({ selectedDate }) {
     return getNoDataProgressBarConfigs();
   };
 
+
+  const getTitles = () => {
+  switch (active) {
+    case "Gut Fermentation":
+      return {
+        firstTitle: "Absorptive Metabolism Score",
+        secondTitle: "Fermentative Metabolism Score",
+        firstScoreType: "absorptive",
+        secondScoreType: "fermentative"
+      };
+    case "Glucose -Vs- Fat":
+      return {
+        firstTitle: "Fat Metabolism Score",
+        secondTitle: "Glucose Metabolism Score",
+        firstScoreType: "fat",
+        secondScoreType: "glucose"
+      };
+    case "Liver Heptic":
+      return {
+        firstTitle: "Hepatic Stress Score",
+        secondTitle: "Detoxification Metabolism Score",
+        firstScoreType: "hepatic_stress",
+        secondScoreType: "detoxification"
+      };
+    default:
+      return {
+        firstTitle: "Absorptive Metabolism Score",
+        secondTitle: "Fermentative Metabolism Score",
+        firstScoreType: "absorptive",
+        secondScoreType: "fermentative"
+      };
+  }
+};
+
   // Helper function for default config
-  const getDefaultProgressBarConfigs = () => {
-    return [
-      {
-        percentage: "-",
-        colors: [
-          { color: "#DA5747", width: "30%" },
-          { color: "#FFC412", width: "40%" },
-          { color: "#3FAF58", width: "30%" }
-        ],
-        markers: [
-          { position: "0%", label: "0" },
-          { position: "30%", label: "60" },
-          { position: "70%", label: "80" },
-          { position: "100%", label: "100" }
-        ],
-        status: "Good",
-        statusColor: "#3FAF58",
-        interpretation: "-",
-        intervention: "-"
-      },
-      {
-        percentage: "-",
-        colors: [
-          { color: "#3FAF58", width: "30%" },
-          { color: "#FFC412", width: "40%" },
-          { color: "#DA5747", width: "30%" }
-        ],
-        markers: [
-          { position: "0%", label: "0" },
-          { position: "30%", label: "60" },
-          { position: "70%", label: "80" },
-          { position: "100%", label: "100" }
-        ],
-        status: "Good",
-        statusColor: "#3FAF58",
-        interpretation: "-",
-        intervention: "-"
-      }
-    ];
-  };
+const getDefaultProgressBarConfigs = () => {
+  const titles = getTitles(); // uses current `active` tab
+
+  return [
+    {
+      percentage: "-", // no test → no pointer value
+      colors: getZoneSegmentsForScoreType(titles.firstScoreType),
+      markers: getMarkersForScoreType(titles.firstScoreType),
+      status: "Good",
+      statusColor: "#3FAF58",
+      interpretation: "-",
+      intervention: "-"
+    },
+    {
+      percentage: "-",
+      colors: getZoneSegmentsForScoreType(titles.secondScoreType),
+      markers: getMarkersForScoreType(titles.secondScoreType),
+      status: "Good",
+      statusColor: "#3FAF58",
+      interpretation: "-",
+      intervention: "-"
+    }
+  ];
+};
+
 
   // Helper function for "No Data Found" config
   const getNoDataProgressBarConfigs = () => {
@@ -1101,7 +1315,7 @@ export default function Trends({ selectedDate }) {
           ))}
           <div
             className="absolute top-1/2 w-[11px] h-[22px] border-[10px] border-[#252525] rounded-[10px] transform -translate-y-1/2"
-            style={{ left: `${config.percentage}%` }}
+             style={{ left: config.percentage === "-" ? "0%" : `${config.percentage}%` }}
           />
         </div>
         <div className="relative w-full">
@@ -1117,7 +1331,7 @@ export default function Trends({ selectedDate }) {
         </div>
       </div>
       <div className="flex items-center">
-        <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">{config.percentage}%</p>
+        <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold"> {config.percentage === "-" ? "-" : `${config.percentage}%`}</p>
         <div className="mx-3 h-4 w-px bg-[#252525]"></div>
         <p className="text-[20px] md:text-[25px] font-semibold" style={{ color: config.statusColor }}>{config.status}</p>
       </div>
@@ -1296,44 +1510,66 @@ export default function Trends({ selectedDate }) {
     setSecondShowDropdown(false);
   };
 
-  const tabs = [
-    { label: "Gut Fermentation", color: "#DA5747" },
-    { label: "Glucose -Vs- Fat", color: "#3FAF58" },
-    { label: "Liver Heptic", color: "#3FAF58" },
-  ]
+    const getTabColor = (tabLabel) => {
+    const metabolismData =
+      scoresInsightData?.latest_test?.test_json?.Metabolism_Score_Analysis;
 
-  const getTitles = () => {
-    switch (active) {
-      case "Gut Fermentation":
-        return {
-          firstTitle: "Absorptive Metabolism Score",
-          secondTitle: "Fermentative Metabolism Score",
-          firstScoreType: "absorptive",
-          secondScoreType: "fermentative"
-        };
-      case "Glucose -Vs- Fat":
-        return {
-          firstTitle: "Fat Metabolism Score",
-          secondTitle: "Glucose Metabolism Score",
-          firstScoreType: "fat",
-          secondScoreType: "glucose"
-        };
-      case "Liver Heptic":
-        return {
-          firstTitle: "Hepatic Stress Score",
-          secondTitle: "Detoxification Metabolism Score",
-          firstScoreType: "hepatic_stress",
-          secondScoreType: "detoxification"
-        };
-      default:
-        return {
-          firstTitle: "Absorptive Metabolism Score",
-          secondTitle: "Fermentative Metabolism Score",
-          firstScoreType: "absorptive",
-          secondScoreType: "fermentative"
-        };
+    // If no data yet → fallback to old static colors
+    if (!metabolismData) {
+      if (tabLabel === "Gut Fermentation") return "#DA5747";
+      if (tabLabel === "Glucose -Vs- Fat") return "#3FAF58";
+      if (tabLabel === "Liver Heptic") return "#3FAF58";
+      return "#E1E6ED";
     }
+
+    let zone1 = "";
+    let zone2 = "";
+
+    switch (tabLabel) {
+      case "Gut Fermentation":
+        zone1 = metabolismData.absorption?.zone || "";
+        zone2 = metabolismData.fermentation?.zone || "";
+        break;
+
+      case "Glucose -Vs- Fat":
+        zone1 = metabolismData.fat_metabolism?.zone || "";
+        zone2 = metabolismData.glucose_metabolism?.zone || "";
+        break;
+
+      case "Liver Heptic":
+        zone1 = metabolismData.hepatic_stress?.zone || "";
+        zone2 = metabolismData.detoxification?.zone || "";
+        break;
+
+      default:
+        break;
+    }
+
+    const z1 = zone1.toLowerCase();
+    const z2 = zone2.toLowerCase();
+
+    const hasPoor = z1 === "poor" || z2 === "poor";
+    const hasFair = z1 === "fair" || z2 === "fair";
+    const hasGood = z1 === "good" || z2 === "good";
+
+    if (hasPoor) return "#DA5747";   // any Poor
+    if (hasFair) return "#FFC412";   // no Poor, at least one Fair
+    if (hasGood) return "#3FAF58";   // both Good (or at least good & no fair/poor)
+
+    // Safety fallback
+    return "#E1E6ED";
   };
+
+
+
+  const tabs = [
+    { label: "Gut Fermentation" },
+    { label: "Glucose -Vs- Fat" },
+    { label: "Liver Heptic" },
+  ];
+
+
+ 
 
   const titles = getTitles();
 
@@ -1355,6 +1591,11 @@ export default function Trends({ selectedDate }) {
   if (error) {
     return <div className="flex-1 min-w-0 rounded-[15px] mx-2 p-4 text-red-500">Error: {error}</div>;
   }
+
+
+  // if (!scoresLoading && (!scoresInsightData || scoresInsightData?.noData)) {
+  //   return null; 
+  // }
 
   return (
     <div className="flex-1 min-w-0  rounded-[15px] mx-2">
@@ -1385,7 +1626,7 @@ export default function Trends({ selectedDate }) {
                 </span>
                 <div
                   className="w-[6px] h-[6px] rounded-full"
-                  style={{ backgroundColor: tab.color }}
+                  style={{ backgroundColor: getTabColor(tab.label)  }}
                 />
               </button>
             )
@@ -1398,7 +1639,7 @@ export default function Trends({ selectedDate }) {
               Main Marker: {activeMarker.name}
             </span>
             <span className="text-[#252525] text-[20px] font-semibold leading-[110%] tracking-[-0.4px]">
-              {activeMarker.value ? `${activeMarker.value} ${activeMarker.unit}` : "-"}
+              {activeMarker.value ? `${parseFloat(activeMarker.value).toFixed(3)} ${activeMarker.unit}` : "-"}
             </span>
           </div>
 
