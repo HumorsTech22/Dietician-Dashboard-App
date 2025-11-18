@@ -1,5 +1,6 @@
 "use client"
 import { Suspense } from 'react'
+
 import { ClientProfile } from "@/components/client-profile";
 import CreateDietPlan from "@/components/create-diet-plan";
 
