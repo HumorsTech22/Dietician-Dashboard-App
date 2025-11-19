@@ -911,8 +911,8 @@ const getMarkersForScoreType = (scoreType) => {
     case "fermentative":
       return [
         { position: "0%", label: "0" },
+        { position: "20%", label: "20" },
         { position: "30%", label: "30" },
-        { position: "35%", label: "35" },
         { position: "100%", label: "100" }
       ];
 
@@ -926,17 +926,17 @@ const getMarkersForScoreType = (scoreType) => {
 
     case "glucose":
       return [
-        { position: "0%", label: "0" },
-        { position: "40%", label: "40" },
-        { position: "60%", label: "60" },
+          { position: "0%", label: "0" },
+        { position: "20%", label: "20" },
+        { position: "30%", label: "30" },
         { position: "100%", label: "100" }
       ];
 
     case "hepatic_stress":
       return [
         { position: "0%", label: "0" },
+        { position: "20%", label: "20" },
         { position: "30%", label: "30" },
-        { position: "60%", label: "60" },
         { position: "100%", label: "100" }
       ];
 
@@ -956,9 +956,9 @@ const getZoneSegmentsForScoreType = (scoreType) => {
     // Good <30, Fair 30–35, Poor >35
     case "fermentative":
       return [
-        { color: "#3FAF58", width: "30%" }, // 0–30  → Good
-        { color: "#FFC412", width: "5%" },  // 30–35 → Fair
-        { color: "#DA5747", width: "65%" }  // 35–100 → Poor
+        { color: "#3FAF58", width: "20%" }, // 0–20  → Good
+        { color: "#FFC412", width: "10%" }, // 20–30 → Fair
+        { color: "#DA5747", width: "70%" }  // 30–100 → Poor
       ];
 
     // NEW: Absorptive - Good >80, Fair 50-79.99, Poor <50
@@ -984,17 +984,17 @@ const getZoneSegmentsForScoreType = (scoreType) => {
     // Glucose: Good <40, Fair 40–60, Poor >60
     case "glucose":
       return [
-        { color: "#3FAF58", width: "40%" }, // 0–40  → Good
-        { color: "#FFC412", width: "20%" }, // 40–60 → Fair
-        { color: "#DA5747", width: "40%" }  // 60–100 → Poor
+        { color: "#3FAF58", width: "20%" }, // 0-20 → Good
+        { color: "#FFC412", width: "10%" }, // 20-30 → Fair
+        { color: "#DA5747", width: "70%" }  // 30-100 → Poor
       ];
 
     // Hepatic Stress: Good <30, Fair 30–60, Poor >60
     case "hepatic_stress":
       return [
-        { color: "#3FAF58", width: "30%" }, // 0–30  → Good
-        { color: "#FFC412", width: "30%" }, // 30–60 → Fair
-        { color: "#DA5747", width: "40%" }  // 60–100 → Poor
+        { color: "#3FAF58", width: "20%" }, // 0–20  → Good
+        { color: "#FFC412", width: "10%" }, // 20–30 → Fair
+        { color: "#DA5747", width: "70%" }  // 30–100 → Poor
       ];
 
     // NEW: Detoxification - Good >80, Fair 50-79.99, Poor <50
@@ -1041,6 +1041,7 @@ const getZoneSegmentsForScoreType = (scoreType) => {
     // If we have actual metabolism data
     if (hasActualData) {
       const metabolismData = testJson.Metabolism_Score_Analysis;
+      console.log("metabolismData1044:-", metabolismData);
 
       const getZoneColor = (zone) => {
         switch (zone) {
@@ -1066,9 +1067,9 @@ const getProgressColors = (score, scoreType) => {
       else zoneColor = "#DA5747";
       break;
 
-    case "fermentative": // Good <30, Fair 30–35, Poor >35
-      if (score > 35) zoneColor = "#DA5747";
-      else if (score >= 30 && score <= 35) zoneColor = "#FFC412";
+     case "fermentative": // Good 0-20, Fair 20-30, Poor >30
+      if (score > 30) zoneColor = "#DA5747";
+      else if (score >= 20 && score <= 30) zoneColor = "#FFC412";
       else zoneColor = "#3FAF58";
       break;
 
@@ -1082,19 +1083,19 @@ const getProgressColors = (score, scoreType) => {
       else zoneColor = "#3FAF58";
       break;
 
-    case "glucose": // Good <40, Fair 40–60, Poor >60
-      if (score > 60) zoneColor = "#DA5747";
-      else if (score >= 40 && score <= 60) zoneColor = "#FFC412";
-      else zoneColor = "#3FAF58";
-      break;
+  case "glucose": // Good 0-20, Fair 20-30, Poor >30
+  if (score > 30) zoneColor = "#DA5747";
+  else if (score >= 20 && score <= 30) zoneColor = "#FFC412";
+  else zoneColor = "#3FAF58";
+  break;
 
     // ==============================
     // LIVER HEPTIC
     // ==============================
 
-    case "hepatic_stress": // Good <30, Fair 30–60, Poor >60
-      if (score > 60) zoneColor = "#DA5747";
-      else if (score >= 30 && score <= 60) zoneColor = "#FFC412";
+    case "hepatic_stress": // Good 0-20, Fair 20-30, Poor >30
+      if (score > 30) zoneColor = "#DA5747";
+      else if (score >= 20 && score <= 30) zoneColor = "#FFC412";
       else zoneColor = "#3FAF58";
       break;
 

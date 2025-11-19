@@ -122,7 +122,6 @@ import { fetchWeeklyAnalysisComplete } from "../services/authService";
 export default function MealLogged() {
   const [activeFilter, setActiveFilter] = useState("low");
   const [weeklyAnalysisData, setWeeklyAnalysisData] = useState([]);
-  console.log("weeklyAnalysisData125:-", weeklyAnalysisData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
@@ -131,7 +130,6 @@ export default function MealLogged() {
   const visibleWeeksCount = 5; // Show 5 weeks at a time
 
   const clientProfile = useSelector((state) => state.clientProfile.data);
-
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
   };
@@ -268,7 +266,6 @@ export default function MealLogged() {
       };
 
       const response = await fetchWeeklyAnalysisComplete(requestBody);
-      console.log("response274:-", response);
       const arr = response?.api_response?.food_level_evaluation || [];
       setWeeklyAnalysisData(arr);
     } catch (err) {
@@ -344,13 +341,13 @@ export default function MealLogged() {
             </span>
           </div>
 
-          <div className="flex gap-[26px] items-center">
+          {/* <div className="flex gap-[26px] items-center">
             <div className="px-[20px] py-[15px] items-center bg-[#308BF9] rounded-[15px] cursor-pointer">
               <p className="text-[12px] leading-[100%] font-semibold text-white space-x-0 tracking-[-0.24px]">
                 Update Diet plan
               </p>
             </div>
-          </div>
+          </div> */}
         </div>
 
         <div className="w-full border-b border-[#E1E6ED]"></div>

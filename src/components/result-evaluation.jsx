@@ -229,7 +229,8 @@ const WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export const ResultEvaluation = () => {
   const clientData = useSelector((state) => state.clientProfile.data);
-  console.log("clientData31:-", clientData);
+
+  
 
   const hasActivePlan =
     clientData?.plans_summary?.active &&
@@ -279,6 +280,28 @@ export const ResultEvaluation = () => {
       };
     });
   }, [windowStart]);
+
+
+   const isLoading = !clientData; // or use a specific loading flag from your Redux state
+
+  // Show loading while data is being fetched
+  if (isLoading) {
+    return (
+      <div className="w-full bg-white px-[15px] py-[30px] rounded-[15px]">
+        <div className="flex justify-start ml-[15px]">
+          <p className="text-[#252525] text-center text-[25px] font-semibold leading-normal tracking-[-1px]">
+            Result Evaluation
+          </p>
+        </div>
+        <div className="my-[20px] border border-[#E1E6ED]"></div>
+        <div className="text-center py-10">
+          <p className="text-[#535359] text-[18px]">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+
 
   // if no active plan → show NoPlans screen
   if (!hasActivePlan) {
@@ -352,65 +375,76 @@ export const ResultEvaluation = () => {
           </span>
         </div>
 
-        <div className="flex items-center justify-between">
-          <IoChevronBackSharp
-            className={[
-              "w-[52px] h-[52px] py-[13px] pl-2.5",
-              canGoPrev ? "cursor-pointer" : "opacity-40 cursor-not-allowed",
-            ].join(" ")}
-            onClick={handlePrevClick}
-            title={canGoPrev ? "Previous" : "Beginning of plan period"}
-            aria-disabled={!canGoPrev}
-          />
+       <div className="flex items-center justify-between">
+  <IoChevronBackSharp
+    className={[
+      "w-[52px] h-[52px] py-[13px] pl-2.5",
+      canGoPrev ? "cursor-pointer" : "opacity-40 cursor-not-allowed",
+    ].join(" ")}
+    onClick={handlePrevClick}
+    title={canGoPrev ? "Previous" : "Beginning of plan period"}
+    aria-disabled={!canGoPrev}
+  />
 
-          {visibleDates.map((item, idx) => {
-            const isToday = startOfDay(item.date).getTime() === today.getTime();
-            const isSelected = startOfDay(item.date).getTime() === startOfDay(selectedDate).getTime();
+  {visibleDates.map((item, idx) => {
+    const isToday = startOfDay(item.date).getTime() === today.getTime();
+    const isSelected = startOfDay(item.date).getTime() === startOfDay(selectedDate).getTime();
+    const isFutureDate = item.date > today;
+    const isSelectable = !isFutureDate && item.date >= planStartDate && item.date <= planEndDate;
 
-            return (
-              <div
-                key={idx}
-                onClick={() => setSelectedDate(item.date)}
-                title={`Select ${item.date.toDateString()}`}
-                className={[
-                  "flex flex-col px-[7px] py-2 gap-1 rounded-[12px] select-none cursor-pointer",
-                  isSelected
-                    ? "bg-[#308BF9] text-white"
-                    : "text-[#535359]",
-                ].join(" ")}
-              >
-                <span className="text-center text-[15px] font-semibold leading-[126%] tracking-[-0.3px]">
-                  {item.day}
-                </span>
-                <span className="text-center text-[10px] font-normal leading-normal tracking-[-0.2px]">
-                  {item.week}
-                </span>
+    return (
+      <div
+        key={idx}
+        onClick={() => isSelectable && setSelectedDate(item.date)}
+        title={isFutureDate ? "Future dates are not selectable" : `Select ${item.date.toDateString()}`}
+        className={[
+          "flex flex-col px-[7px] py-2 gap-1 rounded-[12px] select-none",
+          isSelectable ? "cursor-pointer" : "cursor-not-allowed opacity-50",
+          isSelected
+            ? "bg-[#308BF9] text-white"
+            : "text-[#535359]",
+        ].join(" ")}
+      >
+        <span className="text-center text-[15px] font-semibold leading-[126%] tracking-[-0.3px]">
+          {item.day}
+        </span>
+        <span className="text-center text-[10px] font-normal leading-normal tracking-[-0.2px]">
+          {item.week}
+        </span>
 
-                {/* {isToday && !isSelected && (
-                  <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-[#308BF9]" />
-                )}
-                 */}
-                {/* Show plan boundary indicators */}
-                {/* {startOfDay(item.date).getTime() === planStartDate.getTime() && !isSelected && (
-                  <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-green-500" title="Plan start" />
-                )} */}
-                {/* {startOfDay(item.date).getTime() === planEndDate.getTime() && !isSelected && (
-                  <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-red-500" title="Plan end" />
-                )} */}
-              </div>
-            );
-          })}
+        {/* {isToday && !isSelected && (
+          <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-[#308BF9]" />
+        )}
+         */}
+        {/* Show plan boundary indicators */}
+        {/* {startOfDay(item.date).getTime() === planStartDate.getTime() && !isSelected && (
+          <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-green-500" title="Plan start" />
+        )} */}
+        {/* {startOfDay(item.date).getTime() === planEndDate.getTime() && !isSelected && (
+          <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-red-500" title="Plan end" />
+        )} */}
 
-          <IoIosArrowForward
-            className={[
-              "w-[52px] h-[52px] py-[13px] pl-2.5",
-              canGoNext ? "cursor-pointer" : "opacity-40 cursor-not-allowed",
-            ].join(" ")}
-            onClick={handleNextClick}
-            title={canGoNext ? "Next" : "End of plan period"}
-            aria-disabled={!canGoNext}
-          />
-        </div>
+        {/* Today indicator */}
+        {isToday && !isSelected && (
+          <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-[#308BF9]" />
+        )}
+        
+        
+      </div>
+    );
+  })}
+
+  <IoIosArrowForward
+    className={[
+      "w-[52px] h-[52px] py-[13px] pl-2.5",
+      canGoNext ? "cursor-pointer" : "opacity-40 cursor-not-allowed",
+    ].join(" ")}
+    onClick={handleNextClick}
+    title={canGoNext ? "Next" : "End of plan period"}
+    aria-disabled={!canGoNext}
+  />
+</div>
+
 
         <div className="my-[20px] border border-[#E1E6ED]"></div>
         <TestEvaluation />

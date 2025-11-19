@@ -220,59 +220,142 @@
 
 
 
-
-
 "use client";
+
 import { useState, useRef, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { toast } from "sonner";
-import { submitPlanSummaryService } from "../services/authService";
-import Image from "next/image";
+import {
+  submitPlanSummaryService,
+  fetchTestRemaining,
+} from "../services/authService";
 import { setExtractedData } from "@/store/extractedDataSlice";
+import { cookieManager } from "../lib/cookies";
 
 export default function TestLogInfo({ onConfirmNext }) {
-  const [testsAllotted, setTestsAllotted] = useState("");
-  const [testRemaining, setTestRemaining] = useState(10000);
+  const [testsAllotted, setTestsAllotted] = useState(""); // for payload
+  const [planDays, setPlanDays] = useState("");           // shown in "No of Tests allotted"
+  const [baseRemaining, setBaseRemaining] = useState(0);  // API remaining
+  const [testRemaining, setTestRemaining] = useState(0);  // finalRemaining = baseRemaining - planDays
+  
+  // NEW: Separate variable to store the subtraction result
+  const [subtractionResult, setSubtractionResult] = useState(0);
+console.log("subtractionResult243:-", subtractionResult);
   const [isLoading, setIsLoading] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
   const [apiResponse, setApiResponse] = useState(null);
 
-  // ✅ progress state
   const [progress, setProgress] = useState(0);
   const rafRef = useRef(null);
   const startTimeRef = useRef(0);
   const targetMsRef = useRef(0);
-  const capRef = useRef(95);
+  const capRef = useRef(0);
   const runningRef = useRef(false);
 
-  const dispatch = useDispatch();
   const [errors, setErrors] = useState({ testsAllotted: "" });
 
-  // Load data from localStorage on component mount
+  const dispatch = useDispatch();
+
+  // ========= 1) Fetch remaining from TESTREMAINING API =========
   useEffect(() => {
-    loadFromLocalStorage();
+    const fetchRemainingFromApi = async () => {
+      try {
+        const dieticianCookie = cookieManager.getJSON("dietician");
+        const dietitianId = dieticianCookie?.dietician_id;
+
+        if (!dietitianId) {
+          console.warn("No dietitian_id in cookie");
+          return;
+        }
+
+        const resp = await fetchTestRemaining(dietitianId);
+        console.log("TESTREMAINING resp:", resp);
+
+        if (resp?.success) {
+          const remainingFromApi = parseInt(resp.remaining, 10) || 0;
+          setBaseRemaining(remainingFromApi);
+          setTestRemaining(remainingFromApi); // initial, before subtracting
+        } else {
+          setBaseRemaining(0);
+          setTestRemaining(0);
+        }
+      } catch (err) {
+        console.error("Error fetching remaining tests:", err);
+      }
+    };
+
+    fetchRemainingFromApi();
   }, []);
+
+  // ========= 2) Helpers =========
+
+  const calculatePlanDays = (startDate, endDate) => {
+    if (!startDate || !endDate) return "";
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) return "";
+
+    const timeDiff = end.getTime() - start.getTime();
+    const daysDiff =
+      Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1; // include both start & end
+
+    return daysDiff > 0 ? `${daysDiff}` : "";
+  };
 
   const loadFromLocalStorage = () => {
     try {
       const savedData = localStorage.getItem("planSummary");
+      console.log("planSummary from LS:", savedData);
       if (savedData) {
         const data = JSON.parse(savedData);
-        
-        // Set tests allotted from localStorage
+
+        // If tests already stored earlier
         if (data.test_no_assigned) {
-          setTestsAllotted(data.test_no_assigned.toString());
-          const allotted = parseInt(data.test_no_assigned) || 0;
-          const remaining = 10000 - allotted;
-          setTestRemaining(remaining >= 0 ? remaining : 0);
+          setTestsAllotted(String(data.test_no_assigned));
+        }
+
+        if (data.plan_start_date && data.plan_end_date) {
+          const calculatedDays = calculatePlanDays(
+            data.plan_start_date,
+            data.plan_end_date
+          );
+          console.log("calculatedDays:", calculatedDays);
+          setPlanDays(calculatedDays || "");
         }
       }
     } catch (error) {
-      console.error('Error loading from localStorage:', error);
+      console.error("Error loading from localStorage:", error);
     }
   };
 
-  // ---- Progress helpers ----
+  useEffect(() => {
+    loadFromLocalStorage();
+  }, []);
+
+  // ========= 3) Subtraction logic (CORE) - MODIFIED =========
+  useEffect(() => {
+    const allotted = parseInt(planDays, 10) || 0;
+    const remaining = parseInt(baseRemaining, 10) || 0;
+
+    console.log("DEBUG: baseRemaining:", remaining, "planDays:", allotted);
+
+    // sync testsAllotted with planDays (for submit)
+    setTestsAllotted(allotted ? String(allotted) : "");
+
+    const finalRemaining = remaining - allotted;
+    console.log("DEBUG: finalRemaining:", finalRemaining);
+
+    // Store in both variables
+    const result = finalRemaining >= 0 ? finalRemaining : 0;
+    setTestRemaining(result);
+    setSubtractionResult(result); // NEW: Store in separate variable
+    
+    console.log("DEBUG: subtractionResult stored:", result);
+  }, [planDays, baseRemaining]);
+
+  // Rest of your code remains the same...
   const startProgress = (targetMs = 300000, cap = 98) => {
     cancelProgress();
     startTimeRef.current = Date.now();
@@ -311,38 +394,29 @@ export default function TestLogInfo({ onConfirmNext }) {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
   };
 
-  // ---- Cookie Reader ----
+  // ========= 5) Cookie Reader for submit =========
   function getCookie(name) {
     const m = document.cookie.match(
-      new RegExp("(?:^|; )" + name.replace(/([$?*|{}\\^])/g, "\\$1") + "=([^;]*)")
+      new RegExp(
+        "(?:^|; )" + name.replace(/([$?*|{}\\^])/g, "\\$1") + "=([^;]*)"
+      )
     );
     return m ? decodeURIComponent(m[1]) : "";
   }
 
-  // ---- Handlers ----
-  const handleTestsAllottedChange = (e) => {
-    const value = e.target.value;
-    setTestsAllotted(value);
-    setErrors((prev) => ({ ...prev, testsAllotted: "" }));
-    if (value && !isNaN(value)) {
-      const allotted = parseInt(value) || 0;
-      const remaining = 10000 - allotted;
-      setTestRemaining(remaining >= 0 ? remaining : 0);
-    } else {
-      setTestRemaining(10000);
-    }
-  };
-
+  // ========= 6) Validation / Save =========
   const validateForm = () => {
     let ok = true;
     const next = { testsAllotted: "" };
-    if (!testsAllotted.trim()) {
+
+    if (!testsAllotted || testsAllotted.toString().trim() === "") {
       next.testsAllotted = "Enter tests assigned";
       ok = false;
-    } else if (isNaN(testsAllotted) || parseInt(testsAllotted) <= 0) {
+    } else if (isNaN(testsAllotted) || parseInt(testsAllotted, 10) <= 0) {
       next.testsAllotted = "Enter a valid positive number";
       ok = false;
     }
+
     setErrors(next);
     if (!ok) toast.error("Please fix the highlighted fields");
     return ok;
@@ -352,18 +426,20 @@ export default function TestLogInfo({ onConfirmNext }) {
     if (!isDraft && !validateForm()) return;
     const existingData = localStorage.getItem("planSummary");
     let planSummary = existingData ? JSON.parse(existingData) : {};
-    planSummary = { ...planSummary, test_no_assigned: parseInt(testsAllotted) || 0 };
+    planSummary = {
+      ...planSummary,
+      test_no_assigned: parseInt(testsAllotted, 10) || 0,
+    };
     if (isDraft) planSummary.isDraft = true;
     localStorage.setItem("planSummary", JSON.stringify(planSummary));
   };
 
   const handleSaveAsDraft = () => saveToLocalStorage(true);
 
-  // ---- Extract Diet PDF ----
+  // ========= 7) Extract Diet PDF =========
   const extractDietPdf = async ({ dieticianId, clientId, dietplanId }) => {
-    // Get PDF from localStorage
-    const savedPdf = localStorage.getItem('uploadedPdfFile');
-    
+    const savedPdf = localStorage.getItem("uploadedPdfFile");
+
     if (!savedPdf) {
       toast.error("No PDF found. Please upload a file first.");
       return false;
@@ -379,37 +455,39 @@ export default function TestLogInfo({ onConfirmNext }) {
 
       let pdfFile;
 
-      // Always prioritize base64 data over blob URL
-      if (pdfData.data && pdfData.data.startsWith('data:application/pdf')) {
-        // Convert base64 data URL to File object
+      if (pdfData.data && pdfData.data.startsWith("data:application/pdf")) {
         const response = await fetch(pdfData.data);
         const blob = await response.blob();
         pdfFile = new File([blob], pdfData.name || "diet_plan.pdf", {
-          type: "application/pdf"
+          type: "application/pdf",
         });
         console.log("PDF created from base64 data");
       } else if (pdfData.blobUrl) {
-        // Fallback: try blob URL but with better error handling
         try {
           console.log("Attempting to use blob URL:", pdfData.blobUrl);
           const response = await fetch(pdfData.blobUrl);
           if (!response.ok) {
-            throw new Error(`Blob URL fetch failed with status: ${response.status}`);
+            throw new Error(
+              `Blob URL fetch failed with status: ${response.status}`
+            );
           }
           const blob = await response.blob();
           pdfFile = new File([blob], pdfData.name || "diet_plan.pdf", {
-            type: "application/pdf"
+            type: "application/pdf",
           });
           console.log("PDF created from blob URL");
         } catch (blobError) {
           console.error("Blob URL failed:", blobError);
-          throw new Error("Blob URL is no longer valid. Please re-upload the PDF file.");
+          throw new Error(
+            "Blob URL is no longer valid. Please re-upload the PDF file."
+          );
         }
       } else {
-        throw new Error("No valid PDF data found in storage. Please re-upload the PDF file.");
+        throw new Error(
+          "No valid PDF data found in storage. Please re-upload the PDF file."
+        );
       }
 
-      // Validate the created file
       if (!pdfFile || pdfFile.size === 0) {
         throw new Error("Created PDF file is empty or invalid");
       }
@@ -417,7 +495,7 @@ export default function TestLogInfo({ onConfirmNext }) {
       console.log("PDF File ready for upload:", {
         name: pdfFile.name,
         size: pdfFile.size,
-        type: pdfFile.type
+        type: pdfFile.type,
       });
 
       const formData = new FormData();
@@ -426,19 +504,20 @@ export default function TestLogInfo({ onConfirmNext }) {
       formData.append("profile_id", clientId || "");
       formData.append("dietplan_id", dietplanId || "");
 
-      // Log FormData contents for debugging
       for (let [key, value] of formData.entries()) {
         console.log(`FormData: ${key} =`, value);
       }
 
       const res = await fetch("https://respyr.in/mini/api/extract", {
         method: "POST",
-        body: formData
+        body: formData,
       });
 
       if (!res.ok) {
         const txt = await res.text().catch(() => "");
-        throw new Error(`Extractor error (${res.status}): ${txt || "Failed to extract"}`);
+        throw new Error(
+          `Extractor error (${res.status}): ${txt || "Failed to extract"}`
+        );
       }
 
       const json = await res.json();
@@ -460,97 +539,99 @@ export default function TestLogInfo({ onConfirmNext }) {
     }
   };
 
-  // ---- Submit Plan Summary ----
-  const submitPlanSummary = async () => {
-    if (!validateForm()) return;
+  // ========= 8) Submit Plan Summary =========
+const submitPlanSummary = async () => {
+  if (!validateForm()) return;
 
-    setIsLoading(true);
-    startProgress(8000, 90);
+  setIsLoading(true);
+  startProgress(8000, 90);
 
-    try {
-      const planSummaryData = localStorage.getItem("planSummary");
-      if (!planSummaryData) {
-        toast.error("No plan summary data found");
-        resetProgress();
-        return;
-      }
-
-      const planSummary = JSON.parse(planSummaryData);
-      const urlParams = new URLSearchParams(window.location.search);
-      const dietitianId = urlParams.get("dietician_id");
-      const clientId = urlParams.get("profile_id");
-      const cookieDietician = getCookie("dietician");
-      const effectiveDieticianId = dietitianId || cookieDietician || "";
-      const effectiveClientId = clientId || "";
-
-      if (!effectiveDieticianId || !effectiveClientId) {
-        toast.error("Missing dietician ID or client ID (URL/cookie)");
-        resetProgress();
-        return;
-      }
-
-      const requestBody = {
-        dietitian_id: effectiveDieticianId,
-        client_id: effectiveClientId,
-        plan_title: planSummary.plan_title || "",
-        plan_start_date: planSummary.plan_start_date || "",
-        plan_end_date: planSummary.plan_end_date || "",
-        calories_target: planSummary.calories_target || 0,
-        protein_target: planSummary.protein_target || 0,
-        fiber_target: planSummary.fiber_target || 0,
-        water_target: planSummary.water_target || 0,
-        test_no_assigned: parseInt(testsAllotted) || 0,
-        goal: planSummary.goal || [],
-        approach: planSummary.approach || "",
-        status: "active",
-      };
-
-      console.log("Submitting plan summary:", requestBody);
-
-      const resp = await submitPlanSummaryService(requestBody);
-      setApiResponse(resp);
-
-      if (resp?.status) {
-        completeProgress();
-        toast.success("Plan summary submitted successfully!");
-
-        const dietplanId = resp?.inserted_data?.id || "";
-        console.log("Diet plan ID received:", dietplanId);
-        
-        const extractedOk = await extractDietPdf({
-          dieticianId: effectiveDieticianId,
-          clientId: effectiveClientId,
-          dietplanId,
-        });
-
-        if (extractedOk) {
-          onConfirmNext?.();
-        }
-      } else {
-        toast.error(resp?.message || "Failed to submit plan summary");
-        resetProgress();
-      }
-    } catch (error) {
-      console.error("API Error:", error);
-      toast.error(error.message || "Failed to submit plan summary");
+  try {
+    const planSummaryData = localStorage.getItem("planSummary");
+    if (!planSummaryData) {
+      toast.error("No plan summary data found");
       resetProgress();
-    } finally {
-      setIsLoading(false);
-      setTimeout(() => {
-        if (!isExtracting) resetProgress();
-      }, 600);
+      return;
     }
-  };
+
+    const planSummary = JSON.parse(planSummaryData);
+    const urlParams = new URLSearchParams(window.location.search);
+    const dietitianId = urlParams.get("dietician_id");
+    const clientId = urlParams.get("profile_id");
+    const cookieDietician = getCookie("dietician");
+    const effectiveDieticianId = dietitianId || cookieDietician || "";
+    const effectiveClientId = clientId || "";
+
+    if (!effectiveDieticianId || !effectiveClientId) {
+      toast.error("Missing dietician ID or client ID (URL/cookie)");
+      resetProgress();
+      return;
+    }
+
+    const requestBody = {
+      dietitian_id: effectiveDieticianId,
+      client_id: effectiveClientId,
+      plan_title: planSummary.plan_title || "",
+      plan_start_date: planSummary.plan_start_date || "",
+      plan_end_date: planSummary.plan_end_date || "",
+      calories_target: planSummary.calories_target || 0,
+      protein_target: planSummary.protein_target || 0,
+      fiber_target: planSummary.fiber_target || 0,
+      water_target: planSummary.water_target || 0,
+      test_no_assigned: parseInt(testsAllotted, 10) || 0,
+      goal: planSummary.goal || [],
+      approach: planSummary.approach || "",
+      status: "active",
+     
+      diet_type: planSummary.diet_type || "", 
+      is_diabetic: planSummary.is_diabetic || false, 
+      carbs_target: planSummary.carbs_target || 0, 
+      fat_target: planSummary.fat_target || 0, 
+    };
+
+
+
+    const resp = await submitPlanSummaryService(requestBody);
+    setApiResponse(resp);
+
+    if (resp?.status) {
+      completeProgress();
+      toast.success("Plan summary submitted successfully!");
+
+      const dietplanId = resp?.inserted_data?.id || "";
+
+      const extractedOk = await extractDietPdf({
+        dieticianId: effectiveDieticianId,
+        clientId: effectiveClientId,
+        dietplanId,
+      });
+
+      if (extractedOk) {
+        onConfirmNext?.();
+      }
+    } else {
+      toast.error(resp?.message || "Failed to submit plan summary");
+      resetProgress();
+    }
+  } catch (error) {
+    console.error("API Error:", error);
+    toast.error(error.message || "Failed to submit plan summary");
+    resetProgress();
+  } finally {
+    setIsLoading(false);
+    setTimeout(() => {
+      if (!isExtracting) resetProgress();
+    }, 600);
+  }
+};
 
   const handleConfirmNext = () => {
-    // Check if PDF exists in localStorage
-    const savedPdf = localStorage.getItem('uploadedPdfFile');
+    const savedPdf = localStorage.getItem("uploadedPdfFile");
     if (!savedPdf) {
       toast.error("Please upload a PDF file before proceeding.");
       return;
     }
 
-    // Validate PDF data structure
     try {
       const pdfData = JSON.parse(savedPdf);
       if (!pdfData.data && !pdfData.blobUrl) {
@@ -566,34 +647,7 @@ export default function TestLogInfo({ onConfirmNext }) {
     submitPlanSummary();
   };
 
-  // Debug function to check stored PDF
-  const debugStoredPdf = () => {
-    const savedPdf = localStorage.getItem('uploadedPdfFile');
-    if (savedPdf) {
-      try {
-        const parsed = JSON.parse(savedPdf);
-        console.log("📄 Stored PDF Debug:", {
-          hasBlobUrl: !!parsed.blobUrl,
-          hasData: !!parsed.data,
-          dataType: parsed.data ? typeof parsed.data : 'none',
-          dataStartsWith: parsed.data ? parsed.data.substring(0, 30) + '...' : 'none',
-          name: parsed.name,
-          size: parsed.size,
-          type: parsed.type
-        });
-      } catch (error) {
-        console.error("❌ Error parsing stored PDF:", error);
-      }
-    } else {
-      console.log("❌ No PDF found in localStorage");
-    }
-  };
-
-  // Call debug on component mount
-  useEffect(() => {
-    debugStoredPdf();
-  }, []);
-
+  // ========= 9) JSX =========
   return (
     <>
       <div className="flex-1 flex-col gap-[310px] h-full">
@@ -608,45 +662,50 @@ export default function TestLogInfo({ onConfirmNext }) {
 
           <div className="mt-[15px]">
             <div className="flex gap-5 items-end">
-              {/* Tests assigned with inline error */}
+              {/* No of Tests allotted (planDays) */}
               <div className="relative flex-1">
                 <input
                   type="text"
-                  id="tests_allotted"
-                  value={testsAllotted}
-                  onChange={handleTestsAllottedChange}
-                  className={`block py-[15px] pl-[19px] pr-[13px] w-full text-[14px] text-[#252525] bg-white rounded-[8px] border focus:outline-none focus:ring-0 focus:border-blue-600 peer
-                  ${errors.testsAllotted ? "border-[#DA5747]" : "border-[#E1E6ED]"}`}
+                  id="plan_days"
+                  value={planDays}
+                  readOnly
+                  className="block py-[15px] pl-[19px] pr-[13px] w-full text-[14px] text-[#252525] bg-white rounded-[8px] border border-[#E1E6ED] focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                   placeholder=" "
                 />
                 <label
-                  htmlFor="tests_allotted"
+                  htmlFor="plan_days"
                   className="absolute text-[14px] text-[#9CA3AF] duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1"
                 >
-                  Tests assigned
+                  No of Tests allotted
                 </label>
-
-                {errors.testsAllotted ? (
-                  <div className="flex gap-[5px] items-center mt-1">
-                    <Image
-                      src="/icons/hugeicons_information-circle-redd.png"
-                      alt="info"
-                      width={15}
-                      height={15}
-                    />
-                    <span className="text-[#DA5747] text-[10px]">
-                      {errors.testsAllotted}
-                    </span>
-                  </div>
-                ) : null}
               </div>
 
-              {/* Readonly remaining */}
-              <div className="relative flex-1">
+              {/* Test remaining (API remaining − planDays) */}
+              <div className="relative hidden">
                 <input
                   type="text"
                   id="test_remaining"
                   value={testRemaining}
+                  readOnly
+                  hidden
+                  className="block py-[15px] pl-[19px] pr-[13px] w-full text-[14px] text-[#252525] bg-white rounded-[8px] border border-[#E1E6ED] focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                  placeholder=" "
+                />
+                <label
+                  htmlFor="test_remaining"
+                  className="absolute text-[14px] text-[#9CA3AF] duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1"
+                >
+                  Test remaining
+                </label>
+              </div>
+
+
+
+ <div className="relative flex-1">
+                <input
+                  type="text"
+                  id="test_remaining_1"
+                  value={subtractionResult}
                   readOnly
                   className="block py-[15px] pl-[19px] pr-[13px] w-full text-[14px] text-[#252525] bg-white rounded-[8px] border border-[#E1E6ED] focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                   placeholder=" "
@@ -658,7 +717,10 @@ export default function TestLogInfo({ onConfirmNext }) {
                   Test remaining
                 </label>
               </div>
+
             </div>
+
+            
           </div>
         </div>
 

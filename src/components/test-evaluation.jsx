@@ -276,7 +276,7 @@ import { useSelector } from "react-redux"
 
 export default function TestEvaluation() {
   const scoresInsight = useSelector((state) => state.scoresInsight?.data);
-
+console.log("scoresInsight279:-", scoresInsight);
   const formatDate = (dateString) => {
     if (!dateString) return '';
     
@@ -305,11 +305,9 @@ export default function TestEvaluation() {
 
   // Get scores from the nested structure
   const scores = scoresInsight?.latest_test?.scores;
-  console.log("scores298:-", scores);
   const testDate = scoresInsight?.latest_test?.date_time;
-  console.log("testDate300:-", testDate);
   const metabolismScores = scoresInsight?.latest_test?.test_json?.Metabolism_Score_Analysis;
-  console.log("metabolismScores302:-", metabolismScores);
+  console.log("metabolismScores310:-", metabolismScores);
 
   return (
     <>

@@ -3,6 +3,7 @@
 import { apiFetcher } from "../config/fetcher";
 import { API_ENDPOINTS } from "../config/apiConfig";
 
+
 export const loginService = async (email, password) => {
   return apiFetcher(API_ENDPOINTS.AUTH.LOGIN, {
     method: "POST",
@@ -168,6 +169,35 @@ export const fetchTestAnalytics = async (dieticianId, date = "") => {
     body: JSON.stringify({
       dietitian_id: dieticianId,
       date: date,
+    }),
+  });
+};
+
+
+
+export const fetchTestRemaining = async (dieticianId) => {
+  return apiFetcher(API_ENDPOINTS.TESTINFO.TESTREMAINING, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      dietitian_id: dieticianId,
+    }),
+  });
+};
+
+
+
+export const fetchClientLog = async (dieticianId, clientId) => {
+  return apiFetcher(API_ENDPOINTS.PLANHISTORY.CLIENTLOG, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      dietitian_id: dieticianId,
+      client_id: clientId,
     }),
   });
 };

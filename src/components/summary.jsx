@@ -343,11 +343,13 @@ import { toast } from 'sonner'
 
 export default function Summary({ onConfirmNext }) {
   const [planTitle, setPlanTitle] = useState('');
+  console.log("planTitle346:-", planTitle);
   const [approachInput, setApproachInput] = useState('');
   const [approachTags, setApproachTags] = useState([]);
   const [goals, setGoals] = useState([{ id: 1, title: '', current: '', target: '' }]);
   const [goalUnits, setGoalUnits] = useState([{ id: 1, currentUnit: 'Unit', targetUnit: 'Unit' }]);
-  const [isDiabetic, setIsDiabetic] = useState('no');
+  console.log("goalUnits351:-", goalUnits);
+  const [isDiabetic, setIsDiabetic] = useState(false);
   const [dietType, setDietType] = useState('');
   const [showDietDropdown, setShowDietDropdown] = useState(false);
 
@@ -388,72 +390,84 @@ export default function Summary({ onConfirmNext }) {
   const targetDropdownRef = useRef(null);
 
   const unitOptions = ['kg', 'g', 'lb', 'oz', 'cm', 'm', 'inch', 'ft', '%', 'bpm', 'cal', 'kcal'];
+  
 
   // Load data from localStorage on component mount
   useEffect(() => {
     loadFromLocalStorage();
   }, []);
 
-  const loadFromLocalStorage = () => {
-    try {
-      const savedData = localStorage.getItem('planSummary');
-      if (savedData) {
-        const data = JSON.parse(savedData);
-        
-        // Set basic fields
-        setPlanTitle(data.plan_title || '');
-        setFromDate(ymdToDmy(data.plan_start_date) || '');
-        setToDate(ymdToDmy(data.plan_end_date) || '');
-        setIsDiabetic(data.is_diabetic || 'no');
-        setDietType(data.diet_type || '');
-        setCaloriesTarget(data.calories_target || '');
-        setProteinTarget(data.protein_target || '');
-        setFiberTarget(data.fiber_target || '');
-        setCarbsTarget(data.carbs_target || '');
-        setFatTarget(data.fat_target || '');
-        setWaterTarget(data.water_target || '');
-        
-        // Set approach tags
-        if (data.approach) {
-          setApproachTags(data.approach.split(','));
-        }
-        
-        // Set goals
-        if (data.goal && data.goal.length > 0) {
-          const loadedGoals = [];
-          const loadedGoalUnits = [];
-          
-          data.goal.forEach((goalItem, index) => {
-            const goalId = index + 1;
-            
-            // Extract numeric value and unit from current_stat and target_stat
-            const currentMatch = goalItem.current_stat?.match(/(\d*\.?\d*)(.*)/) || ['', '', 'Unit'];
-            const targetMatch = goalItem.target_stat?.match(/(\d*\.?\d*)(.*)/) || ['', '', 'Unit'];
-            
-            loadedGoals.push({
-              id: goalId,
-              title: goalItem.name || '',
-              current: currentMatch[1] || '',
-              target: targetMatch[1] || ''
-            });
-            
-            loadedGoalUnits.push({
-              id: goalId,
-              currentUnit: currentMatch[2] || 'Unit',
-              targetUnit: targetMatch[2] || 'Unit'
-            });
-          });
-          
-          setGoals(loadedGoals);
-          setGoalUnits(loadedGoalUnits);
-        }
-        
-        //toast.success('Data loaded from saved draft');
+ const loadFromLocalStorage = () => {
+  try {
+    const savedData = localStorage.getItem('planSummary');
+    if (savedData) {
+      const data = JSON.parse(savedData);
+
+      // Set basic fields
+      setPlanTitle(data.plan_title || '');
+      setFromDate(ymdToDmy(data.plan_start_date) || '');
+      setToDate(ymdToDmy(data.plan_end_date) || '');
+      
+      // Handle boolean value for is_diabetic
+      if (typeof data.is_diabetic === 'boolean') {
+        setIsDiabetic(data.is_diabetic);
+      } else if (data.is_diabetic === 'yes') {
+        setIsDiabetic(true);
+      } else if (data.is_diabetic === 'no') {
+        setIsDiabetic(false);
+      } else {
+        setIsDiabetic(false); // Default to false
       }
-    } catch (error) {
-      console.error('Error loading from localStorage:', error);
+      
+      setDietType(data.diet_type || '');
+      setCaloriesTarget(data.calories_target || '');
+      setProteinTarget(data.protein_target || '');
+      setFiberTarget(data.fiber_target || '');
+      setCarbsTarget(data.carbs_target || '');
+      setFatTarget(data.fat_target || '');
+      setWaterTarget(data.water_target || '');
+
+      // Set approach tags
+      if (data.approach) {
+        setApproachTags(data.approach.split(','));
+      }
+
+      // Set goals
+      if (data.goal && data.goal.length > 0) {
+        const loadedGoals = [];
+        const loadedGoalUnits = [];
+
+        data.goal.forEach((goalItem, index) => {
+          const goalId = index + 1;
+
+          // Extract numeric value and unit from current_stat and target_stat
+          const currentMatch = goalItem.current_stat?.match(/(\d*\.?\d*)(.*)/) || ['', '', 'Unit'];
+          const targetMatch = goalItem.target_stat?.match(/(\d*\.?\d*)(.*)/) || ['', '', 'Unit'];
+
+          loadedGoals.push({
+            id: goalId,
+            title: goalItem.name || '',
+            current: currentMatch[1] || '',
+            target: targetMatch[1] || ''
+          });
+
+          loadedGoalUnits.push({
+            id: goalId,
+            currentUnit: currentMatch[2] || 'Unit',
+            targetUnit: targetMatch[2] || 'Unit'
+          });
+        });
+
+        setGoals(loadedGoals);
+        setGoalUnits(loadedGoalUnits);
+      }
+
+      //toast.success('Data loaded from saved draft');
     }
-  };
+  } catch (error) {
+    console.error('Error loading from localStorage:', error);
+  }
+};
 
   const validateToDate = (from, to) => {
     if (!from || !to) return true;
@@ -561,92 +575,107 @@ export default function Summary({ onConfirmNext }) {
   const markError = (key, message) => message ? message : '';
   const markGoalError = (curr, key, message) => ({ ...(curr || {}), [key]: message });
 
-  const validateForm = () => {
-    const nextErrors = {
-      planTitle: '',
-      fromDate: '',
-      toDate: '',
-      isDiabetic: '',
-      dietType: '',
-      caloriesTarget: '',
-      proteinTarget: '',
-      fiberTarget: '',
-      carbsTarget: '',
-      fatTarget: '',
-      waterTarget: '',
-      approach: '',
-      goals: {}
-    };
-
-    if (!planTitle.trim()) nextErrors.planTitle = 'Enter plan title';
-    if (!fromDate) nextErrors.fromDate = 'Select start date';
-    if (!toDate) nextErrors.toDate = 'Select end date';
-
-    if (fromDate && toDate && !validateToDate(fromDate, toDate)) {
-      nextErrors.toDate = 'To date must be after From date';
-    }
-
-    if (!isDiabetic) nextErrors.isDiabetic = 'Please select diabetic status';
-    if (!dietType) nextErrors.dietType = 'Please select diet type';
-    if (!caloriesTarget) nextErrors.caloriesTarget = 'Enter calories target';
-    if (!proteinTarget) nextErrors.proteinTarget = 'Enter protein target';
-    if (!fiberTarget) nextErrors.fiberTarget = 'Enter fiber target';
-    if (!carbsTarget) nextErrors.carbsTarget = 'Enter carbs target';
-    if (!fatTarget) nextErrors.fatTarget = 'Enter fat target';
-    if (!waterTarget) nextErrors.waterTarget = 'Enter water target';
-
-    if (approachTags.length === 0) nextErrors.approach = 'Add at least one approach';
-
-    goals.forEach(g => {
-      let ge = nextErrors.goals[g.id] || {};
-      if (!g.title.trim()) ge = markGoalError(ge, 'title', 'Enter goal title');
-      if (!g.current) ge = markGoalError(ge, 'current', 'Enter current stat');
-      if (!g.target) ge = markGoalError(ge, 'target', 'Enter target stat');
-      if (Object.keys(ge).length) nextErrors.goals[g.id] = ge;
-    });
-
-    setErrors(nextErrors);
-
-    const hasTopLevel =
-      nextErrors.planTitle || nextErrors.fromDate || nextErrors.toDate ||
-      nextErrors.isDiabetic || nextErrors.dietType ||
-      nextErrors.caloriesTarget || nextErrors.proteinTarget ||
-      nextErrors.fiberTarget || nextErrors.carbsTarget || nextErrors.fatTarget ||
-      nextErrors.waterTarget || nextErrors.approach;
-
-    const hasGoalLevel = Object.keys(nextErrors.goals).length > 0;
-
-    if (hasTopLevel || hasGoalLevel) {
-      toast.error('Please fix the highlighted fields');
-      return false;
-    }
-    return true;
+ const validateForm = () => {
+  const nextErrors = {
+    planTitle: '',
+    fromDate: '',
+    toDate: '',
+    isDiabetic: '',
+    dietType: '',
+    caloriesTarget: '',
+    proteinTarget: '',
+    fiberTarget: '',
+    carbsTarget: '',
+    fatTarget: '',
+    waterTarget: '',
+    approach: '',
+    goals: {}
   };
 
-  const prepareFormData = () => {
-    return {
-      plan_title: planTitle,
-      plan_start_date: dmyToYmd(fromDate),
-      plan_end_date: dmyToYmd(toDate),
-      is_diabetic: isDiabetic,
-      diet_type: dietType,
-      calories_target: caloriesTarget,
-      protein_target: proteinTarget,
-      fiber_target: fiberTarget,
-      carbs_target: carbsTarget,
-      fat_target: fatTarget,
-      water_target: waterTarget,
-      goal: goals.map(goal => {
-        const goalUnit = goalUnits.find(gu => gu.id === goal.id) || { currentUnit: 'Unit', targetUnit: 'Unit' };
-        return {
-          name: goal.title,
-          current_stat: `${goal.current}${goalUnit.currentUnit}`,
-          target_stat: `${goal.target}${goalUnit.targetUnit}`
-        };
-      }),
-      approach: approachTags.join(',')
-    };
+  if (!planTitle.trim()) nextErrors.planTitle = 'Enter plan title';
+  if (!fromDate) nextErrors.fromDate = 'Select start date';
+  if (!toDate) nextErrors.toDate = 'Select end date';
+
+  if (fromDate && toDate && !validateToDate(fromDate, toDate)) {
+    nextErrors.toDate = 'To date must be after From date';
+  }
+
+  // Fix: Check if isDiabetic is boolean (true/false) instead of string
+  if (isDiabetic === undefined || isDiabetic === null) {
+    nextErrors.isDiabetic = 'Please select diabetic status';
+  }
+
+  if (!dietType) nextErrors.dietType = 'Please select diet type';
+  if (!caloriesTarget) nextErrors.caloriesTarget = 'Enter calories target';
+  if (!proteinTarget) nextErrors.proteinTarget = 'Enter protein target';
+  if (!fiberTarget) nextErrors.fiberTarget = 'Enter fiber target';
+  if (!carbsTarget) nextErrors.carbsTarget = 'Enter carbs target';
+  if (!fatTarget) nextErrors.fatTarget = 'Enter fat target';
+  if (!waterTarget) nextErrors.waterTarget = 'Enter water target';
+
+  if (approachTags.length === 0) nextErrors.approach = 'Add at least one approach';
+
+  goals.forEach(g => {
+    let ge = nextErrors.goals[g.id] || {};
+    if (!g.title.trim()) ge = markGoalError(ge, 'title', 'Enter goal title');
+    if (!g.current) ge = markGoalError(ge, 'current', 'Enter current stat');
+    if (!g.target) ge = markGoalError(ge, 'target', 'Enter target stat');
+
+    // Add unit validation
+    const goalUnit = goalUnits.find(gu => gu.id === g.id) || { currentUnit: 'Unit', targetUnit: 'Unit' };
+    if (goalUnit.currentUnit === 'Unit') ge = markGoalError(ge, 'currentUnit', 'Select current unit');
+    if (goalUnit.targetUnit === 'Unit') ge = markGoalError(ge, 'targetUnit', 'Select target unit');
+
+    if (Object.keys(ge).length) nextErrors.goals[g.id] = ge;
+  });
+
+  setErrors(nextErrors);
+
+  const hasTopLevel =
+    nextErrors.planTitle || nextErrors.fromDate || nextErrors.toDate ||
+    nextErrors.isDiabetic || nextErrors.dietType ||
+    nextErrors.caloriesTarget || nextErrors.proteinTarget ||
+    nextErrors.fiberTarget || nextErrors.carbsTarget || nextErrors.fatTarget ||
+    nextErrors.waterTarget || nextErrors.approach;
+
+  const hasGoalLevel = Object.keys(nextErrors.goals).length > 0;
+
+  if (hasTopLevel || hasGoalLevel) {
+    toast.error('Please fix the highlighted fields');
+    return false;
+  }
+  return true;
+};
+
+const prepareFormData = () => {
+  return {
+    plan_title: planTitle,
+    plan_start_date: dmyToYmd(fromDate),
+    plan_end_date: dmyToYmd(toDate),
+    is_diabetic: isDiabetic, // Direct boolean value
+    diet_type: dietType,
+    calories_target: caloriesTarget,
+    protein_target: proteinTarget,
+    fiber_target: fiberTarget,
+    carbs_target: carbsTarget,
+    fat_target: fatTarget,
+    water_target: waterTarget,
+    goal: goals.map(goal => {
+      const goalUnit = goalUnits.find(gu => gu.id === goal.id) || { currentUnit: 'Unit', targetUnit: 'Unit' };
+      
+      // Use currentUnit as the main unit (since they're synced now)
+      const unit = goalUnit.currentUnit !== 'Unit' ? goalUnit.currentUnit : goalUnit.targetUnit;
+
+      return {
+        name: goal.title,
+        current_stat: goal.current || '',
+        target_stat: goal.target || '',
+        unit: unit !== 'Unit' ? unit : '' // Only include unit if it's selected
+      };
+    }),
+    approach: approachTags.join(',')
   };
+};
 
   const saveToLocalStorage = (isDraft = false) => {
     if (!isDraft && !validateForm()) return;
@@ -655,11 +684,11 @@ export default function Summary({ onConfirmNext }) {
     localStorage.setItem('planSummary', JSON.stringify(formData));
     if (isDraft)
       //toast.success('Draft saved successfully!');
-    ""
-    else { 
+      ""
+    else {
       //toast.success('Plan saved successfully!'); 
       ""
-      onConfirmNext?.(); 
+      onConfirmNext?.();
     }
   };
 
@@ -678,7 +707,7 @@ export default function Summary({ onConfirmNext }) {
           <p className='text-[#252525] pb-[18px] pt-[23px] text-[20px] font-semibold leading-[110%] tracking-[0.4px] whitespace-nowrap'>
             Plan Summary
           </p>
-       
+
         </div>
 
         <div className="w-full border-b border-[#E1E6ED]"></div>
@@ -813,15 +842,15 @@ export default function Summary({ onConfirmNext }) {
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#E1E6ED] rounded-[8px] shadow-lg z-10">
                     <div
                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525] border-b border-[#E1E6ED]"
-                      onClick={() => handleDietSelect('Veg')}
+                      onClick={() => handleDietSelect('Vegetarian')}
                     >
-                      Veg
+                      Vegetarian
                     </div>
                     <div
                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525] border-b border-[#E1E6ED]"
-                      onClick={() => handleDietSelect('Non-Veg')}
+                      onClick={() => handleDietSelect(' Non-Vegetarian')}
                     >
-                      Non-Veg
+                      Non-Vegetarian
                     </div>
                     <div
                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525] border-b border-[#E1E6ED]"
@@ -831,9 +860,33 @@ export default function Summary({ onConfirmNext }) {
                     </div>
                     <div
                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525]"
+                      onClick={() => handleDietSelect('Fishitarian')}
+                    >
+                      Fishitarian
+                    </div>
+                    <div
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525]"
                       onClick={() => handleDietSelect('Vegan')}
                     >
                       Vegan
+                    </div>
+                     <div
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525]"
+                      onClick={() => handleDietSelect('Lacto-Ovo Vegetarian')}
+                    >
+                      Lacto-Ovo Vegetarian
+                    </div>
+                    <div
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525]"
+                      onClick={() => handleDietSelect('Pescatarian')}
+                    >
+                      Pescatarian
+                    </div>
+                    <div
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525]"
+                      onClick={() => handleDietSelect('Flexitarian')}
+                    >
+                      Flexitarian
                     </div>
                   </div>
                 )}
@@ -848,41 +901,39 @@ export default function Summary({ onConfirmNext }) {
             </div>
 
             <div className="flex-1">
-              <div className="flex items-center">
-                <div className='px-[9px] pt-[5px] pb-[5px] text-[#252525] text-[12px] leading-normal font-semibold tracking-[-0.24px]'>
-                  Client is diabetic?
-                </div>
-                <div className="flex gap-6">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="diabetic"
-                      value="yes"
-                      checked={isDiabetic === 'yes'}
-                      onChange={(e) => {
-                        setIsDiabetic(e.target.value);
-                        setErrors(prev => ({ ...prev, isDiabetic: '' }));
-                      }}
-                      className="w-4 h-4 text-[#308BF9] bg-white border-[#D9D9D9] focus:ring-[#308BF9] focus:ring-2"
-                    />
-                    <span className="text-[14px] text-[#252525]">Yes</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="diabetic"
-                      value="no"
-                      checked={isDiabetic === 'no'}
-                      onChange={(e) => {
-                        setIsDiabetic(e.target.value);
-                        setErrors(prev => ({ ...prev, isDiabetic: '' }));
-                      }}
-                      className="w-4 h-4 text-[#308BF9] bg-white border-[#D9D9D9] focus:ring-[#308BF9] focus:ring-2"
-                    />
-                    <span className="text-[14px] text-[#252525]">No</span>
-                  </label>
-                </div>
-              </div>
+           <div className="flex items-center">
+  <div className='px-[9px] pt-[5px] pb-[5px] text-[#252525] text-[12px] leading-normal font-semibold tracking-[-0.24px]'>
+    Client is diabetic?
+  </div>
+ <div className="flex gap-6">
+  <label className="flex items-center gap-2 cursor-pointer">
+    <input
+      type="radio"
+      name="diabetic"
+      checked={isDiabetic === true}
+      onChange={() => {
+        setIsDiabetic(true);
+        setErrors(prev => ({ ...prev, isDiabetic: '' }));
+      }}
+      className="w-4 h-4 text-[#308BF9] bg-white border-[#D9D9D9] focus:ring-[#308BF9] focus:ring-2"
+    />
+    <span className="text-[14px] text-[#252525]">Yes</span>
+  </label>
+  <label className="flex items-center gap-2 cursor-pointer">
+    <input
+      type="radio"
+      name="diabetic"
+      checked={isDiabetic === false}
+      onChange={() => {
+        setIsDiabetic(false);
+        setErrors(prev => ({ ...prev, isDiabetic: '' }));
+      }}
+      className="w-4 h-4 text-[#308BF9] bg-white border-[#D9D9D9] focus:ring-[#308BF9] focus:ring-2"
+    />
+    <span className="text-[14px] text-[#252525]">No</span>
+  </label>
+</div>
+</div>
               {errors.isDiabetic && (
                 <div className="flex gap-[5px] items-center mt-1">
                   <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
@@ -1075,85 +1126,107 @@ export default function Summary({ onConfirmNext }) {
                     ) : null}
                   </div>
 
-                  <div className="flex gap-10">
-                    <div className="flex flex-col" ref={currentDropdownRef}>
-                      <div className={`flex items-center py-[15px] pl-[19px] pr-[15px] rounded-[8px] bg-white relative
-                        ${gErr.current ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'}`}>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.1"
-                          value={goal.current}
-                          onChange={(e) => updateGoal(goal.id, 'current', e.target.value)}
-                          placeholder="Current Stat"
-                          className="w-full max-w-[90px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#A1A1A1]"
-                        />
-                        <div className="h-[20px] border-l border-[#E1E6ED] mx-3"></div>
-                        <div className="flex items-center gap-2 cursor-pointer" onClick={() => toggleCurrentDropdown(goal.id)}>
-                          <span className="text-[#252525] text-[12px]">{goalUnit.currentUnit}</span>
-                          <IoIosArrowDown className={`text-[#A1A1A1] transition-transform ${showCurrentDropdown === goal.id ? 'rotate-180' : ''}`} />
-                        </div>
-                        {showCurrentDropdown === goal.id && (
-                          <div className="absolute top-full right-0 mt-1 bg-white border border-[#E1E6ED] rounded-[8px] shadow-lg z-10 min-w-[100px]">
-                            {unitOptions.map((unit) => (
-                              <div
-                                key={unit}
-                                className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-[12px]"
-                                onClick={() => handleUnitSelect(unit, 'currentUnit', goal.id)}
-                              >
-                                {unit}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      {gErr.current ? (
-                        <div className="flex gap-[5px] items-center mt-1">
-                          <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
-                          <span className="text-[#DA5747] text-[10px]">{gErr.current}</span>
-                        </div>
-                      ) : null}
-                    </div>
+                 <div className="flex gap-10">
+  <div className="flex flex-col" ref={currentDropdownRef}>
+    <div className={`flex items-center py-[15px] pl-[19px] pr-[15px] rounded-[8px] bg-white relative
+      ${gErr.current || gErr.currentUnit ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'}`}>
+      <input
+        type="number"
+        min="0"
+        step="0.1"
+        value={goal.current}
+        onChange={(e) => updateGoal(goal.id, 'current', e.target.value)}
+        placeholder="Current Stat"
+        className="w-full max-w-[90px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#A1A1A1]"
+      />
+      <div className="h-[20px] border-l border-[#E1E6ED] mx-3"></div>
+      <div
+        className={`flex items-center gap-2 cursor-pointer px-2 py-1 rounded ${goalUnit.currentUnit === 'Unit' ? '' : ''}`}
+        onClick={() => toggleCurrentDropdown(goal.id)}
+      >
+        <span className={`text-[12px] ${goalUnit.currentUnit === 'Unit' ? 'text-[#252525]' : 'text-[#252525]'}`}>
+          {goalUnit.currentUnit}
+        </span>
+        <IoIosArrowDown className={`transition-transform ${showCurrentDropdown === goal.id ? 'rotate-180' : ''} ${goalUnit.currentUnit === 'Unit' ? 'text-[#A1A1A1]' : 'text-[#A1A1A1]'}`} />
+      </div>
+      {showCurrentDropdown === goal.id && (
+        <div className="absolute top-full right-0 mt-1 bg-white border border-[#E1E6ED] rounded-[8px] shadow-lg z-10 min-w-[100px] max-h-40 overflow-y-auto">
+          {unitOptions.map((unit) => (
+            <div
+              key={unit}
+              className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-[12px]"
+              onClick={() => {
+                // When selecting a unit for current, also set it for target
+                handleUnitSelect(unit, 'currentUnit', goal.id);
+                handleUnitSelect(unit, 'targetUnit', goal.id);
+              }}
+            >
+              {unit}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+    {(gErr.current || gErr.currentUnit) && (
+      <div className="flex gap-[5px] items-center mt-1">
+        <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+        <span className="text-[#DA5747] text-[10px]">
+          {gErr.currentUnit || gErr.current}
+        </span>
+      </div>
+    )}
+  </div>
 
-                    <div className="flex flex-col" ref={targetDropdownRef}>
-                      <div className={`flex items-center py-[15px] pl-[19px] pr-[15px] rounded-[8px] bg-white relative
-                        ${gErr.target ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'}`}>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.1"
-                          value={goal.target}
-                          onChange={(e) => updateGoal(goal.id, 'target', e.target.value)}
-                          placeholder="Target Stat"
-                          className="w-full max-w-[90px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#A1A1A1]"
-                        />
-                        <div className="h-[20px] border-l border-[#E1E6ED] mx-3"></div>
-                        <div className="flex items-center gap-2 cursor-pointer" onClick={() => toggleTargetDropdown(goal.id)}>
-                          <span className="text-[#252525] text-[12px]">{goalUnit.targetUnit}</span>
-                          <IoIosArrowDown className={`text-[#A1A1A1] transition-transform ${showTargetDropdown === goal.id ? 'rotate-180' : ''}`} />
-                        </div>
-                        {showTargetDropdown === goal.id && (
-                          <div className="absolute top-full right-0 mt-1 bg-white border border-[#E1E6ED] rounded-[8px] shadow-lg z-10 min-w-[100px]">
-                            {unitOptions.map((unit) => (
-                              <div
-                                key={unit}
-                                className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-[12px]"
-                                onClick={() => handleUnitSelect(unit, 'targetUnit', goal.id)}
-                              >
-                                {unit}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      {gErr.target ? (
-                        <div className="flex gap-[5px] items-center mt-1">
-                          <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
-                          <span className="text-[#DA5747] text-[10px]">{gErr.target}</span>
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
+  <div className="flex flex-col" ref={targetDropdownRef}>
+    <div className={`flex items-center py-[15px] pl-[19px] pr-[15px] rounded-[8px] bg-white relative
+      ${gErr.target || gErr.targetUnit ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'}`}>
+      <input
+        type="number"
+        min="0"
+        step="0.1"
+        value={goal.target}
+        onChange={(e) => updateGoal(goal.id, 'target', e.target.value)}
+        placeholder="Target Stat"
+        className="w-full max-w-[90px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#A1A1A1]"
+      />
+      <div className="h-[20px] border-l border-[#E1E6ED] mx-3"></div>
+      <div
+        className={`flex items-center gap-2 cursor-pointer px-2 py-1 rounded ${goalUnit.targetUnit === 'Unit' ? '' : ''}`}
+        onClick={() => toggleTargetDropdown(goal.id)}
+      >
+        <span className={`text-[12px] ${goalUnit.targetUnit === 'Unit' ? 'text-[#252525]' : 'text-[#252525]'}`}>
+          {goalUnit.targetUnit}
+        </span>
+        <IoIosArrowDown className={`transition-transform ${showTargetDropdown === goal.id ? 'rotate-180' : ''} ${goalUnit.targetUnit === 'Unit' ? 'text-[#A1A1A1]' : 'text-[#A1A1A1]'}`} />
+      </div>
+      {showTargetDropdown === goal.id && (
+        <div className="absolute top-full right-0 mt-1 bg-white border border-[#E1E6ED] rounded-[8px] shadow-lg z-10 min-w-[100px] max-h-40 overflow-y-auto">
+          {unitOptions.map((unit) => (
+            <div
+              key={unit}
+              className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-[12px]"
+              onClick={() => {
+                // When selecting a unit for target, also set it for current
+                handleUnitSelect(unit, 'targetUnit', goal.id);
+                handleUnitSelect(unit, 'currentUnit', goal.id);
+              }}
+            >
+              {unit}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+    {(gErr.target || gErr.targetUnit) && (
+      <div className="flex gap-[5px] items-center mt-1">
+        <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />
+        <span className="text-[#DA5747] text-[10px]">
+          {gErr.targetUnit || gErr.target}
+        </span>
+      </div>
+    )}
+  </div>
+</div>
                 </div>
               </div>
             );
