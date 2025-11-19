@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cookieManager } from '../lib/cookies';
+import { toast } from 'sonner';
 
 const MonoIcon = ({ src, size = 20, color = "#A1A1A1", alt = "" }) => (
   <span
@@ -59,6 +60,23 @@ export default function Header() {
    };
 
 
+   const handleMenuClick = (menuItem, e) => {
+  if (menuItem.name === "Messages" || menuItem.name === "Settings") {
+    e.preventDefault();
+    toast.info("Coming Soon");
+    return false;
+  }
+
+  setActive(menuItem.path);
+  return true;
+};
+
+
+ const handleNotificationClick = () => {
+    toast.info("Coming Soon");
+  };
+
+
   return (
     <div className="flex justify-between bg-[#F5F7FA] p-4">
       <div className="flex">
@@ -75,6 +93,7 @@ export default function Header() {
             <Link href={m.path} key={m.name} onClick={() => setActive(m.path)}>
               <button
                 className="flex items-center gap-1.5 cursor-pointer rounded-[15px] px-[20px] py-[15px] bg-white"
+                onClick={(e) => handleMenuClick(m, e)}
               >
                 <MonoIcon src={m.icon} color={color} alt={m.name} />
                 <span
@@ -90,7 +109,10 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-5">
-        <div className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white">
+        <div 
+          className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white"
+          onClick={handleNotificationClick}
+        >
           <MonoIcon src="/icons/hugeicons_notification-01.svg" color="#A1A1A1" alt="notification" />
         </div>
 

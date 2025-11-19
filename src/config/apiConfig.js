@@ -31,8 +31,13 @@ export const API_ENDPOINTS = {
   DASHBOARD:{
     TABLECARDS:"/dietitian/api/web/test_statistic_by_dietitian.php",
     TESTANALYTICS:"/dietitian/api/web/get_test_analytics.php"
- 
-  }
+  },
+  TESTINFO:{
+    TESTREMAINING:"/dietitian/api/web/get_test_stat.php"
+  },
+  PLANHISTORY:{
+    CLIENTLOG:"/dietitian/api/app/get_diet_plan_statistics.php"
+  },
  
   
   

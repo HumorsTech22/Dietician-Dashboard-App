@@ -562,7 +562,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
 
     // Get parameters from URL
    const dieticianCookie = cookieManager.getJSON('dietician');
-   const dieticianId = searchParams?.get('dietician_id') || dieticianCookie?.dietician_id || ''
+ const dieticianId = dieticianCookie?.dietician_id || '';
     const profileId = searchParams?.get('profile_id') || '';
 
     const hideClientBits = (pathname || '').toLowerCase().includes('testlog-info')
@@ -642,7 +642,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
 
 
     // Function to handle Create Plan button click
-    const handleCreatePlanClick = () => {
+    const handleCreatePlanClick = () => { 
         // Clear localStorage when creating a new plan
         localStorage.clear();
 
@@ -692,7 +692,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
 
                             {isPlanHistoryPage ? (
                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>
-                                    {clientData?.profile_name || 'Sagar Hosur'}
+                                    {clientData?.profile_name || 'N/A'}
                                 </span>
                             ) : (
                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Clients</span>
@@ -707,7 +707,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                 </span>
                             ) : (
                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>
-                                    {clientData?.profile_name || 'Sagar Hosur'}
+                                    {clientData?.profile_name || 'N/A'}
                                 </span>
                             )}
                         </div>
@@ -778,12 +778,12 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     {/* Text section */}
                                     <div className="flex flex-col items-center gap-5">
                                         <span className="text-[#252525] text-[25px] font-semibold leading-[110%] tracking-[-1px]">
-                                            {clientData?.profile_name || 'Sagar Hosur'}
+                                            {clientData?.profile_name || 'N/A'}
                                         </span>
 
                                         <div className="flex items-center gap-5">
                                             <span className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
-                                                {clientData?.age ? `${clientData.age} years` : '25 years'}
+                                                {clientData?.age ? `${clientData.age} years` : 'N/A years'}
                                             </span>
                                             <div className="w-1 h-1 rounded-full bg-[#252525]"></div>
                                             <span className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
@@ -799,14 +799,14 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     <div className='flex flex-col gap-3 '>
                                         <span className="text-[#252525] text-center text-[12px] font-semibold leading-[110%] tracking-[-0.24px]">Height</span>
                                         <span className="text-[#535359] text-center text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
-                                            {clientData?.height ? `${clientData.height} cm` : '180 cm'}
+                                            {clientData?.height ? `${clientData.height} cm` : '- cm'}
                                         </span>
                                     </div>
                                     <div className=' border-[#D9D9D9] border-[1px]'></div>
                                     <div className='flex flex-col gap-3 items-center'>
                                         <span className="text-[#252525] text-center text-[12px] font-semibold leading-[110%] tracking-[-0.24px]">Weight</span>
                                         <span className="text-[#535359] text-center text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
-                                            {clientData?.weight ? `${clientData.weight}kg` : '65kg'}
+                                            {clientData?.weight ? `${clientData.weight}kg` : '- kg'}
                                         </span>
                                     </div>
 
@@ -1052,7 +1052,8 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                             href={{
                                                 pathname: '/planhistory',
                                                 query: {
-                                                    profile_id: profileId
+                                                    profile_id: profileId,
+                                                   
                                                 }
                                             }}
                                             className='flex flex-col'
@@ -1090,7 +1091,8 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                             href={{
                                                 pathname: '/planhistory',
                                                 query: {
-                                                    profile_id: profileId
+                                                    profile_id: profileId,
+                                                   
                                                 }
                                             }}
                                             className='flex flex-col'
@@ -1121,9 +1123,55 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                         </Link>
                                     ))}
 
+ {/* Not Started */}
+                                     {clientData?.plans_summary?.not_started?.map((plan, index) => (
+    <Link
+      key={`not-started-${index}`}
+      href={{
+        pathname: '/planhistory',
+        query: {
+          profile_id: profileId,
+          
+        }
+      }}
+      className='flex flex-col'
+    >
+      <div className='flex gap-[25px] justify-between'>
+        <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>{plan.plan_title}</span>
+        <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>
+          {new Date(plan.plan_start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}-{new Date(plan.plan_end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+        </span>
+      </div>
+
+      <div className='flex justify-between'>
+        <div>
+          <span className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize'>
+            Updated {new Date(plan.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, {new Date(plan.updated_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}
+          </span>
+        </div>
+        <div className='flex gap-[3px] items-center'>
+          <Image
+            src="/icons/clock.svg" // You might want a different icon for not started plans
+            alt='not started'
+            width={12}
+            height={12}
+          />
+          <span className='text-[#FFA500] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Not Started</span>
+        </div>
+      </div>
+    </Link>
+  ))}
+
                                     {/* Fallback to original data if no API data */}
-                                    {(!clientData?.plans_summary?.active?.length && !clientData?.plans_summary?.completed?.length) && (
-                                        // <>
+                                   
+
+
+                                    {(!clientData?.plans_summary?.active?.length && 
+    !clientData?.plans_summary?.completed?.length && 
+    !clientData?.plans_summary?.not_started?.length) && (
+    <p className='text-[18px] text-[#252525]'>No Data found</p>
+
+     // <>
                                         //     <div className='flex flex-col '>
                                         //         <div className='flex gap-[25px] justify-between '>
                                         //             <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] cursor-pointer'>1-Month Plan</span>
@@ -1171,8 +1219,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
 
                                         //     </div>
                                         // </>
-                                        <p className='text-[18px] text-[#252525]'>No Data found</p>
-                                    )}
+  )}
                                 </div>
 
                             </div>

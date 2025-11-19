@@ -541,7 +541,7 @@ export default function ClientTable({ showUserProfile = true, showDailyStatusHea
   const handleRowClick = (client) => {
   
     const params = new URLSearchParams({
-        dietician_id: client.dieticianId,
+        //dietician_id: client.dieticianId,
       profile_id: client.profileId
     });
     router.push(`/profile?${params.toString()}`);

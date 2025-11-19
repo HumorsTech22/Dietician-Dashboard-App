@@ -2383,7 +2383,7 @@ const getDayTotals = () => {
                       ? `PDF Extraction Error: ${extractedData.result.error}`
                       : planSummary && extractedData?.result
                         ? `No diet plan data available for ${selectedDayObj?.day}.`
-                        : 'Loading plan data...'
+                        : 'Please Repload the pdf'
                     }
                   </span>
                 </div>

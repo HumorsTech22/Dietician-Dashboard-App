@@ -32,7 +32,7 @@ export default function RootLayout({ children }) {
           </div>
 
           <div className="fixed top-4 right-4 z-50">
-            <Toaster />
+            <Toaster position="top-right"/>
           </div>
     </Providers>
       </body>
