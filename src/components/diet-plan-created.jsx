@@ -1948,7 +1948,6 @@ export default function DietPlanCreated() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [planSummary, setPlanSummary] = useState(null);
-  console.log("planSummary1951:-", planSummary);
   const [allDays, setAllDays] = useState([]);
 const [windowStartIndex, setWindowStartIndex] = useState(0);
 

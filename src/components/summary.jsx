@@ -343,12 +343,10 @@ import { toast } from 'sonner'
 
 export default function Summary({ onConfirmNext }) {
   const [planTitle, setPlanTitle] = useState('');
-  console.log("planTitle346:-", planTitle);
   const [approachInput, setApproachInput] = useState('');
   const [approachTags, setApproachTags] = useState([]);
   const [goals, setGoals] = useState([{ id: 1, title: '', current: '', target: '' }]);
   const [goalUnits, setGoalUnits] = useState([{ id: 1, currentUnit: 'Unit', targetUnit: 'Unit' }]);
-  console.log("goalUnits351:-", goalUnits);
   const [isDiabetic, setIsDiabetic] = useState(false);
   const [dietType, setDietType] = useState('');
   const [showDietDropdown, setShowDietDropdown] = useState(false);
@@ -901,7 +899,7 @@ const prepareFormData = () => {
             </div>
 
             <div className="flex-1">
-           <div className="flex items-center">
+           {/* <div className="flex items-center">
   <div className='px-[9px] pt-[5px] pb-[5px] text-[#252525] text-[12px] leading-normal font-semibold tracking-[-0.24px]'>
     Client is diabetic?
   </div>
@@ -933,7 +931,7 @@ const prepareFormData = () => {
     <span className="text-[14px] text-[#252525]">No</span>
   </label>
 </div>
-</div>
+</div> */}
               {errors.isDiabetic && (
                 <div className="flex gap-[5px] items-center mt-1">
                   <Image src="/icons/hugeicons_information-circle-redd.png" alt="info" width={15} height={15} />

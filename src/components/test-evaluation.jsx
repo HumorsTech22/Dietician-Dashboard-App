@@ -276,7 +276,6 @@ import { useSelector } from "react-redux"
 
 export default function TestEvaluation() {
   const scoresInsight = useSelector((state) => state.scoresInsight?.data);
-console.log("scoresInsight279:-", scoresInsight);
   const formatDate = (dateString) => {
     if (!dateString) return '';
     
@@ -307,7 +306,6 @@ console.log("scoresInsight279:-", scoresInsight);
   const scores = scoresInsight?.latest_test?.scores;
   const testDate = scoresInsight?.latest_test?.date_time;
   const metabolismScores = scoresInsight?.latest_test?.test_json?.Metabolism_Score_Analysis;
-  console.log("metabolismScores310:-", metabolismScores);
 
   return (
     <>

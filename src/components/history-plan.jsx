@@ -314,9 +314,7 @@ import { cookieManager } from "../lib/cookies"
 export default function HistoryPlan() {
     
   const clientProfile = useSelector((state) => state.clientProfile?.data);
-  console.log("clientProfile317:-", clientProfile);
   const [clientLogData, setClientLogData] = useState(null);
-  console.log("clientLogData315:-", clientLogData);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   

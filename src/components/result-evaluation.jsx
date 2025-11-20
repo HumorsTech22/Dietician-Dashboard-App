@@ -200,6 +200,7 @@
 
 
 
+
 "use client";
 import React, { useMemo, useState } from "react";
 import { IoChevronBackSharp } from "react-icons/io5";
@@ -229,8 +230,7 @@ const WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export const ResultEvaluation = () => {
   const clientData = useSelector((state) => state.clientProfile.data);
-
-  
+  const isLoading = useSelector((state) => state.clientProfile.loading);
 
   const hasActivePlan =
     clientData?.plans_summary?.active &&
@@ -243,28 +243,46 @@ export const ResultEvaluation = () => {
 
   // today + selected state
   const today = startOfDay(new Date());
-  
-  // Set boundaries to plan dates only
-  const minDate = planStartDate;
-  const maxDate = planEndDate;
 
-  // Set initial selected date to plan start date
+  // --------------------------------------------------------
+  // FIX: Highlight TODAY always when inside plan range
+  // --------------------------------------------------------
   const getInitialSelectedDate = () => {
-    if (!planStartDate) return today;
-    return planStartDate;
+    if (!planStartDate || !planEndDate) return today;
+
+    if (today < planStartDate) return planStartDate;
+    if (today > planEndDate) return planEndDate;
+
+    return today; // << always highlight today
   };
 
-  const [selectedDate, setSelectedDate] = useState(getInitialSelectedDate);
+  const [selectedDate, setSelectedDate] = useState(() => getInitialSelectedDate());
 
   // calendar strip window (16 boxes)
   const VISIBLE_COUNT = 16;
 
-  // Initial window starts at plan start date
+  // --------------------------------------------------------
+  // FIX: Window should start around TODAY instead of plan start
+  // --------------------------------------------------------
   const getInitialWindowStart = () => {
-    return planStartDate || today;
+    if (!planStartDate || !planEndDate) return today;
+
+    if (today < planStartDate) return planStartDate;
+    if (today > planEndDate) return addDays(planEndDate, 1 - VISIBLE_COUNT);
+
+    const middleStart = addDays(today, -Math.floor(VISIBLE_COUNT / 2));
+
+    if (middleStart < planStartDate) return planStartDate;
+
+    const lastPossible = addDays(middleStart, VISIBLE_COUNT - 1);
+    if (lastPossible > planEndDate) {
+      return addDays(planEndDate, 1 - VISIBLE_COUNT);
+    }
+
+    return middleStart;
   };
 
-  const [windowStart, setWindowStart] = useState(getInitialWindowStart);
+  const [windowStart, setWindowStart] = useState(() => getInitialWindowStart());
 
   // Navigation constraints based on plan dates
   const canGoPrev = planStartDate && startOfDay(windowStart).getTime() > planStartDate.getTime();
@@ -281,10 +299,7 @@ export const ResultEvaluation = () => {
     });
   }, [windowStart]);
 
-
-   const isLoading = !clientData; // or use a specific loading flag from your Redux state
-
-  // Show loading while data is being fetched
+  // Loading
   if (isLoading) {
     return (
       <div className="w-full bg-white px-[15px] py-[30px] rounded-[15px]">
@@ -301,14 +316,12 @@ export const ResultEvaluation = () => {
     );
   }
 
-
-
-  // if no active plan → show NoPlans screen
+  // No active plan
   if (!hasActivePlan) {
     return <NoPlans />;
   }
 
-  // if no plan dates, show message
+  // If no dates
   if (!planStartDate || !planEndDate) {
     return (
       <div className="w-full bg-white px-[15px] py-[30px] rounded-[15px]">
@@ -326,25 +339,22 @@ export const ResultEvaluation = () => {
   }
 
   const handleDateClick = (date) => {
-    // Only allow selection if date is within plan range
     if (date < planStartDate || date > planEndDate) return;
-    setSelectedDate(date);
+    setSelectedDate(startOfDay(date));
   };
 
   const handlePrevClick = () => {
     if (!canGoPrev) return;
     const newWindowStart = addDays(windowStart, -VISIBLE_COUNT);
-    // Ensure we don't go before plan start date
     setWindowStart(newWindowStart < planStartDate ? planStartDate : newWindowStart);
   };
 
   const handleNextClick = () => {
     if (!canGoNext) return;
     const newWindowStart = addDays(windowStart, VISIBLE_COUNT);
-    // Ensure the last date in window doesn't exceed plan end date
     const lastDateInNewWindow = addDays(newWindowStart, VISIBLE_COUNT - 1);
+
     if (lastDateInNewWindow > planEndDate) {
-      // Adjust window start so the last date is exactly plan end date
       const adjustedWindowStart = addDays(planEndDate, 1 - VISIBLE_COUNT);
       setWindowStart(adjustedWindowStart);
     } else {
@@ -352,8 +362,7 @@ export const ResultEvaluation = () => {
     }
   };
 
-  // Filter dates to only show those within plan range
-  const visibleDates = dates.filter(item => {
+  const visibleDates = dates.filter((item) => {
     const itemDate = startOfDay(item.date);
     return itemDate >= planStartDate && itemDate <= planEndDate;
   });
@@ -375,76 +384,77 @@ export const ResultEvaluation = () => {
           </span>
         </div>
 
-       <div className="flex items-center justify-between">
-  <IoChevronBackSharp
-    className={[
-      "w-[52px] h-[52px] py-[13px] pl-2.5",
-      canGoPrev ? "cursor-pointer" : "opacity-40 cursor-not-allowed",
-    ].join(" ")}
-    onClick={handlePrevClick}
-    title={canGoPrev ? "Previous" : "Beginning of plan period"}
-    aria-disabled={!canGoPrev}
-  />
+        {/* ----------------- DATE ROW ----------------- */}
+        <div className="flex items-center justify-between">
+          <IoChevronBackSharp
+            className={[
+              "w-[52px] h-[52px] py-[13px] pl-2.5",
+              canGoPrev ? "cursor-pointer" : "opacity-40 cursor-not-allowed",
+            ].join(" ")}
+            onClick={handlePrevClick}
+            title={canGoPrev ? "Previous" : "Beginning of plan period"}
+            aria-disabled={!canGoPrev}
+          />
 
-  {visibleDates.map((item, idx) => {
-    const isToday = startOfDay(item.date).getTime() === today.getTime();
-    const isSelected = startOfDay(item.date).getTime() === startOfDay(selectedDate).getTime();
-    const isFutureDate = item.date > today;
-    const isSelectable = !isFutureDate && item.date >= planStartDate && item.date <= planEndDate;
+          {visibleDates.map((item, idx) => {
+            const isToday = startOfDay(item.date).getTime() === today.getTime();
+            const isSelected = startOfDay(item.date).getTime() === startOfDay(selectedDate).getTime();
+            const isFutureDate = item.date > today;
+            const isSelectable = !isFutureDate && item.date >= planStartDate && item.date <= planEndDate;
 
-    return (
-      <div
-        key={idx}
-        onClick={() => isSelectable && setSelectedDate(item.date)}
-        title={isFutureDate ? "Future dates are not selectable" : `Select ${item.date.toDateString()}`}
-        className={[
-          "flex flex-col px-[7px] py-2 gap-1 rounded-[12px] select-none",
-          isSelectable ? "cursor-pointer" : "cursor-not-allowed opacity-50",
-          isSelected
-            ? "bg-[#308BF9] text-white"
-            : "text-[#535359]",
-        ].join(" ")}
-      >
-        <span className="text-center text-[15px] font-semibold leading-[126%] tracking-[-0.3px]">
-          {item.day}
-        </span>
-        <span className="text-center text-[10px] font-normal leading-normal tracking-[-0.2px]">
-          {item.week}
-        </span>
+            return (
+              <div
+                key={idx}
+                onClick={() => isSelectable && setSelectedDate(item.date)}
+                title={
+                  isFutureDate
+                    ? "Future dates are not selectable"
+                    : `Select ${item.date.toDateString()}`
+                }
+                className={[
+                  "flex flex-col px-[7px] py-2 gap-1 rounded-[12px] select-none",
+                  isSelectable ? "cursor-pointer" : "cursor-not-allowed opacity-50",
+                  isSelected ? "bg-[#308BF9] text-white" : "text-[#535359]",
+                ].join(" ")}
+              >
+                <span className="text-center text-[15px] font-semibold leading-[126%] tracking-[-0.3px]">
+                  {item.day}
+                </span>
+                <span className="text-center text-[10px] font-normal leading-normal tracking-[-0.2px]">
+                  {item.week}
+                </span>
 
-        {/* {isToday && !isSelected && (
-          <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-[#308BF9]" />
-        )}
-         */}
-        {/* Show plan boundary indicators */}
-        {/* {startOfDay(item.date).getTime() === planStartDate.getTime() && !isSelected && (
-          <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-green-500" title="Plan start" />
-        )} */}
-        {/* {startOfDay(item.date).getTime() === planEndDate.getTime() && !isSelected && (
-          <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-red-500" title="Plan end" />
-        )} */}
+                {/* {isToday && !isSelected && (
+                  <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-[#308BF9]" />
+                )} */}
 
-        {/* Today indicator */}
-        {isToday && !isSelected && (
-          <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-[#308BF9]" />
-        )}
-        
-        
-      </div>
-    );
-  })}
+                {/* Show plan boundary indicators */}
+                {/* {startOfDay(item.date).getTime() === planStartDate.getTime() && !isSelected && (
+                  <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-green-500" title="Plan start" />
+                )} */}
 
-  <IoIosArrowForward
-    className={[
-      "w-[52px] h-[52px] py-[13px] pl-2.5",
-      canGoNext ? "cursor-pointer" : "opacity-40 cursor-not-allowed",
-    ].join(" ")}
-    onClick={handleNextClick}
-    title={canGoNext ? "Next" : "End of plan period"}
-    aria-disabled={!canGoNext}
-  />
-</div>
+                {/* {startOfDay(item.date).getTime() === planEndDate.getTime() && !isSelected && (
+                  <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-red-500" title="Plan end" />
+                )} */}
 
+                {/* Today indicator */}
+                {isToday && !isSelected && (
+                  <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-[#308BF9]" />
+                )}
+              </div>
+            );
+          })}
+
+          <IoIosArrowForward
+            className={[
+              "w-[52px] h-[52px] py-[13px] pl-2.5",
+              canGoNext ? "cursor-pointer" : "opacity-40 cursor-not-allowed",
+            ].join(" ")}
+            onClick={handleNextClick}
+            title={canGoNext ? "Next" : "End of plan period"}
+            aria-disabled={!canGoNext}
+          />
+        </div>
 
         <div className="my-[20px] border border-[#E1E6ED]"></div>
         <TestEvaluation />

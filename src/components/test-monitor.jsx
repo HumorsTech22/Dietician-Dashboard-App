@@ -219,12 +219,12 @@ export default function TestMonitor() {
                     Client Not tracked
                   </span>
                 </div>
-                <div className="flex gap-2.5">
+                {/* <div className="flex gap-2.5">
                   <span className="text-[#308BF9] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] whitespace-nowrap">
                     Send Reminder
                   </span>
                   <IoIosArrowForward className="text-[#308BF9]" />
-                </div>
+                </div> */}
               </div>
               {loading ? (
                 <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">...</span>
