@@ -476,7 +476,7 @@ export default function MealLogged() {
                 if (range && range.end < today) {
                   return `No Data Found for ${fmt(range.start)} - ${fmt(range.end)}`;
                 } else {
-                  return `Analysis will be generated after ${fmt(range.start)} - ${fmt(range.end)}`;
+                  return `Analysis will be available after ${fmt(range.end)} 9pm`;
                 }
               })()}
             </span>
