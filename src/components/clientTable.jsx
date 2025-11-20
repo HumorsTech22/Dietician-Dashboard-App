@@ -379,6 +379,7 @@ export default function ClientTable({ showUserProfile = true, showDailyStatusHea
    activeTab = "all"
 }) {
 
+
   const [search, setSearch] = useState("");
      const router = useRouter();
 

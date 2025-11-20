@@ -8,7 +8,6 @@ import {  useSelector } from 'react-redux';
 export default function NoPlans() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const clientData = useSelector((state) => state.clientProfile.data);
-  console.log("clientData11:-", clientData);
 
   const handleCreatePlanClick = () => {
     // Clear localStorage when creating a new plan

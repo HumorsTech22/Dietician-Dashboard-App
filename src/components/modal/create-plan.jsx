@@ -282,7 +282,6 @@ export default function CreatePlanModal({ open, onClose }) {
   const [selectedPlan, setSelectedPlan] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadedFile, setLocalUploadedFile] = useState(null);
-  console.log("uploadedFile285:-", uploadedFile);
   const [blobUrl, setBlobUrl] = useState(null);
   const [urlParams, setUrlParams] = useState({ dietician_id: null, profile_id: null });
 
@@ -354,7 +353,8 @@ export default function CreatePlanModal({ open, onClose }) {
       return url;
     });
 
-    toast.success(`File selected: ${file.name}`);
+    //toast.success(`File selected: ${file.name}`);
+    return `File selected: ${file.name}`;
   };
 
   const storeFileInLocalStorage = (file) => {

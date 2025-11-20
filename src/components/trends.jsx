@@ -1041,7 +1041,6 @@ const getZoneSegmentsForScoreType = (scoreType) => {
     // If we have actual metabolism data
     if (hasActualData) {
       const metabolismData = testJson.Metabolism_Score_Analysis;
-      console.log("metabolismData1044:-", metabolismData);
 
       const getZoneColor = (zone) => {
         switch (zone) {

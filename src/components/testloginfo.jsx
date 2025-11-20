@@ -240,7 +240,6 @@ export default function TestLogInfo({ onConfirmNext }) {
   
   // NEW: Separate variable to store the subtraction result
   const [subtractionResult, setSubtractionResult] = useState(0);
-console.log("subtractionResult243:-", subtractionResult);
   const [isLoading, setIsLoading] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
   const [apiResponse, setApiResponse] = useState(null);
@@ -269,7 +268,6 @@ console.log("subtractionResult243:-", subtractionResult);
         }
 
         const resp = await fetchTestRemaining(dietitianId);
-        console.log("TESTREMAINING resp:", resp);
 
         if (resp?.success) {
           const remainingFromApi = parseInt(resp.remaining, 10) || 0;
@@ -307,7 +305,6 @@ console.log("subtractionResult243:-", subtractionResult);
   const loadFromLocalStorage = () => {
     try {
       const savedData = localStorage.getItem("planSummary");
-      console.log("planSummary from LS:", savedData);
       if (savedData) {
         const data = JSON.parse(savedData);
 
@@ -321,7 +318,6 @@ console.log("subtractionResult243:-", subtractionResult);
             data.plan_start_date,
             data.plan_end_date
           );
-          console.log("calculatedDays:", calculatedDays);
           setPlanDays(calculatedDays || "");
         }
       }
@@ -339,20 +335,17 @@ console.log("subtractionResult243:-", subtractionResult);
     const allotted = parseInt(planDays, 10) || 0;
     const remaining = parseInt(baseRemaining, 10) || 0;
 
-    console.log("DEBUG: baseRemaining:", remaining, "planDays:", allotted);
 
     // sync testsAllotted with planDays (for submit)
     setTestsAllotted(allotted ? String(allotted) : "");
 
     const finalRemaining = remaining - allotted;
-    console.log("DEBUG: finalRemaining:", finalRemaining);
 
     // Store in both variables
     const result = finalRemaining >= 0 ? finalRemaining : 0;
     setTestRemaining(result);
     setSubtractionResult(result); // NEW: Store in separate variable
-    
-    console.log("DEBUG: subtractionResult stored:", result);
+  
   }, [planDays, baseRemaining]);
 
   // Rest of your code remains the same...
@@ -451,7 +444,6 @@ console.log("subtractionResult243:-", subtractionResult);
       startProgress(300000, 98);
 
       const pdfData = JSON.parse(savedPdf);
-      console.log("PDF Data from localStorage:", pdfData);
 
       let pdfFile;
 
@@ -461,10 +453,9 @@ console.log("subtractionResult243:-", subtractionResult);
         pdfFile = new File([blob], pdfData.name || "diet_plan.pdf", {
           type: "application/pdf",
         });
-        console.log("PDF created from base64 data");
+  
       } else if (pdfData.blobUrl) {
         try {
-          console.log("Attempting to use blob URL:", pdfData.blobUrl);
           const response = await fetch(pdfData.blobUrl);
           if (!response.ok) {
             throw new Error(
@@ -475,7 +466,7 @@ console.log("subtractionResult243:-", subtractionResult);
           pdfFile = new File([blob], pdfData.name || "diet_plan.pdf", {
             type: "application/pdf",
           });
-          console.log("PDF created from blob URL");
+
         } catch (blobError) {
           console.error("Blob URL failed:", blobError);
           throw new Error(
@@ -492,11 +483,6 @@ console.log("subtractionResult243:-", subtractionResult);
         throw new Error("Created PDF file is empty or invalid");
       }
 
-      console.log("PDF File ready for upload:", {
-        name: pdfFile.name,
-        size: pdfFile.size,
-        type: pdfFile.type,
-      });
 
       const formData = new FormData();
       formData.append("file", pdfFile);
@@ -541,7 +527,10 @@ console.log("subtractionResult243:-", subtractionResult);
 
   // ========= 8) Submit Plan Summary =========
 const submitPlanSummary = async () => {
-  if (!validateForm()) return;
+ 
+  if (!validateForm()) {
+    return;
+  }
 
   setIsLoading(true);
   startProgress(8000, 90);
@@ -556,20 +545,32 @@ const submitPlanSummary = async () => {
 
     const planSummary = JSON.parse(planSummaryData);
     const urlParams = new URLSearchParams(window.location.search);
-    const dietitianId = urlParams.get("dietician_id");
     const clientId = urlParams.get("profile_id");
-    const cookieDietician = getCookie("dietician");
-    const effectiveDieticianId = dietitianId || cookieDietician || "";
+    
+    // FIX: Parse the dietician cookie to extract just the ID
+    const dieticianCookie = getCookie("dietician");
+    
+    let effectiveDieticianId = "";
+    if (dieticianCookie) {
+      try {
+        const dieticianData = JSON.parse(dieticianCookie);
+        effectiveDieticianId = dieticianData.dietician_id || "";
+      } catch (parseError) {
+        console.error("Error parsing dietician cookie:", parseError);
+      }
+    }
+
     const effectiveClientId = clientId || "";
 
     if (!effectiveDieticianId || !effectiveClientId) {
+
       toast.error("Missing dietician ID or client ID (URL/cookie)");
       resetProgress();
       return;
     }
 
     const requestBody = {
-      dietitian_id: effectiveDieticianId,
+      dietitian_id: effectiveDieticianId, // Now this is just "RespyrD02"
       client_id: effectiveClientId,
       plan_title: planSummary.plan_title || "",
       plan_start_date: planSummary.plan_start_date || "",
@@ -582,13 +583,11 @@ const submitPlanSummary = async () => {
       goal: planSummary.goal || [],
       approach: planSummary.approach || "",
       status: "active",
-     
       diet_type: planSummary.diet_type || "", 
       is_diabetic: planSummary.is_diabetic || false, 
       carbs_target: planSummary.carbs_target || 0, 
       fat_target: planSummary.fat_target || 0, 
     };
-
 
 
     const resp = await submitPlanSummaryService(requestBody);
@@ -625,16 +624,21 @@ const submitPlanSummary = async () => {
   }
 };
 
-  const handleConfirmNext = () => {
+  const handleConfirmNext = () => {   
+      
     const savedPdf = localStorage.getItem("uploadedPdfFile");
+    
     if (!savedPdf) {
+    
       toast.error("Please upload a PDF file before proceeding.");
       return;
     }
 
     try {
       const pdfData = JSON.parse(savedPdf);
+        
       if (!pdfData.data && !pdfData.blobUrl) {
+         
         toast.error("Invalid PDF data. Please re-upload the PDF file.");
         return;
       }

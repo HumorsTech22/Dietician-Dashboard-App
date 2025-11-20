@@ -564,10 +564,12 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
    const dieticianCookie = cookieManager.getJSON('dietician');
  const dieticianId = dieticianCookie?.dietician_id || '';
     const profileId = searchParams?.get('profile_id') || '';
+ 
 
     const hideClientBits = (pathname || '').toLowerCase().includes('testlog-info')
         || (pathname || '').toLowerCase().includes('plan-summary')
         || (pathname || '').toLowerCase().endsWith('/plansummary');
+
 
     const options = [
         { value: "automatically", label: "Automatically fill" },
@@ -577,11 +579,13 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
 
     // Fetch client profile data
     useEffect(() => {
+    
+
         const loadClientProfile = async () => {
             try {
                 setLoading(true);
-                const response = await fetchClientProfileData(dieticianId, profileId);
 
+                const response = await fetchClientProfileData(dieticianId, profileId);
                 if (response.success && response.data) {
                     setClientData(response.data);
                     dispatch(setClientProfile(response.data));
@@ -707,7 +711,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                 </span>
                             ) : (
                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>
-                                    {clientData?.profile_name || 'N/A'}
+                                    {clientData?.profile_name || 'sagar'}
                                 </span>
                             )}
                         </div>
