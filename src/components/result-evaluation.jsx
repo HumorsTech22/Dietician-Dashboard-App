@@ -199,8 +199,6 @@
 
 
 
-
-
 "use client";
 import React, { useMemo, useState } from "react";
 import { IoChevronBackSharp } from "react-icons/io5";
@@ -213,67 +211,101 @@ import { useSelector } from "react-redux";
 import Image from "next/image";
 import NoPlans from "./no-plans";
 
+// Utility function to pad single digit numbers with leading zero
 function pad2(n) {
   return n.toString().padStart(2, "0");
 }
+
+// Utility function to set time to start of day (00:00:00)
 function startOfDay(d) {
   const x = new Date(d);
   x.setHours(0, 0, 0, 0);
   return x;
 }
+
+// Utility function to add/subtract days from a date
 function addDays(d, n) {
   const x = new Date(d);
   x.setDate(x.getDate() + n);
   return x;
 }
+
+// Array of weekday abbreviations
 const WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export const ResultEvaluation = () => {
+  // Get client data from Redux store
   const clientData = useSelector((state) => state.clientProfile.data);
+  console.log("clientData233:-", clientData);
   const isLoading = useSelector((state) => state.clientProfile.loading);
 
+  // Check for different plan statuses in the client data
   const hasActivePlan =
     clientData?.plans_summary?.active &&
     clientData.plans_summary.active.length > 0;
+  
+  const hasNotStartedPlan =
+    clientData?.plans_summary?.not_started &&
+    clientData.plans_summary.not_started.length > 0;
 
-  // Get plan dates from active plan
+  const hasCompletedPlan =
+    clientData?.plans_summary?.completed &&
+    clientData.plans_summary.completed.length > 0;
+
+  // Get plan data based on priority: active > not_started > completed
   const activePlan = hasActivePlan ? clientData.plans_summary.active[0] : null;
-  const planStartDate = activePlan ? startOfDay(new Date(activePlan.plan_start_date)) : null;
-  const planEndDate = activePlan ? startOfDay(new Date(activePlan.plan_end_date)) : null;
+  const notStartedPlan = hasNotStartedPlan ? clientData.plans_summary.not_started[0] : null;
+  const completedPlan = hasCompletedPlan ? clientData.plans_summary.completed[0] : null;
+  
+  // Determine which plan to use (priority order - active plans take precedence)
+  const currentPlan = activePlan || notStartedPlan || completedPlan;
+  
+  // Extract plan start and end dates from the current plan
+  const planStartDate = currentPlan ? startOfDay(new Date(currentPlan.plan_start_date)) : null;
+  const planEndDate = currentPlan ? startOfDay(new Date(currentPlan.plan_end_date)) : null;
 
-  // today + selected state
+  // Check specific plan status for conditional rendering
+  const isPlanNotStarted = hasNotStartedPlan && !hasActivePlan;
+  const isPlanCompleted = hasCompletedPlan && !hasActivePlan && !hasNotStartedPlan;
+
+  // Get today's date at start of day for comparisons
   const today = startOfDay(new Date());
 
-  // --------------------------------------------------------
-  // FIX: Highlight TODAY always when inside plan range
-  // --------------------------------------------------------
+  // Function to determine initial selected date
   const getInitialSelectedDate = () => {
     if (!planStartDate || !planEndDate) return today;
 
+    // If today is before plan start, select plan start date
     if (today < planStartDate) return planStartDate;
+    // If today is after plan end, select plan end date
     if (today > planEndDate) return planEndDate;
 
-    return today; // << always highlight today
+    // Default to today if within plan range
+    return today;
   };
 
+  // State for currently selected date in the calendar
   const [selectedDate, setSelectedDate] = useState(() => getInitialSelectedDate());
 
-  // calendar strip window (16 boxes)
+  // Number of dates to show in the calendar strip
   const VISIBLE_COUNT = 16;
 
-  // --------------------------------------------------------
-  // FIX: Window should start around TODAY instead of plan start
-  // --------------------------------------------------------
+  // Function to determine initial window start for calendar
   const getInitialWindowStart = () => {
     if (!planStartDate || !planEndDate) return today;
 
+    // If today is before plan start, start from plan start
     if (today < planStartDate) return planStartDate;
+    // If today is after plan end, show the last possible window
     if (today > planEndDate) return addDays(planEndDate, 1 - VISIBLE_COUNT);
 
+    // Try to center today in the middle of the visible window
     const middleStart = addDays(today, -Math.floor(VISIBLE_COUNT / 2));
 
+    // Adjust if middle start is before plan start
     if (middleStart < planStartDate) return planStartDate;
 
+    // Check if the window would extend beyond plan end
     const lastPossible = addDays(middleStart, VISIBLE_COUNT - 1);
     if (lastPossible > planEndDate) {
       return addDays(planEndDate, 1 - VISIBLE_COUNT);
@@ -282,24 +314,37 @@ export const ResultEvaluation = () => {
     return middleStart;
   };
 
+  // State for the starting date of the visible calendar window
   const [windowStart, setWindowStart] = useState(() => getInitialWindowStart());
 
-  // Navigation constraints based on plan dates
+  // Navigation constraints - check if we can go previous/next
   const canGoPrev = planStartDate && startOfDay(windowStart).getTime() > planStartDate.getTime();
   const canGoNext = planEndDate && startOfDay(addDays(windowStart, VISIBLE_COUNT - 1)).getTime() < planEndDate.getTime();
 
+  // Memoized array of dates for the visible calendar window
   const dates = useMemo(() => {
     return Array.from({ length: VISIBLE_COUNT }, (_, i) => {
       const d = startOfDay(addDays(windowStart, i));
       return {
         date: d,
-        day: pad2(d.getDate()),
-        week: WEEK[d.getDay()],
+        day: pad2(d.getDate()), // Padded day (01, 02, etc.)
+        week: WEEK[d.getDay()], // Weekday abbreviation
       };
     });
   }, [windowStart]);
 
-  // Loading
+  // Utility function to format dates for display
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  // =========================================================================
+  // LOADING STATE
+  // =========================================================================
   if (isLoading) {
     return (
       <div className="w-full bg-white px-[15px] py-[30px] rounded-[15px]">
@@ -316,12 +361,16 @@ export const ResultEvaluation = () => {
     );
   }
 
-  // No active plan
-  if (!hasActivePlan) {
+  // =========================================================================
+  // NO PLANS STATE - No active, not_started, or completed plans
+  // =========================================================================
+  if (!hasActivePlan && !hasNotStartedPlan && !hasCompletedPlan) {
     return <NoPlans />;
   }
 
-  // If no dates
+  // =========================================================================
+  // NO DATES AVAILABLE STATE - Plan exists but dates are missing/invalid
+  // =========================================================================
   if (!planStartDate || !planEndDate) {
     return (
       <div className="w-full bg-white px-[15px] py-[30px] rounded-[15px]">
@@ -338,22 +387,178 @@ export const ResultEvaluation = () => {
     );
   }
 
+  // =========================================================================
+  // NOT STARTED PLAN STATE - Show "Will Start" message
+  // =========================================================================
+  if (isPlanNotStarted) {
+    return (
+      <div className="w-full bg-white px-[15px] py-[30px] rounded-[15px]">
+        <div className="flex justify-start ml-[15px]">
+          <p className="text-[#252525] text-center text-[25px] font-semibold leading-normal tracking-[-1px]">
+            Result Evaluation
+          </p>
+        </div>
+        <div className="my-[20px] border border-[#E1E6ED]"></div>
+        <div className="text-center py-10">
+          <div className="flex flex-col items-center justify-center">
+            {/* Main message */}
+            <p className="text-[#535359] text-[18px] font-semibold mb-2">
+              Plan Will Start On
+            </p>
+            {/* Formatted start date */}
+            <p className="text-[#308BF9] text-[20px] font-bold">
+              {formatDate(currentPlan.plan_start_date)}
+            </p>
+            {/* Additional information */}
+            <p className="text-[#535359] text-[14px] mt-4">
+              Your result evaluation will be available once your plan begins.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // COMPLETED PLAN STATE - Show completion message with historical data access
+  // =========================================================================
+  if (isPlanCompleted) {
+    return (
+      <div className="w-full bg-white px-[15px] py-[30px] rounded-[15px]">
+        <div className="flex justify-start ml-[15px]">
+          <p className="text-[#252525] text-center text-[25px] font-semibold leading-normal tracking-[-1px]">
+            Result Evaluation
+          </p>
+        </div>
+        <div className="my-[20px] border border-[#E1E6ED]"></div>
+        
+        {/* Completion Message Section */}
+        <div className="text-center py-10">
+          <div className="flex flex-col items-center justify-center">
+            {/* Main completion message */}
+            <p className="text-[#535359] text-[18px] font-semibold mb-2">
+              Plan Has Been Completed
+            </p>
+            {/* Date range display */}
+            <div className="flex items-center gap-2 mb-4">
+              <p className="text-[#308BF9] text-[16px] font-bold">
+                {formatDate(currentPlan.plan_start_date)}
+              </p>
+              <span className="text-[#535359]">to</span>
+              <p className="text-[#308BF9] text-[16px] font-bold">
+                {formatDate(currentPlan.plan_end_date)}
+              </p>
+            </div>
+            {/* Additional information */}
+            <p className="text-[#535359] text-[14px] mt-2">
+              This plan has been completed. You can view your historical data below.
+            </p>
+          </div>
+        </div>
+
+        {/* Historical Data Section - Allow access to completed plan data */}
+        <div className="flex flex-col gap-[20px]">
+          <div className="ml-4">
+            <span className="text-[#535359] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">
+              Select a date from completed plan
+            </span>
+          </div>
+
+          {/* ----------------- DATE ROW FOR COMPLETED PLAN ----------------- */}
+          <div className="flex items-center justify-between">
+            {/* Previous arrow */}
+            <IoChevronBackSharp
+              className={[
+                "w-[52px] h-[52px] py-[13px] pl-2.5",
+                canGoPrev ? "cursor-pointer" : "opacity-40 cursor-not-allowed",
+              ].join(" ")}
+              onClick={handlePrevClick}
+              title={canGoPrev ? "Previous" : "Beginning of plan period"}
+              aria-disabled={!canGoPrev}
+            />
+
+            {/* Date boxes */}
+            {dates.map((item, idx) => {
+              const itemDate = startOfDay(item.date);
+              const isSelected = itemDate.getTime() === startOfDay(selectedDate).getTime();
+              const isInPlanRange = itemDate >= planStartDate && itemDate <= planEndDate;
+
+              // Only show dates within the completed plan range
+              if (!isInPlanRange) return null;
+
+              return (
+                <div
+                  key={idx}
+                  onClick={() => setSelectedDate(item.date)}
+                  title={`Select ${item.date.toDateString()}`}
+                  className={[
+                    "flex flex-col px-[7px] py-2 gap-1 rounded-[12px] select-none cursor-pointer",
+                    isSelected ? "bg-[#308BF9] text-white" : "text-[#535359]",
+                  ].join(" ")}
+                >
+                  <span className="text-center text-[15px] font-semibold leading-[126%] tracking-[-0.3px]">
+                    {item.day}
+                  </span>
+                  <span className="text-center text-[10px] font-normal leading-normal tracking-[-0.2px]">
+                    {item.week}
+                  </span>
+                </div>
+              );
+            })}
+
+            {/* Next arrow */}
+            <IoIosArrowForward
+              className={[
+                "w-[52px] h-[52px] py-[13px] pl-2.5",
+                canGoNext ? "cursor-pointer" : "opacity-40 cursor-not-allowed",
+              ].join(" ")}
+              onClick={handleNextClick}
+              title={canGoNext ? "Next" : "End of plan period"}
+              aria-disabled={!canGoNext}
+            />
+          </div>
+
+          <div className="my-[20px] border border-[#E1E6ED]"></div>
+          {/* Test evaluation component */}
+          <TestEvaluation />
+        </div>
+
+        {/* Additional evaluation components for historical data */}
+        <div className="flex flex-col gap-[50px]">
+          <Trends selectedDate={selectedDate} />
+          <FoodEvaluation />
+          <MealLogged />
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // ACTIVE PLAN STATE - Normal functionality for currently active plans
+  // =========================================================================
+
+  // Handler for date selection
   const handleDateClick = (date) => {
+    // Only allow selection of dates within plan range
     if (date < planStartDate || date > planEndDate) return;
     setSelectedDate(startOfDay(date));
   };
 
+  // Handler for previous navigation
   const handlePrevClick = () => {
     if (!canGoPrev) return;
     const newWindowStart = addDays(windowStart, -VISIBLE_COUNT);
+    // Ensure we don't go before plan start date
     setWindowStart(newWindowStart < planStartDate ? planStartDate : newWindowStart);
   };
 
+  // Handler for next navigation
   const handleNextClick = () => {
     if (!canGoNext) return;
     const newWindowStart = addDays(windowStart, VISIBLE_COUNT);
     const lastDateInNewWindow = addDays(newWindowStart, VISIBLE_COUNT - 1);
 
+    // Adjust if new window would extend beyond plan end
     if (lastDateInNewWindow > planEndDate) {
       const adjustedWindowStart = addDays(planEndDate, 1 - VISIBLE_COUNT);
       setWindowStart(adjustedWindowStart);
@@ -362,6 +567,7 @@ export const ResultEvaluation = () => {
     }
   };
 
+  // Filter dates to only show those within the plan range
   const visibleDates = dates.filter((item) => {
     const itemDate = startOfDay(item.date);
     return itemDate >= planStartDate && itemDate <= planEndDate;
@@ -369,6 +575,7 @@ export const ResultEvaluation = () => {
 
   return (
     <div className="w-full bg-white px-[15px] py-[30px] rounded-[15px]">
+      {/* Header Section */}
       <div className="flex justify-start ml-[15px]">
         <p className="text-[#252525] text-center text-[25px] font-semibold leading-normal tracking-[-1px]">
           Result Evaluation
@@ -377,6 +584,7 @@ export const ResultEvaluation = () => {
 
       <div className="my-[20px] border border-[#E1E6ED]"></div>
 
+      {/* Date Selection Section */}
       <div className="flex flex-col gap-[20px]">
         <div className="ml-4">
           <span className="text-[#535359] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">
@@ -386,6 +594,7 @@ export const ResultEvaluation = () => {
 
         {/* ----------------- DATE ROW ----------------- */}
         <div className="flex items-center justify-between">
+          {/* Previous arrow */}
           <IoChevronBackSharp
             className={[
               "w-[52px] h-[52px] py-[13px] pl-2.5",
@@ -396,6 +605,7 @@ export const ResultEvaluation = () => {
             aria-disabled={!canGoPrev}
           />
 
+          {/* Date boxes */}
           {visibleDates.map((item, idx) => {
             const isToday = startOfDay(item.date).getTime() === today.getTime();
             const isSelected = startOfDay(item.date).getTime() === startOfDay(selectedDate).getTime();
@@ -417,27 +627,16 @@ export const ResultEvaluation = () => {
                   isSelected ? "bg-[#308BF9] text-white" : "text-[#535359]",
                 ].join(" ")}
               >
+                {/* Day number */}
                 <span className="text-center text-[15px] font-semibold leading-[126%] tracking-[-0.3px]">
                   {item.day}
                 </span>
+                {/* Weekday abbreviation */}
                 <span className="text-center text-[10px] font-normal leading-normal tracking-[-0.2px]">
                   {item.week}
                 </span>
 
-                {/* {isToday && !isSelected && (
-                  <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-[#308BF9]" />
-                )} */}
-
-                {/* Show plan boundary indicators */}
-                {/* {startOfDay(item.date).getTime() === planStartDate.getTime() && !isSelected && (
-                  <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-green-500" title="Plan start" />
-                )} */}
-
-                {/* {startOfDay(item.date).getTime() === planEndDate.getTime() && !isSelected && (
-                  <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-red-500" title="Plan end" />
-                )} */}
-
-                {/* Today indicator */}
+                {/* Today indicator (blue dot) */}
                 {isToday && !isSelected && (
                   <span className="mx-auto mt-[2px] w-[4px] h-[4px] rounded-full bg-[#308BF9]" />
                 )}
@@ -445,6 +644,7 @@ export const ResultEvaluation = () => {
             );
           })}
 
+          {/* Next arrow */}
           <IoIosArrowForward
             className={[
               "w-[52px] h-[52px] py-[13px] pl-2.5",
@@ -457,9 +657,11 @@ export const ResultEvaluation = () => {
         </div>
 
         <div className="my-[20px] border border-[#E1E6ED]"></div>
+        {/* Test evaluation component */}
         <TestEvaluation />
       </div>
 
+      {/* Additional evaluation components */}
       <div className="flex flex-col gap-[50px]">
         <Trends selectedDate={selectedDate} />
         <FoodEvaluation />
