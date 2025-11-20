@@ -332,7 +332,7 @@ export default function DashboardCard({ activeTab }) {
               <IoIosArrowForward className="text-[#308BF9]" />
             </div>
           </div>
-          <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">2000</span>
+          <span className="text-[#252525] text-[40px] font-bold leading-normal tracking-[-0.8px]">20</span>
         </div>
       </div>
     );
