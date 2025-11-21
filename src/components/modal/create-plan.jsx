@@ -267,23 +267,24 @@
 
 
 
-
 "use client";
 
 import { Modal } from "react-responsive-modal";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
 
 export default function CreatePlanModal({ open, onClose }) {
   const router = useRouter();
+  const fileInputRef = useRef(null);
 
   const [selectedPlan, setSelectedPlan] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadedFile, setLocalUploadedFile] = useState(null);
   const [blobUrl, setBlobUrl] = useState(null);
   const [urlParams, setUrlParams] = useState({ dietician_id: null, profile_id: null });
+  const [isDragging, setIsDragging] = useState(false);
 
   // Get parameters from URL safely on client side
   useEffect(() => {
@@ -334,6 +335,12 @@ export default function CreatePlanModal({ open, onClose }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    processFile(file);
+  };
+
+  const processFile = (file) => {
+    if (!file) return;
+
     if (file.type !== "application/pdf") {
       toast.error("Please upload a valid PDF file");
       return;
@@ -353,8 +360,47 @@ export default function CreatePlanModal({ open, onClose }) {
       return url;
     });
 
-    //toast.success(`File selected: ${file.name}`);
-    return `File selected: ${file.name}`;
+    toast.success(`File selected: ${file.name}`);
+  };
+
+  // Drag and drop handlers
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isDragging) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      processFile(file);
+    }
+  };
+
+  // Click handler for the entire drop zone
+  const handleDropZoneClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   const storeFileInLocalStorage = (file) => {
@@ -502,7 +548,18 @@ export default function CreatePlanModal({ open, onClose }) {
             <p className="text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.3px]">File size max. 3MB</p>
           </div>
 
-          <div className="flex-1 border-2 border-dashed border-[#E1E6ED] rounded-[10px] p-8 text-center cursor-pointer hover:bg-[#F5F7FA] transition-colors">
+          <div 
+            className={`flex-1 border-2 border-dashed rounded-[10px] p-8 text-center cursor-pointer transition-colors
+              ${isDragging 
+                ? "border-[#308BF9] bg-[#F0F7FF]" 
+                : "border-[#E1E6ED] hover:bg-[#F5F7FA]"
+              }`}
+            onClick={handleDropZoneClick}
+            onDragEnter={handleDragEnter}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
             <div className="flex flex-col items-center gap-6">
               <Image
                 src="/icons/hugeicons_cursor-magic-selection-04.svg"
@@ -510,20 +567,24 @@ export default function CreatePlanModal({ open, onClose }) {
                 width={48}
                 height={48}
               />
-              <label htmlFor="file-upload" className="cursor-pointer">
-                <input
-                  id="file-upload"
-                  type="file"
-                  accept="application/pdf,.pdf"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-                <p className="text-[#252525] text-[15px]">
-                  {uploadedFile
-                    ? `Selected: ${uploadedFile.name}`
-                    : "Drag or browse from My Computer"}
+              <input
+                ref={fileInputRef}
+                id="file-upload"
+                type="file"
+                accept="application/pdf,.pdf"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              <p className="text-[#252525] text-[15px]">
+                {uploadedFile
+                  ? `Selected: ${uploadedFile.name}`
+                  : "Drag or browse from My Computer"}
+              </p>
+              {isDragging && (
+                <p className="text-[#308BF9] text-sm font-medium">
+                  Drop your PDF file here...
                 </p>
-              </label>
+              )}
             </div>
           </div>
         </div>

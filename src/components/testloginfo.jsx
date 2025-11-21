@@ -223,7 +223,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useDispatch } from "react-redux";
+
 import { toast } from "sonner";
 import {
   submitPlanSummaryService,
@@ -231,6 +231,8 @@ import {
 } from "../services/authService";
 import { setExtractedData } from "@/store/extractedDataSlice";
 import { cookieManager } from "../lib/cookies";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsExtracting } from "@/store/extractionSlice";
 
 export default function TestLogInfo({ onConfirmNext }) {
   const [testsAllotted, setTestsAllotted] = useState(""); // for payload
@@ -241,7 +243,8 @@ export default function TestLogInfo({ onConfirmNext }) {
   // NEW: Separate variable to store the subtraction result
   const [subtractionResult, setSubtractionResult] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [isExtracting, setIsExtracting] = useState(false);
+  //const [isExtracting, setIsExtracting] = useState(false);
+  const isExtracting = useSelector((state) => state.extraction.isExtracting);
   const [apiResponse, setApiResponse] = useState(null);
 
   const [progress, setProgress] = useState(0);
@@ -439,7 +442,7 @@ export default function TestLogInfo({ onConfirmNext }) {
     }
 
     try {
-      setIsExtracting(true);
+    dispatch(setIsExtracting(true)); 
       toast.message("Extracting PDF…");
       startProgress(300000, 98);
 
@@ -518,7 +521,7 @@ export default function TestLogInfo({ onConfirmNext }) {
       resetProgress();
       return false;
     } finally {
-      setIsExtracting(false);
+       dispatch(setIsExtracting(false)); 
       setTimeout(() => {
         if (!isLoading) resetProgress();
       }, 600);

@@ -7,7 +7,7 @@ import CreateDietPlan from './create-diet-plan';
 import Summary from './summary';
 import TestLogInfo from './testloginfo';
 import DietPlanCreated from './diet-plan-created';
-
+import { useSelector } from "react-redux";
 import { toast } from 'sonner';
 
 export default function Preview() {
@@ -23,6 +23,7 @@ const [pdfData, setPdfData] = useState({ fileName: '', blobUrl: '' });
 
   const [activePanel, setActivePanel] = useState('summary');
 
+const isExtracting = useSelector((state) => state.extraction.isExtracting);
 
 
   // NEW CODE ADDED:
@@ -180,8 +181,14 @@ const handleReupload = (event) => {
 
                   {/* Plan summary tile */}
                   <div
-                    className={`flex gap-[52px] justify-between py-5 pl-[23px] pr-[15px] rounded-[5px] items-center cursor-pointer ${activePanel === 'summary' ? 'bg-white' : ''}`}
-                    onClick={() => setActivePanel('summary')}
+                    className={`flex gap-[52px] justify-between py-5 pl-[23px] pr-[15px] rounded-[5px] items-center cursor-pointer
+    ${activePanel === 'summary' ? 'bg-white' : ''}
+    ${isExtracting ? 'opacity-60 cursor-not-allowed pointer-events-none' : ''}
+  `}
+  onClick={() => {
+    if (isExtracting) return;  // ✅ block click
+    setActivePanel('summary');
+  }}
                   >
                     <div className='flex gap-2.5 items-center'>
                       <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] whitespace-nowrap'>Plan summary</span>
@@ -195,8 +202,14 @@ const handleReupload = (event) => {
 
                   {/* Tests log info tile */}
                   <div
-                    className={`flex justify-between py-5 pl-[23px] pr-[15px] rounded-[5px] items-center cursor-pointer ${activePanel === 'testlog' ? 'bg-white' : ''}`}
-                    onClick={() => setActivePanel('testlog')}
+                     className={`flex justify-between py-5 pl-[23px] pr-[15px] rounded-[5px] items-center cursor-pointer
+    ${activePanel === 'testlog' ? 'bg-white' : ''}
+    ${isExtracting ? 'opacity-60 cursor-not-allowed pointer-events-none' : ''}
+  `}
+  onClick={() => {
+    if (isExtracting) return;
+    setActivePanel('testlog');
+  }}
                   >
                     <div className='flex gap-2.5 items-center'>
                       <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] whitespace-nowrap'>Tests log info</span>
@@ -210,8 +223,14 @@ const handleReupload = (event) => {
 
                   {/* Diet plan tile */}
                   <div
-                    className={`flex justify-between py-5 pl-[23px] pr-[15px] rounded-[5px] items-center cursor-pointer ${activePanel === 'dietplan' ? 'bg-white' : ''}`}
-                    onClick={() => setActivePanel('dietplan')}
+                    className={`flex justify-between py-5 pl-[23px] pr-[15px] rounded-[5px] items-center cursor-pointer
+    ${activePanel === 'dietplan' ? 'bg-white' : ''}
+    ${isExtracting ? 'opacity-60 cursor-not-allowed pointer-events-none' : ''}
+  `}
+  onClick={() => {
+    if (isExtracting) return;
+    setActivePanel('dietplan');
+  }}
                   >
                     <div className='flex gap-2.5 items-center'>
                       <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] whitespace-nowrap'>Diet plan</span>
