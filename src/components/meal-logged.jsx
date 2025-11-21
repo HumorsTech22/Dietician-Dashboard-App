@@ -122,9 +122,10 @@ import { fetchWeeklyAnalysisComplete } from "../services/authService";
 export default function MealLogged() {
   const [activeFilter, setActiveFilter] = useState("low");
   const [weeklyAnalysisData, setWeeklyAnalysisData] = useState([]);
+  const [apiMessage, setApiMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // Add state for visible weeks pagination
   const [visibleWeekStart, setVisibleWeekStart] = useState(0);
   const visibleWeeksCount = 4; // Show 5 weeks at a time
@@ -156,6 +157,19 @@ export default function MealLogged() {
     return acc;
   }, {});
 
+  // ===== FIX HELPERS (minimal change, only for correct week index) =====
+  const toLocalMidnight = (dateStr) => {
+    if (!dateStr) return new Date();
+    const [y, m, d] = String(dateStr).split("-").map(Number);
+    return new Date(y, m - 1, d); // local midnight
+  };
+
+  const startOfDay = (d) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+  const endOfDay = (d) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+
   // ====== Plan-based weeks builder logic ======
   let weeks = [];
   let currentWeekIdx = 0;
@@ -170,40 +184,45 @@ export default function MealLogged() {
   if (clientProfile?.plans_summary?.active?.length > 0) {
     // Use plan dates
     const activePlan = clientProfile.plans_summary.active[0];
-    const planStart = new Date(activePlan.plan_start_date);
-    const planEnd = new Date(activePlan.plan_end_date);
-    
+
+    // FIX: parse plan dates as local midnight (avoid UTC shift)
+    const planStart = toLocalMidnight(activePlan.plan_start_date);
+    const planEnd = toLocalMidnight(activePlan.plan_end_date);
+
     // Calculate weeks based on plan duration
     const planDurationMs = planEnd - planStart;
-    const planDurationDays = Math.ceil(planDurationMs / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end dates
-    
+    const planDurationDays =
+      Math.ceil(planDurationMs / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end dates
+
     const numberOfWeeks = Math.ceil(planDurationDays / 7);
-    
+
     for (let i = 0; i < numberOfWeeks; i++) {
       const start = new Date(planStart);
-      start.setDate(planStart.getDate() + (i * 7));
-      
+      start.setDate(planStart.getDate() + i * 7);
+
       const end = new Date(start);
       end.setDate(start.getDate() + 6);
-      
+
       // Don't exceed plan end date
       if (end > planEnd) {
         end.setTime(planEnd.getTime());
       }
-      
-      weeks.push({ 
-        label: `Week ${i + 1}`, 
+
+      weeks.push({
+        label: `Week ${i + 1}`,
         start: start.getDate(),
         end: end.getDate(),
-        startDate: new Date(start),
-        endDate: new Date(end)
+        startDate: startOfDay(new Date(start)),
+        endDate: endOfDay(new Date(end)), // FIX: inclusive till night
       });
     }
-    
-    // Find current week index based on today's date
+
+    // Find current week index based on today's date (date-only compare)
     const today = new Date();
-    currentWeekIdx = weeks.findIndex(week => 
-      today >= week.startDate && today <= week.endDate
+    const todayDay = startOfDay(today);
+
+    currentWeekIdx = weeks.findIndex(
+      (week) => todayDay >= week.startDate && todayDay <= week.endDate
     );
     if (currentWeekIdx === -1) currentWeekIdx = 0;
   } else {
@@ -219,12 +238,12 @@ export default function MealLogged() {
       const start = i * 7 + 1;
       if (start > daysInMonth) break;
       const end = Math.min(start + 6, daysInMonth);
-      weeks.push({ 
-        label: `Week ${i + 1}`, 
-        start, 
+      weeks.push({
+        label: `Week ${i + 1}`,
+        start,
         end,
-        startDate: new Date(year, month, start),
-        endDate: new Date(year, month, end)
+        startDate: startOfDay(new Date(year, month, start)),
+        endDate: endOfDay(new Date(year, month, end)), // FIX: inclusive till night
       });
     }
   }
@@ -232,7 +251,7 @@ export default function MealLogged() {
   const monthDate = (day) => {
     if (clientProfile?.plans_summary?.active?.length > 0) {
       const activePlan = clientProfile.plans_summary.active[0];
-      const planStart = new Date(activePlan.plan_start_date);
+      const planStart = toLocalMidnight(activePlan.plan_start_date); // FIX local
       return new Date(planStart.getFullYear(), planStart.getMonth(), day);
     } else {
       const today = new Date();
@@ -245,7 +264,7 @@ export default function MealLogged() {
     if (!w) return null;
     return {
       start: w.startDate,
-      end: w.endDate
+      end: w.endDate,
     };
   };
 
@@ -256,6 +275,7 @@ export default function MealLogged() {
   const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId) => {
     setLoading(true);
     setError(null);
+    setApiMessage(null);
     try {
       const requestBody = {
         dietician_id: clientProfile?.dietician_id,
@@ -266,11 +286,23 @@ export default function MealLogged() {
       };
 
       const response = await fetchWeeklyAnalysisComplete(requestBody);
-      const arr = response?.api_response?.food_level_evaluation || [];
-      setWeeklyAnalysisData(arr);
+
+      // Check if response has message instead of food evaluation data
+      if (response?.message) {
+        setApiMessage({
+          message: response.message,
+          end_date: response.end_date,
+        });
+        setWeeklyAnalysisData([]);
+      } else {
+        const arr = response?.api_response?.food_level_evaluation || [];
+        setWeeklyAnalysisData(arr);
+        setApiMessage(null);
+      }
     } catch (err) {
       setError(err?.message || "Failed to fetch weekly analysis");
       setWeeklyAnalysisData([]);
+      setApiMessage(null);
     } finally {
       setLoading(false);
     }
@@ -280,14 +312,16 @@ export default function MealLogged() {
   useEffect(() => {
     if (!clientProfile?.plans_summary?.active?.length) {
       setWeeklyAnalysisData([]);
+      setApiMessage(null);
       return;
     }
 
     const activePlan = clientProfile.plans_summary.active[0];
     const dietPlanId = activePlan.id;
 
-    const planStart = new Date(activePlan.plan_start_date);
-    const planEnd = new Date(activePlan.plan_end_date);
+    // FIX local parsing
+    const planStart = toLocalMidnight(activePlan.plan_start_date);
+    const planEnd = toLocalMidnight(activePlan.plan_end_date);
 
     // Choose which week index to use (default = current calendar week)
     const weekIdxToUse =
@@ -322,13 +356,19 @@ export default function MealLogged() {
 
   // Get visible weeks for display
   const visibleWeeks = weeks.slice(
-    visibleWeekStart, 
+    visibleWeekStart,
     visibleWeekStart + visibleWeeksCount
   );
 
   // Check if arrows should be enabled
   const canGoNext = visibleWeekStart + visibleWeeksCount < weeks.length;
   const canGoPrev = visibleWeekStart > 0;
+
+  // Determine what to display
+  const showMessageState = apiMessage && dataArr.length === 0;
+  const showNoDataState =
+    !apiMessage && dataArr.length === 0 && !loading && !error;
+  const showDataState = dataArr.length > 0;
 
   return (
     <>
@@ -340,14 +380,6 @@ export default function MealLogged() {
               Meal Logged Analysis
             </span>
           </div>
-
-          {/* <div className="flex gap-[26px] items-center">
-            <div className="px-[20px] py-[15px] items-center bg-[#308BF9] rounded-[15px] cursor-pointer">
-              <p className="text-[12px] leading-[100%] font-semibold text-white space-x-0 tracking-[-0.24px]">
-                Update Diet plan
-              </p>
-            </div>
-          </div> */}
         </div>
 
         <div className="w-full border-b border-[#E1E6ED]"></div>
@@ -366,8 +398,12 @@ export default function MealLogged() {
               <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] whitespace-nowrap">
                 Select a Week
               </span>
-              <IoIosArrowBack 
-                className={`${canGoPrev ? "text-[#252525] cursor-pointer" : "text-[#A1A1A1] cursor-not-allowed"}`}
+              <IoIosArrowBack
+                className={`${
+                  canGoPrev
+                    ? "text-[#252525] cursor-pointer"
+                    : "text-[#A1A1A1] cursor-not-allowed"
+                }`}
                 onClick={canGoPrev ? handlePrevWeeks : undefined}
               />
             </div>
@@ -376,24 +412,33 @@ export default function MealLogged() {
               <div className="flex items-center">
                 {visibleWeeks.map((w, idx) => {
                   const actualIndex = visibleWeekStart + idx;
-                  
+
                   // Effective selected index (auto-select current week if user hasn't clicked)
                   const effectiveIdx =
                     selectedWeekIdx === null ? currentWeekIdx : selectedWeekIdx;
 
                   const today = new Date();
-                  
+
                   // If a plan exists, disable weeks that are fully outside plan range OR are future weeks
                   let isDisabled = false;
                   if (clientProfile?.plans_summary?.active?.length > 0) {
                     const activePlan = clientProfile.plans_summary.active[0];
-                    const planStart = new Date(activePlan.plan_start_date);
-                    const planEnd = new Date(activePlan.plan_end_date);
+
+                    // FIX Local parsing
+                    const planStart = toLocalMidnight(
+                      activePlan.plan_start_date
+                    );
+                    const planEnd = toLocalMidnight(activePlan.plan_end_date);
+
                     const range = getWeekDateRange(actualIndex);
 
                     if (range) {
                       // Disable if outside plan range OR if it's a future week
-                      if (range.end < planStart || range.start > planEnd || range.start > today) {
+                      if (
+                        range.end < planStart ||
+                        range.start > planEnd ||
+                        range.start > today
+                      ) {
                         isDisabled = true;
                       }
                     }
@@ -405,7 +450,9 @@ export default function MealLogged() {
                     }
                   }
 
-                  const isSelected = actualIndex === effectiveIdx && !isDisabled;
+                  const isSelected =
+                    actualIndex === effectiveIdx && !isDisabled;
+            
 
                   const wrapBase =
                     "flex flex-col w-full gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px]";
@@ -437,8 +484,7 @@ export default function MealLogged() {
                       >
                         <span className={titleClass}>{w.label}</span>
                         <span className={dateClass}>
-                          {fmt(w.startDate)} -{" "}
-                          {fmt(w.endDate)}
+                          {fmt(w.startDate)} - {fmt(w.endDate)}
                         </span>
                       </div>
                       {idx !== visibleWeeks.length - 1 && (
@@ -449,8 +495,12 @@ export default function MealLogged() {
                 })}
               </div>
 
-              <IoIosArrowForward 
-                className={`ml-2 ${canGoNext ? "text-[#252525] cursor-pointer" : "text-[#A1A1A1] cursor-not-allowed"}`}
+              <IoIosArrowForward
+                className={`ml-2 ${
+                  canGoNext
+                    ? "text-[#252525] cursor-pointer"
+                    : "text-[#A1A1A1] cursor-not-allowed"
+                }`}
                 onClick={canGoNext ? handleNextWeeks : undefined}
               />
             </div>
@@ -465,23 +515,36 @@ export default function MealLogged() {
               Loading analysis...
             </span>
           </div>
-        ) : dataArr.length === 0 ? (
+        ) : showMessageState ? (
+          // Show API message when available
+          <div className="flex justify-center items-center py-8">
+            <span className="text-[#C0CAD8] text-[20px] font-semibold leading-[110%] tracking-[-0.4px] text-center">
+              {apiMessage.message}
+            </span>
+          </div>
+        ) : showNoDataState ? (
+          // Show fallback message when no data and no API message
           <div className="flex justify-center items-center py-8">
             <span className="text-[#C0CAD8] text-[20px] font-semibold leading-[110%] tracking-[-0.4px] text-center">
               {(() => {
-                const weekIdxToUse = selectedWeekIdx === null ? currentWeekIdx : selectedWeekIdx;
+                const weekIdxToUse =
+                  selectedWeekIdx === null ? currentWeekIdx : selectedWeekIdx;
                 const range = getWeekDateRange(weekIdxToUse);
                 const today = new Date();
-                
+
                 if (range && range.end < today) {
-                  return `Analysis will be available after - ${fmt(range.end)} 9pm`;
+                  return `Analysis will be available after - ${fmt(
+                    range.end
+                  )} 9pm`;
                 } else {
-                  return `Analysis will be available after ${fmt(range.end)} 9pm`;
+                  return `Analysis will be available after ${fmt(
+                    range.end
+                  )} 9pm`;
                 }
               })()}
             </span>
           </div>
-        ) : (
+        ) : showDataState ? (
           <>
             {/* Stats Row */}
             <div className="flex justify-between bg-[#E1E6ED] rounded-[15px] px-5 py-[19px] ml-[59px] mr-[59px]">
@@ -577,12 +640,11 @@ export default function MealLogged() {
               </div>
             </div>
           </>
-        )}
+        ) : null}
       </div>
     </>
   );
 }
-
 
 
 

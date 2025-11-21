@@ -4,6 +4,7 @@ import { useSelector } from "react-redux"
 
 export default function FoodEvaluation() {
     const scoresInsight = useSelector((state) => state.scoresInsight?.data);
+    console.log("scoresInsight07:-", scoresInsight);
 
     return (
         <>
