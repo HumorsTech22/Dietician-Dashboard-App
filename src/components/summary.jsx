@@ -719,9 +719,12 @@ const prepareFormData = () => {
                 onChange={(e) => { setPlanTitle(e.target.value); setErrors(prev => ({ ...prev, planTitle: '' })); }}
                 className={`block py-[15px] pl-[19px] pr-[13px] w-full text-[14px] text-[#252525] bg-white rounded-[8px] border appearance-none focus:outline-none focus:ring-0
                   ${errors.planTitle ? 'border-[#DA5747]' : 'border-[#E1E6ED]'} focus:border-blue-600 peer`}
-                placeholder=" "
+                placeholder=""
+                id="plan-title-input"
               />
-              <label className="absolute text-[14px] text-[#9CA3AF] duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1">
+              <label
+              htmlFor="plan-title-input"
+              className="absolute text-[14px] text-[#9CA3AF] duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1">
                 Name of the plan
               </label>
               {errors.planTitle ? (
@@ -952,7 +955,7 @@ const prepareFormData = () => {
                   min="0"
                   value={caloriesTarget}
                   onChange={onChangeAndClear(setCaloriesTarget, 'caloriesTarget')}
-                  placeholder=" "
+                  placeholder=""
                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent
                     ${errors.caloriesTarget ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} focus:border-blue-600`}
                 />
@@ -975,7 +978,7 @@ const prepareFormData = () => {
                   step="0.1"
                   value={proteinTarget}
                   onChange={onChangeAndClear(setProteinTarget, 'proteinTarget')}
-                  placeholder=" "
+                  placeholder=""
                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent
                     ${errors.proteinTarget ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} focus:border-blue-600`}
                 />
@@ -998,7 +1001,7 @@ const prepareFormData = () => {
                   step="0.1"
                   value={fiberTarget}
                   onChange={onChangeAndClear(setFiberTarget, 'fiberTarget')}
-                  placeholder=" "
+                  placeholder=""
                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent
                     ${errors.fiberTarget ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} focus:border-blue-600`}
                 />
@@ -1021,7 +1024,7 @@ const prepareFormData = () => {
                   step="0.1"
                   value={carbsTarget}
                   onChange={onChangeAndClear(setCarbsTarget, 'carbsTarget')}
-                  placeholder=" "
+                  placeholder=""
                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent
                     ${errors.carbsTarget ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} focus:border-blue-600`}
                 />
@@ -1044,7 +1047,7 @@ const prepareFormData = () => {
                   step="0.1"
                   value={fatTarget}
                   onChange={onChangeAndClear(setFatTarget, 'fatTarget')}
-                  placeholder=" "
+                  placeholder=""
                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent
                     ${errors.fatTarget ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} focus:border-blue-600`}
                 />
@@ -1067,7 +1070,7 @@ const prepareFormData = () => {
                   step="50"
                   value={waterTarget}
                   onChange={onChangeAndClear(setWaterTarget, 'waterTarget')}
-                  placeholder=" "
+                  placeholder=""
                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent
                     ${errors.waterTarget ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} focus:border-blue-600`}
                 />
@@ -1109,7 +1112,7 @@ const prepareFormData = () => {
                     <input
                       value={goal.title}
                       onChange={(e) => updateGoal(goal.id, 'title', e.target.value)}
-                      placeholder=" "
+                      placeholder=""
                       className={`peer block w-full py-[15px] pl-[19px] pr-[13px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent
                         ${gErr.title ? 'border border-[#DA5747]' : 'border border-[#E1E6ED]'} focus:border-blue-600`}
                     />
