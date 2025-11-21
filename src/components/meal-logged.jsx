@@ -127,7 +127,7 @@ export default function MealLogged() {
   
   // Add state for visible weeks pagination
   const [visibleWeekStart, setVisibleWeekStart] = useState(0);
-  const visibleWeeksCount = 5; // Show 5 weeks at a time
+  const visibleWeeksCount = 4; // Show 5 weeks at a time
 
   const clientProfile = useSelector((state) => state.clientProfile.data);
   const handleFilterChange = (filter) => {
@@ -474,7 +474,7 @@ export default function MealLogged() {
                 const today = new Date();
                 
                 if (range && range.end < today) {
-                  return `No Data Found for ${fmt(range.start)} - ${fmt(range.end)}`;
+                  return `Analysis will be available after - ${fmt(range.end)} 9pm`;
                 } else {
                   return `Analysis will be available after ${fmt(range.end)} 9pm`;
                 }

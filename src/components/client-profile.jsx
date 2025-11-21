@@ -1038,12 +1038,19 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     </span>
 
                                     {/* View All Plans Link - Only show if not already on plan history page */}
-                                    {/* {pathname !== "/planhistory" && (
-                                        <Link href="/planhistory" className='flex gap-2.5'>
+                                    {pathname !== "/planhistory" && (
+                                        <Link 
+                                       href={{
+            pathname: '/planhistory',
+            query: {
+                profile_id: profileId,
+            }
+        }} 
+                                        className='flex gap-2.5'>
                                             <span className='text-[#308BF9] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] cursor-pointer'>View all plans</span>
                                             <IoIosArrowForward className='text-[#308BF9] cursor-pointer' />
                                         </Link>
-                                    )} */}
+                                    )} 
                                 </div>
 
                                 <div className='my-[22px] border boder-[#E1E6ED]'></div>

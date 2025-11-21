@@ -711,6 +711,7 @@ export default function Trends({ selectedDate }) {
   const [firstShowDropdown, setFirstShowDropdown] = useState(false)
   const [secondShowDropdown, setSecondShowDropdown] = useState(false)
   const [graphData, setGraphData] = useState(null)
+  console.log("graphData714:-", graphData);
   const [scoresInsightData, setScoresInsightData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [scoresLoading, setScoresLoading] = useState(false)
