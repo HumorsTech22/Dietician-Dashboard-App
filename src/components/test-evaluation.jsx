@@ -276,7 +276,6 @@ import { useSelector } from "react-redux"
 
 export default function TestEvaluation() {
   const scoresInsight = useSelector((state) => state.scoresInsight?.data);
-  console.log("scoresInsight279:-", scoresInsight);
   const formatDate = (dateString) => {
     if (!dateString) return '';
     

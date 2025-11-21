@@ -236,7 +236,6 @@ const WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export const ResultEvaluation = () => {
   // Get client data from Redux store
   const clientData = useSelector((state) => state.clientProfile.data);
-  console.log("clientData233:-", clientData);
   const isLoading = useSelector((state) => state.clientProfile.loading);
 
   // Check for different plan statuses in the client data

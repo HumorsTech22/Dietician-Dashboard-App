@@ -5,11 +5,13 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { UserPlus } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
+import { IoIosArrowRoundDown } from "react-icons/io";
 import { cookieManager } from "../lib/cookies"
 
 export const UserProfile = ({
   searchQuery = "",
   onSearchChange = () => {},
+  onSortChange = () => {},
 }) => {
   const pathname = usePathname();
   const isClientPage =
@@ -18,6 +20,22 @@ export const UserProfile = ({
 
  const [dieticianName, setDieticianName] = useState('Dietician');
   const [currentDate, setCurrentDate] = useState('-');
+
+   const [isOpen, setIsOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('Recently Added');
+
+  const options = [
+    'Recently Added',
+    'A to Z',
+    'Z to A',
+    'by Age'
+  ];
+
+  const handleOptionSelect = (option) => {
+    setSelectedOption(option);
+    setIsOpen(false);
+      onSortChange(option); 
+  };
 
   useEffect(() => {
     
@@ -61,19 +79,84 @@ export const UserProfile = ({
             </div>
 
             {/* Sort */}
-            {/* <div className="w-fit flex justify-center">
-              <div className="rounded-l-[10px] border border-[#D9D9D9] pl-4 py-2 pr-2.5 bg-[#F0F0F0] text-center">
-                <p className="text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
-                  Sort By
-                </p>
-              </div>
-              <div className="flex rounded-r-[10px] border border-[#D9D9D9] gap-[37px] text-center items-center pl-4 py-2 pr-2.5 bg-white">
-                <p className="cursor-pointer text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
-                  Recently Added
-                </p>
-                <IoIosArrowDown className="text-[#A1A1A1] cursor-pointer" />
-              </div>
-            </div> */}
+    <div className="w-fit flex justify-center relative">
+  <div className="rounded-l-[10px] border border-[#D9D9D9] pl-4 py-2 pr-2.5 bg-[#F0F0F0] text-center">
+    <p className="text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
+      Sort By
+    </p>
+  </div>
+
+  {/* Trigger */}
+  <div
+    className="flex rounded-r-[10px] border border-[#D9D9D9] gap-[37px] text-center items-center pl-4 py-2 pr-2.5 bg-white relative cursor-pointer"
+    onClick={() => setIsOpen(!isOpen)}
+  >
+    <p className="text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal flex items-center gap-1">
+      {selectedOption === "By Age Asc" ? (
+  <>
+    Age Acending <IoIosArrowDown className="rotate-180 text-[14px]" />
+  </>
+) : selectedOption === "By Age Desc" ? (
+  <>
+    Age Decending <IoIosArrowDown className="text-[14px]" />
+  </>
+) : (
+  selectedOption
+)}
+
+    </p>
+
+    <IoIosArrowDown
+      className={`text-[#A1A1A1] transition-transform duration-200 ${
+        isOpen ? "rotate-180" : ""
+      }`}
+    />
+  </div>
+
+  {/* Menu */}
+  {isOpen && (
+    <div className="absolute top-full right-0 mt-1 w-full bg-white border border-[#D9D9D9] rounded-[10px] shadow-lg z-10">
+      {[
+        "Recently Added",
+        "A to Z",
+        "Z to A",
+        "By Age Asc",
+        "By Age Desc",
+      ].map((option, index) => (
+        <div
+          key={option}
+          className={`px-4 py-2 text-[12px] tracking-[-0.24px] leading-[110%] font-normal cursor-pointer hover:bg-gray-50 ${
+            selectedOption === option ? "text-[#308BF9] bg-blue-50" : "text-[#252525]"
+          } ${
+            index === 0
+              ? "rounded-t-[10px]"
+              : index === 4
+              ? "rounded-b-[10px]"
+              : ""
+          }`}
+          onClick={() => handleOptionSelect(option)}
+        >
+          <div className="flex items-center gap-1">
+            {option === "By Age Asc" ? (
+  <>
+    Age Acending <IoIosArrowDown className="rotate-180 text-[14px]" />
+  </>
+) : option === "By Age Desc" ? (
+  <>
+    Age Decending <IoIosArrowDown className="text-[14px]" />
+  </>
+) : (
+  option
+)}
+
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+
           </div>
         ) : isMessagesPage ? (
           <div className="flex gap-[22px] mt-[46px] mb-[12px] mx-[10px]">
