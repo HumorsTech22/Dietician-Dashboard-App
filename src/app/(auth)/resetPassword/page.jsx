@@ -3,10 +3,17 @@ import  ResetPassword  from "@/components/reset-password"
 
 export default function Page() {
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
+<div 
+className="flex items-center pl-[25px] w-full min-h-screen"
+ style={{
+        backgroundImage: "url('/icons/dietician_image_freepik.jpg')", 
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat"
+      }}
+>
         <ResetPassword/>
       </div>
-    </div>
+    
   );
 }

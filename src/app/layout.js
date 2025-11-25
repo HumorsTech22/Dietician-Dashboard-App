@@ -26,7 +26,8 @@ export default function RootLayout({ children }) {
       >
 
     <Providers>
-          <div className=" mt-[30px] mb-[37px]">
+          <div 
+          className="">
 
             {children}
           </div>
