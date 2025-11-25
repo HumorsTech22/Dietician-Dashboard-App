@@ -708,11 +708,15 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                             />
 
                             {isPlanHistoryPage ? (
-                                <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>
+                                <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px] cursor-pointer'
+                                 onClick={() => window.history.back()}
+                                >
                                     {clientData?.profile_name || 'N/A'}
                                 </span>
                             ) : (
-                                <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Clients</span>
+                                <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px] cursor-pointer'
+                                 onClick={() => window.history.back()}
+                                >Clients</span>
                             )}
                         </div>
 

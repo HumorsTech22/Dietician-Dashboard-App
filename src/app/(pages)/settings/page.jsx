@@ -1,9 +1,11 @@
 "use client"
+
+import ProfileSettings from "@/components/profile-settings"
 export default function Settings(){
 
     return(
         <>
-        <p className="text-black">Comming Soon</p>
+           <ProfileSettings/>
         </>
     )
 }
