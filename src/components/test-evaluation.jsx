@@ -278,7 +278,7 @@ export default function TestEvaluation() {
   const scoresInsight = useSelector((state) => state.scoresInsight?.data);
   const formatDate = (dateString) => {
     if (!dateString) return '';
-    
+
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       day: '2-digit',
@@ -293,12 +293,12 @@ export default function TestEvaluation() {
   // Helper function to get color class based on zone
   const getZoneColor = (zone) => {
     if (!zone) return 'text-[#535359]'; // Default color for empty values
-    
+
     const zoneLower = zone.toLowerCase();
     if (zoneLower === 'good') return 'text-[#3FAF58]';
     if (zoneLower === 'fair') return 'text-[#FFC412]';
     if (zoneLower === 'poor') return 'text-[#DA5747]';
-    
+
     return 'text-[#535359]'; // Default color for unknown values
   };
 
@@ -321,168 +321,197 @@ export default function TestEvaluation() {
 
         <div className="border border-[#E1E6ED] mb-3"></div>
 
-        <div className="flex flex-col lg:flex-row gap-[26px] w-full">
-          {/* Chart Section */}
-          <div className="min-w-0 mt-[3px]">
-            <Image
-              src="/icons/Frame 427320804.svg"
-              alt="Metabolism Chart"
-              width={235}
-              height={504}
-              className="w-full h-[504px] max-w-full object-contain"
-            />
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-col lg:flex-row gap-[26px] w-full">
+            {/* Chart Section */}
+            <div className="min-w-0 mt-[3px]">
+              <Image
+                src="/icons/Frame 427320804.svg"
+                alt="Metabolism Chart"
+                width={235}
+                height={504}
+                className="w-full h-[504px] max-w-full object-contain"
+              />
+            </div>
+
+            {/* Metrics Section */}
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col gap-5">
+                {/* Liver Hepatic Metabolism */}
+                <div className="bg-white rounded-[10px] py-2.5 px-5 w-full">
+                  <div className="flex gap-2.5 items-center mb-[5px]">
+                    <div className="p-2">
+                      <Image
+                        src="/icons/hugeicons_liver.svg"
+                        alt="Liver Icon"
+                        width={24}
+                        height={24}
+                      />
+                    </div>
+                    <span className="text-[#252525] text-[12px] font-semibold leading-[110%]">
+                      Liver Hepatic Metabolism
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex-1 p-4 border border-[#E1E6ED] rounded-[10px]">
+                      <span className="text-[#535359] text-[10px] font-normal block mb-[5px]">
+                        Hepatic Stress Metabolism Score
+                      </span>
+                      <div className="flex items-center">
+                        <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
+                          {scores?.hepatic_stress ?? '-'}%
+                        </p>
+                        <div className="mx-3 h-4 w-px bg-[#252525]"></div>
+                        <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.hepatic_stress?.zone)}`}>
+                          {metabolismScores?.hepatic_stress?.zone ?? '-'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 p-4 border border-[#E1E6ED] rounded-[10px]">
+                      <span className="text-[#535359] text-[10px] font-normal block mb-2">
+                        Detoxification Metabolism Score
+                      </span>
+                      <div className="flex items-center">
+                        <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
+                          {scores?.detoxification ?? '-'}%
+                        </p>
+                        <div className="mx-3 h-4 w-px bg-[#252525]"></div>
+                        <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.detoxification?.zone)}`}>
+                          {metabolismScores?.detoxification?.zone ?? '-'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Glucose -Vs- Fat Metabolism */}
+                <div className="bg-white rounded-[10px] py-2.5 px-5 w-full">
+                  <div className="flex gap-2.5 items-center mb-[5px]">
+                    <div className="p-2">
+                      <Image
+                        src="/icons/healthicons_pancreas-outline.svg"
+                        alt="healthicons_pancreas-outline"
+                        width={24}
+                        height={24}
+                      />
+                    </div>
+                    <span className="text-[#252525] text-[12px] font-semibold leading-[110%]">
+                      Glucose -Vs- Fat Metabolism
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex-1 p-4 border border-[#E1E6ED] rounded-[10px]">
+                      <span className="text-[#535359] text-[10px] font-normal block mb-2">
+                        Fat Metabolism Score
+                      </span>
+                      <div className="flex items-center">
+                        <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
+                          {scores?.fat ?? '-'}%
+                        </p>
+                        <div className="mx-3 h-4 w-px bg-[#252525]"></div>
+                        <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.fat_metabolism?.zone)}`}>
+                          {metabolismScores?.fat_metabolism?.zone ?? '-'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 p-4 border border-[#E1E6ED] rounded-[10px]">
+                      <span className="text-[#535359] text-[10px] font-normal block mb-[5px]">
+                        Glucose Metabolism Score
+                      </span>
+                      <div className="flex items-center">
+                        <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
+                          {scores?.glucose ?? '-'}%
+                        </p>
+                        <div className="mx-3 h-4 w-px bg-[#252525]"></div>
+                        <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.glucose_metabolism?.zone)}`}>
+                          {metabolismScores?.glucose_metabolism?.zone ?? '-'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Gut Fermentation Metabolism */}
+                <div className="bg-white rounded-[10px] py-2.5 px-5 w-full">
+                  <div className="flex gap-2.5 items-center mb-[5px]">
+                    <div className="p-2">
+                      <Image
+                        src="/icons/hugeicons_digestion.svg"
+                        alt="hugeicons_digestion"
+                        width={24}
+                        height={24}
+                      />
+                    </div>
+                    <span className="text-[#252525] text-[12px] font-semibold leading-[110%]">
+                      Gut Fermentation Metabolism
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex-1 p-4 border border-[#E1E6ED] rounded-[10px]">
+                      <span className="text-[#535359] text-[10px] font-normal block mb-[5px]">
+                        Absorptive Metabolism Score
+                      </span>
+                      <div className="flex items-center">
+                        <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
+                          {scores?.absorptive ?? '-'}%
+                        </p>
+                        <div className="mx-3 h-4 w-px bg-[#252525]"></div>
+                        <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.absorption?.zone)}`}>
+                          {metabolismScores?.absorption?.zone ?? '-'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 p-4 border border-[#E1E6ED] rounded-[10px]">
+                      <span className="text-[#535359] text-[10px] font-normal block mb-2">
+                        Fermentative Metabolism Score
+                      </span>
+                      <div className="flex items-center">
+                        <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
+                          {scores?.fermentative ?? '-'}%
+                        </p>
+                        <div className="mx-3 h-4 w-px bg-[#252525]"></div>
+                        <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.fermentation?.zone)}`}>
+                          {metabolismScores?.fermentation?.zone ?? '-'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
+
           </div>
 
-          {/* Metrics Section */}
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-col gap-5">
-              {/* Liver Hepatic Metabolism */}
-              <div className="bg-white rounded-[10px] py-2.5 px-5 w-full">
-                <div className="flex gap-2.5 items-center mb-[5px]">
-                  <div className="p-2">
-                    <Image
-                      src="/icons/hugeicons_liver.svg"
-                      alt="Liver Icon"
-                      width={24}
-                      height={24}
-                    />
-                  </div>
-                  <span className="text-[#252525] text-[12px] font-semibold leading-[110%]">
-                    Liver Hepatic Metabolism
-                  </span>
-                </div>
+          <div className="flex gap-[75px] pb-[15px] pl-[30px] pt-8 pr-[15px] rounded-[15px] bg-white">
+            <div className="flex flex-col">
+              <p className="text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] whitespace-nowrap">Overall Metabolism Score</p>
 
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1 p-4 border border-[#E1E6ED] rounded-[10px]">
-                    <span className="text-[#535359] text-[10px] font-normal block mb-[5px]">
-                      Hepatic Stress Metabolism Score
-                    </span>
-                    <div className="flex items-center">
-                      <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
-                        {scores?.hepatic_stress ?? '-'}%
-                      </p>
-                      <div className="mx-3 h-4 w-px bg-[#252525]"></div>
-                      <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.hepatic_stress?.zone)}`}>
-                        {metabolismScores?.hepatic_stress?.zone ?? '-'}
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="flex-1 p-4 border border-[#E1E6ED] rounded-[10px]">
-                    <span className="text-[#535359] text-[10px] font-normal block mb-2">
-                      Detoxification Metabolism Score
-                    </span>
-                    <div className="flex items-center">
-                      <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
-                        {scores?.detoxification ?? '-'}%
-                      </p>
-                      <div className="mx-3 h-4 w-px bg-[#252525]"></div>
-                      <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.detoxification?.zone)}`}>
-                        {metabolismScores?.detoxification?.zone ?? '-'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+              <div className="flex flex-col gap-5">
+               <div className="flex justify-center items-center">
+  <span className="text-[#252525] font-normal leading-normal tracking-[-2px] text-[100px]">88</span>
+  <span className="flex items-end pb-[10px] text-[#252525] text-[20px] font-semibold leading-[126%] tracking-[-0.4px]">%</span>
+</div>
+
+                <span className="flex justify-center text-[#3FAF58] text-[25px] font-semibold leading-[126%] tracking-[-0.5px]">Good</span>
+              </div>
+</div>
+              <div>
+<p className="text-black">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Et voluptas ipsam expedita, labore eum quidem quisquam culpa rerum necessitatibus accusantium corporis itaque harum tempora fuga distinctio exercitationem, ut perspiciatis. Culpa?</p>
               </div>
 
-              {/* Glucose -Vs- Fat Metabolism */}
-              <div className="bg-white rounded-[10px] py-2.5 px-5 w-full">
-                <div className="flex gap-2.5 items-center mb-[5px]">
-                  <div className="p-2">
-                    <Image
-                      src="/icons/healthicons_pancreas-outline.svg"
-                      alt="healthicons_pancreas-outline"
-                      width={24}
-                      height={24}
-                    />
-                  </div>
-                  <span className="text-[#252525] text-[12px] font-semibold leading-[110%]">
-                    Glucose -Vs- Fat Metabolism
-                  </span>
-                </div>
+              
 
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1 p-4 border border-[#E1E6ED] rounded-[10px]">
-                    <span className="text-[#535359] text-[10px] font-normal block mb-2">
-                      Fat Metabolism Score
-                    </span>
-                    <div className="flex items-center">
-                      <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
-                        {scores?.fat ?? '-'}%
-                      </p>
-                      <div className="mx-3 h-4 w-px bg-[#252525]"></div>
-                      <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.fat_metabolism?.zone)}`}>
-                        {metabolismScores?.fat_metabolism?.zone ?? '-'}
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="flex-1 p-4 border border-[#E1E6ED] rounded-[10px]">
-                    <span className="text-[#535359] text-[10px] font-normal block mb-[5px]">
-                      Glucose Metabolism Score
-                    </span>
-                    <div className="flex items-center">
-                      <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
-                        {scores?.glucose ?? '-'}%
-                      </p>
-                      <div className="mx-3 h-4 w-px bg-[#252525]"></div>
-                      <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.glucose_metabolism?.zone)}`}>
-                        {metabolismScores?.glucose_metabolism?.zone ?? '-'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
-              {/* Gut Fermentation Metabolism */}
-              <div className="bg-white rounded-[10px] py-2.5 px-5 w-full">
-                <div className="flex gap-2.5 items-center mb-[5px]">
-                  <div className="p-2">
-                    <Image
-                      src="/icons/hugeicons_digestion.svg"
-                      alt="hugeicons_digestion"
-                      width={24}
-                      height={24}
-                    />
-                  </div>
-                  <span className="text-[#252525] text-[12px] font-semibold leading-[110%]">
-                    Gut Fermentation Metabolism
-                  </span>
-                </div>
-
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1 p-4 border border-[#E1E6ED] rounded-[10px]">
-                    <span className="text-[#535359] text-[10px] font-normal block mb-[5px]">
-                      Absorptive Metabolism Score
-                    </span>
-                    <div className="flex items-center">
-                      <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
-                        {scores?.absorptive ?? '-'}%
-                      </p>
-                      <div className="mx-3 h-4 w-px bg-[#252525]"></div>
-                      <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.absorption?.zone)}`}>
-                        {metabolismScores?.absorption?.zone ?? '-'}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex-1 p-4 border border-[#E1E6ED] rounded-[10px]">
-                    <span className="text-[#535359] text-[10px] font-normal block mb-2">
-                      Fermentative Metabolism Score
-                    </span>
-                    <div className="flex items-center">
-                      <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
-                        {scores?.fermentative ?? '-'}%
-                      </p>
-                      <div className="mx-3 h-4 w-px bg-[#252525]"></div>
-                      <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.fermentation?.zone)}`}>
-                        {metabolismScores?.fermentation?.zone ?? '-'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

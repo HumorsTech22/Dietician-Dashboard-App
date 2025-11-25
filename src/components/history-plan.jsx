@@ -727,7 +727,7 @@ export default function HistoryPlan() {
           {/* Statistics Cards */}
           <div className="flex gap-5 mx-5">
             {/* Tests Taken Card */}
-            <div className="w-[235px] py-[15px] pl-[15px] pr-[81px] rounded-[10px] bg-[#F5F7FA]">
+            <div className="w-full py-[15px] pl-[15px] pr-[81px] rounded-[10px] bg-[#F5F7FA]">
               <div className="flex items-start flex-col gap-[27px]">
                 <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">
                   Tests Taken
@@ -744,7 +744,7 @@ export default function HistoryPlan() {
             </div>
 
             {/* Tests Missed Card */}
-            <div className="w-[235px] py-[15px] pl-[15px] pr-[81px] rounded-[10px] bg-[#F5F7FA]">
+            <div className="w-full py-[15px] pl-[15px] pr-[81px] rounded-[10px] bg-[#F5F7FA]">
               <div className="flex items-start flex-col gap-[27px]">
                 <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">
                   Tests Missed
@@ -761,7 +761,7 @@ export default function HistoryPlan() {
             </div>
 
             {/* Days Logged Card */}
-            <div className="w-[235px] py-[15px] pl-[15px] pr-[81px] rounded-[10px] bg-[#F5F7FA]">
+            <div className="w-full py-[15px] pl-[15px] pr-[81px] rounded-[10px] bg-[#F5F7FA]">
               <div className="flex items-start flex-col gap-[27px]">
                 <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">
                   Days Logged
@@ -778,7 +778,7 @@ export default function HistoryPlan() {
             </div>
 
             {/* Days Missed Card */}
-            <div className="w-[235px] py-[15px] pl-[15px] pr-[81px] rounded-[10px] bg-[#F5F7FA]">
+            <div className="w-full py-[15px] pl-[15px] pr-[81px] rounded-[10px] bg-[#F5F7FA]">
               <div className="flex items-start flex-col gap-[27px]">
                 <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">
                   Days Missed
