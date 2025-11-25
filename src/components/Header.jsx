@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cookieManager } from '../lib/cookies';
 import { toast } from 'sonner';
+import NotificationModal from './modal/notification-modal';
 
 const MonoIcon = ({ src, size = 20, color = "#A1A1A1", alt = "" }) => (
   <span
@@ -31,6 +32,7 @@ export default function Header() {
    const router = useRouter();
   const [active, setActive] = useState(pathname);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Update active state when route changes
   useEffect(() => {
@@ -43,6 +45,8 @@ export default function Header() {
     { name: "Messages", icon: "/icons/hugeicons_message-02.svg", path: "/messages" },
     { name: "Settings", icon: "/icons/hugeicons_settings-03.svg", path: "/settings" },
   ];
+
+const clientRelatedPaths = ["/client", "/planhistory", "/profile"];
 
 
     const handleLogout = () => {
@@ -76,8 +80,12 @@ export default function Header() {
     toast.info("Coming Soon");
   };
 
+  // const openModal = () => setIsModalOpen(true);
+  // const closeModal = () => setIsModalOpen(false);
+
 
   return (
+    <>
     <div className="flex justify-between bg-[#F5F7FA] p-4">
       <div className="flex">
         <Link href="/dashboard">
@@ -87,7 +95,11 @@ export default function Header() {
 
       <div className="flex gap-[15px]">
         {menu.map((m) => {
-          const isActive = active === m.path;
+        const isActive =
+  m.name === "Client"
+    ? clientRelatedPaths.includes(pathname)
+    : active === m.path;
+
           const color = isActive ? "#308BF9" : "#A1A1A1";
           return (
             <Link href={m.path} key={m.name} onClick={() => setActive(m.path)}>
@@ -111,7 +123,8 @@ export default function Header() {
       <div className="flex items-center gap-5">
         <div 
           className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white"
-          onClick={handleNotificationClick}
+        onClick={handleNotificationClick}
+            //onClick={openModal}
         >
           <MonoIcon src="/icons/hugeicons_notification-01.svg" color="#A1A1A1" alt="notification" />
         </div>
@@ -162,6 +175,12 @@ export default function Header() {
         </div>
       </div>
     </div>
+
+      {/* <NotificationModal
+    open={isModalOpen}
+    onClose={closeModal}
+          /> */}
+          </>
   );
 }
 

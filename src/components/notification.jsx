@@ -1,14 +1,20 @@
 
-import React from 'react'
+
 import Image from 'next/image'
+import NotificationModal from './modal/notification-modal';
+import React, { useState } from 'react'
 
 export const Notification = () => {
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const notifications = [
     { id: 1, icon: "/icons/hugeicons_label-important.svg", title: "2 clients: diet plan not assigned", time: "23 minutes ago" },
     { id: 2, icon: "/icons/hugeicons_alert-circle.svg", title: "Subscription plan: expires in 21 days", time: "23 minutes ago" },
     { id: 3, icon: "/icons/hugeicons_message-0234.svg", title: "21 new messages", time: "23 minutes ago" },
   ];
+
+  
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   return (
     <>
@@ -18,7 +24,12 @@ export const Notification = () => {
           <p className='text-[#252525] text-[15px] font-medium leading-[110%] tracking-[-0.3px]'>
             Notifications ({notifications.length})
           </p>
-          <div className='flex gap-[10px]'>
+          <div className='flex gap-[10px] items-center cursor-pointer select-none'
+          onClick={openModal}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && openModal()}
+          >
             <p className='text-[#308BF9] cursor-pointer text-[12px] font-semibold leading-[110%] tracking-[-0.24px]'>View all</p>
             <Image
               src="/icons/right button.svg"
@@ -119,6 +130,13 @@ export const Notification = () => {
 
         </div>
       </div>
+
+      
+
+      <NotificationModal
+open={isModalOpen}
+onClose={closeModal}
+      />
     </>
   )
 }

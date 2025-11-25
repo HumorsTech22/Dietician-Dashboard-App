@@ -198,9 +198,8 @@
 
 
 
-
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { IoIosArrowForward } from "react-icons/io";
 import TestEvaluation from "./test-evaluation";
@@ -238,7 +237,11 @@ export const ResultEvaluation = () => {
   const clientData = useSelector((state) => state.clientProfile.data);
   const isLoading = useSelector((state) => state.clientProfile.loading);
 
-  // Check for different plan statuses in the client data
+  // Get today's date at start of day for comparisons (needed for hooks)
+  const today = startOfDay(new Date());
+  const VISIBLE_COUNT = 16;
+
+  // Compute plan data with safe defaults for when clientData is null/undefined
   const hasActivePlan =
     clientData?.plans_summary?.active &&
     clientData.plans_summary.active.length > 0;
@@ -252,9 +255,9 @@ export const ResultEvaluation = () => {
     clientData.plans_summary.completed.length > 0;
 
   // Get plan data based on priority: active > not_started > completed
-  const activePlan = hasActivePlan ? clientData.plans_summary.active[0] : null;
-  const notStartedPlan = hasNotStartedPlan ? clientData.plans_summary.not_started[0] : null;
-  const completedPlan = hasCompletedPlan ? clientData.plans_summary.completed[0] : null;
+  const activePlan = hasActivePlan ? clientData?.plans_summary?.active[0] : null;
+  const notStartedPlan = hasNotStartedPlan ? clientData?.plans_summary?.not_started[0] : null;
+  const completedPlan = hasCompletedPlan ? clientData?.plans_summary?.completed[0] : null;
   
   // Determine which plan to use (priority order - active plans take precedence)
   const currentPlan = activePlan || notStartedPlan || completedPlan;
@@ -263,14 +266,7 @@ export const ResultEvaluation = () => {
   const planStartDate = currentPlan ? startOfDay(new Date(currentPlan.plan_start_date)) : null;
   const planEndDate = currentPlan ? startOfDay(new Date(currentPlan.plan_end_date)) : null;
 
-  // Check specific plan status for conditional rendering
-  const isPlanNotStarted = hasNotStartedPlan && !hasActivePlan;
-  const isPlanCompleted = hasCompletedPlan && !hasActivePlan && !hasNotStartedPlan;
-
-  // Get today's date at start of day for comparisons
-  const today = startOfDay(new Date());
-
-  // Function to determine initial selected date
+  // Function to determine initial selected date (with safe defaults)
   const getInitialSelectedDate = () => {
     if (!planStartDate || !planEndDate) return today;
 
@@ -283,13 +279,7 @@ export const ResultEvaluation = () => {
     return today;
   };
 
-  // State for currently selected date in the calendar
-  const [selectedDate, setSelectedDate] = useState(() => getInitialSelectedDate());
-
-  // Number of dates to show in the calendar strip
-  const VISIBLE_COUNT = 16;
-
-  // Function to determine initial window start for calendar
+  // Function to determine initial window start for calendar (with safe defaults)
   const getInitialWindowStart = () => {
     if (!planStartDate || !planEndDate) return today;
 
@@ -313,12 +303,36 @@ export const ResultEvaluation = () => {
     return middleStart;
   };
 
+  // =========================================================================
+  // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
+  // =========================================================================
+  // State for currently selected date in the calendar
+  const [selectedDate, setSelectedDate] = useState(() => getInitialSelectedDate());
+
   // State for the starting date of the visible calendar window
   const [windowStart, setWindowStart] = useState(() => getInitialWindowStart());
 
-  // Navigation constraints - check if we can go previous/next
-  const canGoPrev = planStartDate && startOfDay(windowStart).getTime() > planStartDate.getTime();
-  const canGoNext = planEndDate && startOfDay(addDays(windowStart, VISIBLE_COUNT - 1)).getTime() < planEndDate.getTime();
+  // Update windowStart and selectedDate when plan dates become available
+  useEffect(() => {
+    if (!planStartDate || !planEndDate) return;
+    
+    // Recalculate initial window start based on actual plan dates
+    const newWindowStart = getInitialWindowStart();
+    const newSelectedDate = getInitialSelectedDate();
+    
+    // Only update if they're different to avoid unnecessary re-renders
+    const currentWindowStartTime = startOfDay(windowStart).getTime();
+    const newWindowStartTime = startOfDay(newWindowStart).getTime();
+    const currentSelectedTime = startOfDay(selectedDate).getTime();
+    const newSelectedTime = startOfDay(newSelectedDate).getTime();
+    
+    if (currentWindowStartTime !== newWindowStartTime) {
+      setWindowStart(newWindowStart);
+    }
+    if (currentSelectedTime !== newSelectedTime) {
+      setSelectedDate(newSelectedDate);
+    }
+  }, [planStartDate?.getTime(), planEndDate?.getTime()]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Memoized array of dates for the visible calendar window
   const dates = useMemo(() => {
@@ -332,6 +346,50 @@ export const ResultEvaluation = () => {
     });
   }, [windowStart]);
 
+  // =========================================================================
+  // LOADING STATE - Check after all hooks are called
+  // =========================================================================
+  if (isLoading || !clientData) {
+    return (
+      <div className="w-full bg-white px-[15px] py-[30px] rounded-[15px]">
+        <div className="text-center py-10">
+          <p className="text-[#535359] text-[18px]">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Check specific plan status for conditional rendering
+  const isPlanNotStarted = hasNotStartedPlan && !hasActivePlan;
+  const isPlanCompleted = hasCompletedPlan && !hasActivePlan && !hasNotStartedPlan;
+
+  // Navigation constraints - check if we can go previous/next
+  const canGoPrev = planStartDate && startOfDay(windowStart).getTime() > planStartDate.getTime();
+  const canGoNext = planEndDate && startOfDay(addDays(windowStart, VISIBLE_COUNT - 1)).getTime() < planEndDate.getTime();
+
+  // Handler for previous navigation (must be defined before conditional returns)
+  const handlePrevClick = () => {
+    if (!canGoPrev || !planStartDate) return;
+    const newWindowStart = addDays(windowStart, -VISIBLE_COUNT);
+    // Ensure we don't go before plan start date
+    setWindowStart(newWindowStart < planStartDate ? planStartDate : newWindowStart);
+  };
+
+  // Handler for next navigation (must be defined before conditional returns)
+  const handleNextClick = () => {
+    if (!canGoNext || !planEndDate) return;
+    const newWindowStart = addDays(windowStart, VISIBLE_COUNT);
+    const lastDateInNewWindow = addDays(newWindowStart, VISIBLE_COUNT - 1);
+
+    // Adjust if new window would extend beyond plan end
+    if (lastDateInNewWindow > planEndDate) {
+      const adjustedWindowStart = addDays(planEndDate, 1 - VISIBLE_COUNT);
+      setWindowStart(adjustedWindowStart);
+    } else {
+      setWindowStart(newWindowStart);
+    }
+  };
+
   // Utility function to format dates for display
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -340,25 +398,6 @@ export const ResultEvaluation = () => {
       day: 'numeric'
     });
   };
-
-  // =========================================================================
-  // LOADING STATE
-  // =========================================================================
-  if (isLoading) {
-    return (
-      <div className="w-full bg-white px-[15px] py-[30px] rounded-[15px]">
-        <div className="flex justify-start ml-[15px]">
-          <p className="text-[#252525] text-center text-[25px] font-semibold leading-normal tracking-[-1px]">
-            Result Evaluation
-          </p>
-        </div>
-        <div className="my-[20px] border border-[#E1E6ED]"></div>
-        <div className="text-center py-10">
-          <p className="text-[#535359] text-[18px]">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   // =========================================================================
   // NO PLANS STATE - No active, not_started, or completed plans
@@ -370,21 +409,20 @@ export const ResultEvaluation = () => {
   // =========================================================================
   // NO DATES AVAILABLE STATE - Plan exists but dates are missing/invalid
   // =========================================================================
-  if (!planStartDate || !planEndDate) {
-    return (
-      <div className="w-full bg-white px-[15px] py-[30px] rounded-[15px]">
-        <div className="flex justify-start ml-[15px]">
-          <p className="text-[#252525] text-center text-[25px] font-semibold leading-normal tracking-[-1px]">
-            Result Evaluation
-          </p>
-        </div>
-        <div className="my-[20px] border border-[#E1E6ED]"></div>
-        <div className="text-center py-10">
-          <p className="text-[#535359] text-[18px]">Plan dates are not available</p>
-        </div>
-      </div>
-    );
-  }
+  // if (!planStartDate || !planEndDate) {
+    
+    
+
+  //   return (
+  //     <div className="w-full bg-white px-[15px] py-[30px] rounded-[15px]">
+        
+  //       <div className="my-[20px] border border-[#E1E6ED]"></div>
+  //       <div className="text-center py-10">
+  //         <p className="text-[#535359] text-[18px]">Loading</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // =========================================================================
   // NOT STARTED PLAN STATE - Show "Will Start" message
@@ -541,29 +579,6 @@ export const ResultEvaluation = () => {
     // Only allow selection of dates within plan range
     if (date < planStartDate || date > planEndDate) return;
     setSelectedDate(startOfDay(date));
-  };
-
-  // Handler for previous navigation
-  const handlePrevClick = () => {
-    if (!canGoPrev) return;
-    const newWindowStart = addDays(windowStart, -VISIBLE_COUNT);
-    // Ensure we don't go before plan start date
-    setWindowStart(newWindowStart < planStartDate ? planStartDate : newWindowStart);
-  };
-
-  // Handler for next navigation
-  const handleNextClick = () => {
-    if (!canGoNext) return;
-    const newWindowStart = addDays(windowStart, VISIBLE_COUNT);
-    const lastDateInNewWindow = addDays(newWindowStart, VISIBLE_COUNT - 1);
-
-    // Adjust if new window would extend beyond plan end
-    if (lastDateInNewWindow > planEndDate) {
-      const adjustedWindowStart = addDays(planEndDate, 1 - VISIBLE_COUNT);
-      setWindowStart(adjustedWindowStart);
-    } else {
-      setWindowStart(newWindowStart);
-    }
   };
 
   // Filter dates to only show those within the plan range
