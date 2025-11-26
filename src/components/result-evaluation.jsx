@@ -209,6 +209,7 @@ import MealLogged from "./meal-logged";
 import { useSelector } from "react-redux";
 import Image from "next/image";
 import NoPlans from "./no-plans";
+import WeightTracker from "./weight-tracker";
 
 // Utility function to pad single digit numbers with leading zero
 function pad2(n) {
@@ -678,6 +679,7 @@ export const ResultEvaluation = () => {
       {/* Additional evaluation components */}
       <div className="flex flex-col gap-[50px]">
         <Trends selectedDate={selectedDate} />
+        <WeightTracker/>
         <FoodEvaluation />
         <MealLogged />
       </div>

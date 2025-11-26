@@ -496,20 +496,79 @@ export default function TestEvaluation() {
 
 
               <div className="flex flex-col gap-5">
-               <div className="flex justify-center items-center">
-  <span className="text-[#252525] font-normal leading-normal tracking-[-2px] text-[100px]">88</span>
-  <span className="flex items-end pb-[10px] text-[#252525] text-[20px] font-semibold leading-[126%] tracking-[-0.4px]">%</span>
-</div>
+                <div className="flex justify-center items-center">
+                  <span className="text-[#252525] font-normal leading-normal tracking-[-2px] text-[100px]">88</span>
+                  <span className="flex items-end pb-[10px] text-[#252525] text-[20px] font-semibold leading-[126%] tracking-[-0.4px]">%</span>
+                </div>
 
                 <span className="flex justify-center text-[#3FAF58] text-[25px] font-semibold leading-[126%] tracking-[-0.5px]">Good</span>
               </div>
-</div>
-              <div>
-<p className="text-black">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Et voluptas ipsam expedita, labore eum quidem quisquam culpa rerum necessitatibus accusantium corporis itaque harum tempora fuga distinctio exercitationem, ut perspiciatis. Culpa?</p>
+            </div>
+
+            <div className="flex flex-col justify-between">
+            <div className="flex gap-[72px] items-start">
+              <div className="text-[#252525] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">
+                intervention
               </div>
+             <div className="flex gap-3 items-start">
+  {/* Left column */}
+  <div className="space-y-6">
+    {[
+      "Fat/Glucose Impact",
+      "Liver Impact",
+      "Gut Impact",
+    ].map((item, index) => (
+      <p
+        key={index}
+        className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]"
+      >
+        {item}
+      </p>
+    ))}
+  </div>
 
-              
+  {/* Right column */}
+  <div className="space-y-6">
+    {[
+      "High fat-loss readiness: strong β-oxidation (Fat↑), low insulin/glucose tone (Glucose↓)",
+      "controlled hepatic burden (Hepatic Stress↓), adequate detox capacity (Detox↑)",
+      "sufficient absorptive efficiency (Absorption↑), and limited dysbiosis (Fermentation↓)",
+    ].map((item, index) => (
+      <p
+        key={index}
+        className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]"
+      >
+        {item}
+      </p>
+    ))}
+  </div>
+</div>
 
+            </div>
+
+<div className="flex items-start gap-3 bg-[#F0F5FD] rounded-[10px] pl-2.5 pt-[15px] pb-[18px] pr-[21px]">
+  {/* Left: icon + label */}
+  <div className="flex items-center gap-2 shrink-0">
+    <Image
+      src="/icons/hugeicons_award-01.svg"
+      alt="hugeicons_award-01.svg"
+      width={15}
+      height={15}
+    />
+    <p className="whitespace-nowrap bg-gradient-to-r from-[#308BF9] to-[#1C5293] bg-clip-text text-transparent text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">
+      Goal Alignment
+    </p>
+  </div>
+
+  {/* Right: description */}
+  <p className="flex-1 text-[#252525] text-[10px] font-normal leading-[126%] tracking-[-0.2px]">
+    Oats are high in carbohydrates, which can hinder fat loss by maintaining
+    glucose reliance. The fiber content, while generally healthy, may
+    contribute to the high fermentation observed.
+  </p>
+</div>
+
+</div>
 
 
           </div>
