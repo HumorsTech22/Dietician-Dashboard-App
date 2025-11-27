@@ -306,6 +306,25 @@ export default function TestEvaluation() {
   const scores = scoresInsight?.latest_test?.scores;
   const testDate = scoresInsight?.latest_test?.date_time;
   const metabolismScores = scoresInsight?.latest_test?.test_json?.Metabolism_Score_Analysis;
+  const fatLossMetabolism =
+    scoresInsight?.latest_test?.test_json?.fat_loss_metabolism_score;
+    const scientificInterpretation =
+  scoresInsight?.latest_test?.test_json?.fat_loss_metabolism_score
+    ?.scientific_interpretation || "";
+
+let fatImpact = "-";
+let liverImpact = "-";
+let gutImpact = "-";
+
+// Split using comma
+const parts = scientificInterpretation.split(",");
+
+if (parts.length >= 3) {
+  fatImpact = parts[0].trim();   // First part
+  liverImpact = parts[1].trim(); // Second part
+  gutImpact = parts[2].trim();   // Third part
+}
+
 
   return (
     <>
@@ -497,11 +516,18 @@ export default function TestEvaluation() {
 
               <div className="flex flex-col gap-5">
                 <div className="flex justify-center items-center">
-                  <span className="text-[#252525] font-normal leading-normal tracking-[-2px] text-[100px]">88</span>
+                  <span className="text-[#252525] font-normal leading-normal tracking-[-2px] text-[100px]">{typeof fatLossMetabolism?.score === "number"
+    ? Math.round(fatLossMetabolism.score)
+    : 'N/A'}</span>
                   <span className="flex items-end pb-[10px] text-[#252525] text-[20px] font-semibold leading-[126%] tracking-[-0.4px]">%</span>
                 </div>
 
-                <span className="flex justify-center text-[#3FAF58] text-[25px] font-semibold leading-[126%] tracking-[-0.5px]">Good</span>
+               <span
+  className={`flex justify-center text-[25px] font-semibold leading-[126%] tracking-[-0.5px] ${getZoneColor(fatLossMetabolism?.zone)}`}
+>
+  {fatLossMetabolism?.zone ?? "-"}
+</span>
+
               </div>
             </div>
 
@@ -528,26 +554,23 @@ export default function TestEvaluation() {
   </div>
 
   {/* Right column */}
-  <div className="space-y-6">
-    {[
-      "High fat-loss readiness: strong β-oxidation (Fat↑), low insulin/glucose tone (Glucose↓)",
-      "controlled hepatic burden (Hepatic Stress↓), adequate detox capacity (Detox↑)",
-      "sufficient absorptive efficiency (Absorption↑), and limited dysbiosis (Fermentation↓)",
-    ].map((item, index) => (
-      <p
-        key={index}
-        className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]"
-      >
-        {item}
-      </p>
-    ))}
-  </div>
+<div className="space-y-6">
+  {[fatImpact, liverImpact, gutImpact].map((item, index) => (
+    <p
+      key={index}
+      className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]"
+    >
+      {item}
+    </p>
+  ))}
+</div>
+
 </div>
 
             </div>
-
+{/* 
 <div className="flex items-start gap-3 bg-[#F0F5FD] rounded-[10px] pl-2.5 pt-[15px] pb-[18px] pr-[21px]">
-  {/* Left: icon + label */}
+ 
   <div className="flex items-center gap-2 shrink-0">
     <Image
       src="/icons/hugeicons_award-01.svg"
@@ -560,13 +583,13 @@ export default function TestEvaluation() {
     </p>
   </div>
 
-  {/* Right: description */}
+
   <p className="flex-1 text-[#252525] text-[10px] font-normal leading-[126%] tracking-[-0.2px]">
     Oats are high in carbohydrates, which can hinder fat loss by maintaining
     glucose reliance. The fiber content, while generally healthy, may
     contribute to the high fermentation observed.
   </p>
-</div>
+</div> */}
 
 </div>
 

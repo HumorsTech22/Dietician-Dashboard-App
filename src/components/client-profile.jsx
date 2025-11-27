@@ -860,11 +860,11 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                                  'Completed'}
                                             </span>
                                             {/* Edit Plan Button - Commented out but kept for future use */}
-                                            {/* <Link
+                                          <Link
                                                 href={{
-                                                    pathname: './plansummary',
+                                                    pathname: '/plansummary',
                                                     query: {
-                                                        dietician_id: cookieManager.getJSON('dietician')?.dietician_id || '',
+                                                        //dietician_id: cookieManager.getJSON('dietician')?.dietician_id || '',
                                                         profile_id: profileId || ''
                                                     }
                                                 }}
@@ -876,7 +876,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                                     width={24}
                                                     className='cursor-pointer'
                                                 />
-                                            </Link> */}
+                                            </Link> 
                                         </div>
 
                                         {/* Divider */}

@@ -16,7 +16,8 @@ import {
 } from "../../../store/clientSlice";
 import Cookies from "js-cookie";
 import { useDispatch, useSelector } from "react-redux";
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect } from "react";
+import ProtectedRoute from "../../../components/ProtectedRoute";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -57,7 +58,7 @@ const Dashboard = () => {
   return (
     <>
 
-
+ <ProtectedRoute>
       <UserProfile /> 
  {/* <Notification/>  */}
 
@@ -68,7 +69,7 @@ const Dashboard = () => {
 
         </div>
       </div>
-
+</ProtectedRoute>
     </>
   )
 }
