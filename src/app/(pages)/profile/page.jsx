@@ -2,6 +2,7 @@
 import { ClientProfile } from "@/components/client-profile";
 import { ResultEvaluation } from "@/components/result-evaluation";
 import { Suspense } from "react";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function Profile() {
     const showNoPlans = true;
@@ -9,7 +10,7 @@ export default function Profile() {
 
     return (
         <>
-
+<ProtectedRoute>
   <Suspense fallback={<div>Loading client profile...</div>}>
             <div className="flex gap-5">
                 <div className="">
@@ -23,6 +24,7 @@ export default function Profile() {
                 <ResultEvaluation />
             </div>
             </Suspense>
+            </ProtectedRoute>
         </>
     )
 };

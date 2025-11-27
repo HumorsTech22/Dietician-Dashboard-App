@@ -2,10 +2,12 @@
 import { ClientProfile } from "@/components/client-profile";
 import HistoryPlan from "@/components/history-plan";
 import { Suspense } from "react";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function PlanHistory() {
     return (
         <>
+         <ProtectedRoute>
    <Suspense fallback={<div>Loading client profile...</div>}>
             <div className="flex gap-5 ">
               
@@ -18,6 +20,7 @@ export default function PlanHistory() {
                 <HistoryPlan />
             </div>
             </Suspense>
+            </ProtectedRoute>
         </>
     )
 };
