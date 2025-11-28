@@ -709,7 +709,6 @@ export default function Trends({ selectedDate }) {
   const [firstShowDropdown, setFirstShowDropdown] = useState(false);
   const [secondShowDropdown, setSecondShowDropdown] = useState(false);
   const [graphData, setGraphData] = useState(null);
-  console.log("graphData712:-", graphData);
   const [scoresInsightData, setScoresInsightData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [scoresLoading, setScoresLoading] = useState(false);
@@ -778,10 +777,8 @@ export default function Trends({ selectedDate }) {
       setApiMessage(null);
       try {
         const response = await fetchScoreTrend(dieticianId, profileId);
-        console.log("response781:-", response);
         if (response && response.tests_by_date) {
           const normalized = normalizeTestsByDate(response.tests_by_date);
-          console.log("normalized783:-", normalized);
           if (normalized) {
             setGraphData(normalized);
             setApiMessage(null);
