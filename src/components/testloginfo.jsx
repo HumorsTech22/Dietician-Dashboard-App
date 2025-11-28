@@ -246,7 +246,7 @@ export default function TestLogInfo({ onConfirmNext }) {
   //const [isExtracting, setIsExtracting] = useState(false);
   const isExtracting = useSelector((state) => state.extraction.isExtracting);
   const [apiResponse, setApiResponse] = useState(null);
-
+console.log("apiResponse249:-", apiResponse);
   const [progress, setProgress] = useState(0);
   const rafRef = useRef(null);
   const startTimeRef = useRef(0);
