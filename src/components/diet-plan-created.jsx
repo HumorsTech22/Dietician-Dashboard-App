@@ -1955,7 +1955,7 @@ const VISIBLE_COUNT = 7;
 
 
   const extractedData = useSelector((state) => state.extractedData.data);
-
+console.log("extractedData1958:-", extractedData);
   const visibleDays = allDays.slice(
   windowStartIndex,
   windowStartIndex + VISIBLE_COUNT
@@ -2123,11 +2123,11 @@ const handleNextDays = () => {
 };
 
   // Function to handle edit button click
-  const handleEditClick = (meal, section) => {
+  const handleEditClick = (section) => {  
     setSelectedMeal({
-      meal,
-      section,
-      day: days[activeDay]
+       section,
+    day: allDays[activeDay],
+    dayTotals: getDayTotals()
     });
     setIsModalOpen(true);
   };
@@ -2161,7 +2161,7 @@ const handleNextDays = () => {
 
   // Calculate dietPlanData - THIS UPDATES WHEN activeDay CHANGES
   const dietPlanData = getDietPlanDataForActiveDay();
-
+console.log("dietPlanData2164:-", dietPlanData);
 // Get day totals for the active day
 const getDayTotals = () => {
   if (!extractedData?.result || !allDays[activeDay]?.fullDate) return null;
@@ -2316,6 +2316,7 @@ const getDayTotals = () => {
                       </div>
                     </div>
 
+<div className="flex items-start justify-between flex-1">
                     <div className="flex flex-col py-5 pl-5 gap-[30px] border-l border-l-[#E1E6ED] flex-1">
                       {section.meals.map((meal) => (
                         <div key={meal.id} className="flex gap-5 justify-between">
@@ -2373,6 +2374,19 @@ const getDayTotals = () => {
                         </div>
                       ))}
                     </div>
+
+                   <div className="flex flex-col ml-[33px] mb-[44px] mr-2.5 gap-2.5 border border-[#D9D9D9] rounded-[10px] py-[15px] px-5 cursor-pointer"
+                   onClick={() => handleEditClick(section)}
+                   >
+                       <Image
+                          src="/icons/hugeicons_edit-03.svg"
+                           alt="hugeicons_edit-03"
+                         height={24}
+                      width={24}
+                       />
+                         <span className="text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[0.24px]">Edit</span>
+                     </div>
+</div>
                   </div>
                 ))
               ) : (

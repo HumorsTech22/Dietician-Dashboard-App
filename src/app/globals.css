@@ -209,6 +209,55 @@
 
 
 
+/* Floating input styles */
+.floating-input-container {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.floating-input {
+  display: block;
+  padding: 15px 13px 15px 19px;
+  width: 100%;
+  font-size: 14px;
+  color: #252525;
+  background-color: white;
+  border: 1px solid #E1E6ED;
+  border-radius: 8px;
+  appearance: none;
+  outline: none;
+}
+
+.floating-input:focus {
+  border-color: #308BF9;
+}
+
+.floating-label {
+  position: absolute;
+  font-size: 14px;
+  color: #9CA3AF;
+  background-color: white;
+  padding: 0 4px;
+  pointer-events: none;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all 0.2s ease-out;
+}
+
+.floating-input:focus + .floating-label,
+.floating-input:not(:placeholder-shown) + .floating-label {
+  top: 0;
+  transform: translateY(-50%) scale(0.75);
+  transform-origin: left top;
+  color: #308BF9;
+}
+
+.floating-input:not(:placeholder-shown) + .floating-label {
+  color: #535359;
+}
+        
+
 
 /* Hide scrollbar for Chrome, Safari, Edge */
 .scroll-hide::-webkit-scrollbar {

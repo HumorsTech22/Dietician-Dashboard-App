@@ -141,6 +141,8 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [inputError, setInputError] = useState("");
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -168,19 +170,21 @@ export function LoginForm({
       });
       router.push("/dashboard");
 
-    } catch (error) {
-      let errorMessage = "An unexpected error occurred.";
+    }  catch (error) {
+  let errorMessage = "Invalid credentials";
 
-      if (error.isApiError) {
-        errorMessage = error.message || error.data?.error || "Invalid credentials";
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
+  if (error.isApiError) {
+    errorMessage = error.message || error.data?.error || "Invalid credentials";
+  }
 
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+  // set input error for fields
+  setInputError(errorMessage);
+
+  toast.error(errorMessage);
+} finally {
+  setLoading(false);
+}
+
   };
 
   const togglePasswordVisibility = () => {
@@ -202,9 +206,14 @@ export function LoginForm({
               placeholder=" "
               value={email}
               autoComplete="false"
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+      setEmail(e.target.value);
+      setInputError("");
+    }}
               required
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-1 focus:ring-[#E1E6ED] peer"
+              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-1 
+    focus:ring-[#E1E6ED] peer 
+    ${inputError ? "border-[#DA5747]" : "border-gray-300"}`}
             />
             <label
               htmlFor="email"
@@ -225,9 +234,14 @@ export function LoginForm({
               placeholder=" "
               value={password}
               autoComplete="false"
-              onChange={(e) => setPassword(e.target.value)}
+             onChange={(e) => {
+      setPassword(e.target.value);
+      setInputError("");
+    }}
               required
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-1 focus:ring-[#E1E6ED] peer pr-10"
+              className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-1 
+    focus:ring-[#E1E6ED] peer pr-10
+    ${inputError ? "border-[#DA5747]" : "border-gray-300"}`}
             />
             <label
               htmlFor="password"
@@ -260,6 +274,12 @@ export function LoginForm({
             >
               Forgot password?
             </Link>
+
+             {inputError && (
+    <p className="text-[#DA5747] text-[12px] mt-1 absolute -bottom-6">
+      {inputError}
+    </p>
+  )}
           </div>
 
           <p className="text-[#A1A1A1] text-[12px] font-normal leading-[110%] tracking-[-0.24px] whitespace-nowrap">By continuing, you agree to our
