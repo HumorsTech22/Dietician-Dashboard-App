@@ -72,10 +72,12 @@ export const fetchScoreTrend = async (dieticianId, profileId, mode) => {
     body: JSON.stringify({
       dietitian_id: dieticianId,
       profile_id: profileId,
-      mode: mode.toLowerCase(), 
+      // dietitian_id: "RespyrD02",
+      // profile_id: "profile3",
+      //mode: mode.toLowerCase(), 
     }),
   });
-};
+};  
 
 
 
