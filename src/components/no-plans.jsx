@@ -8,7 +8,6 @@ import {  useSelector } from 'react-redux';
 export default function NoPlans() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const clientData = useSelector((state) => state.clientProfile.data);
-
   const handleCreatePlanClick = () => {
     // Clear localStorage when creating a new plan
     localStorage.clear();
@@ -48,67 +47,38 @@ export default function NoPlans() {
 
           {clientData?.plans_count?.total > 0 ? (
             <div className="flex flex-col gap-[30px]">
-              {/* Finished Plan */}
-              <div className="flex flex-col">
-                <div className="flex gap-[25px] justify-betwee cursor-pointer">
-                  <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">
-                    1-Month Plan
-                  </span>
-                  <span className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
-                    05 July-05 Aug
-                  </span>
-                </div>
+              {/* Render Completed Plans if available */}
+              {clientData?.plans_summary?.completed?.length > 0 && clientData?.plans_summary?.completed.map((plan) => (
+                <div key={plan.id} className="flex flex-col">
+                  <div className="flex gap-[25px] justify-between cursor-pointer">
+                    <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">
+                      {plan.plan_title}
+                    </span>
+                    <span className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
+                      {`${plan.plan_start_date} - ${plan.plan_end_date}`}
+                    </span>
+                  </div>
 
-                <div className="flex justify-between">
-                  <div>
-                    <span className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize">
-                      Updated 05 Jul, 12:30pm
-                    </span>
-                  </div>
-                  <div className="flex gap-[3px] items-center">
-                    <Image
-                      src="/icons/verified.svg"
-                      alt="verified"
-                      width={12}
-                      height={12}
-                    />
-                    <span className="text-[#3FAF58] text-[12px] font-normal leading-normal tracking-[-0.24px]">
-                      Finished
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Cancelled Plan */}
-              <div className="flex flex-col">
-                <div className="flex gap-[25px] justify-between cursor-pointer">
-                  <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">
-                    1-Month Plan
-                  </span>
-                  <span className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
-                    05 July-05 Aug
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <div>
-                    <span className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize">
-                      Updated 05 Jul, 12:30pm
-                    </span>
-                  </div>
-                  <div className="flex gap-[3px] items-center">
-                    <Image
-                      src="/icons/close icon.svg"
-                      alt="close icon"
-                      width={12}
-                      height={12}
-                    />
-                    <span className="text-[#A1A1A1] text-[12px] font-normal leading-normal tracking-[-0.24px]">
-                      Cancelled
-                    </span>
+                  <div className="flex justify-between">
+                    <div>
+                      <span className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize">
+                        Updated {plan.updated_at}
+                      </span>
+                    </div>
+                    <div className="flex gap-[3px] items-center">
+                      <Image
+                        src="/icons/verified.svg"
+                        alt="verified"
+                        width={12}
+                        height={12}
+                      />
+                      <span className="text-[#3FAF58] text-[12px] font-normal leading-normal tracking-[-0.24px]">
+                        Finished
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
           ) : (
             <div className="flex justify-center items-center py-8">

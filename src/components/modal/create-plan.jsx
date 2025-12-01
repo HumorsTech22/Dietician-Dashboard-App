@@ -360,7 +360,7 @@ export default function CreatePlanModal({ open, onClose }) {
       return url;
     });
 
-    toast.success(`File selected: ${file.name}`);
+    //toast.success(`File selected: ${file.name}`);
   };
 
   // Drag and drop handlers

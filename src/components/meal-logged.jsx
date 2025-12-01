@@ -519,13 +519,9 @@ const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId) => {
                 const today = new Date();
 
                 if (range && range.end < today) {
-                  return `Analysis will be available after - ${fmt(
-                    range.end
-                  )} 9pm`;
+                  return `Analysis will be available after - ${range?.end ? fmt(range.end) : 'N/A'} 9pm`;
                 } else {
-                  return `Analysis will be available after ${fmt(
-                    range.end
-                  )} 9pm`;
+                  return `Analysis will be available after ${range?.end ? fmt(range.end) : 'N/A'} 9pm`;
                 }
               })()}
             </span>
