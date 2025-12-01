@@ -1931,6 +1931,853 @@
 
 
 
+// "use client"
+
+// import { IoIosArrowDown } from "react-icons/io";
+// import { IoIosArrowBack } from "react-icons/io";
+// import { IoIosArrowForward } from "react-icons/io";
+// import { useState, useEffect } from "react";
+// import Image from "next/image";
+// import DietEvent from "./modal/diet-event-popup";
+// import { useSelector } from "react-redux";
+
+// export default function DietPlanCreated() {
+//   const [activeDay, setActiveDay] = useState(0);
+//   const [days, setDays] = useState([]);
+//   const [currentDate, setCurrentDate] = useState(new Date());
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [selectedMeal, setSelectedMeal] = useState(null);
+//   const [planSummary, setPlanSummary] = useState(null);
+//   const [allDays, setAllDays] = useState([]);
+// const [windowStartIndex, setWindowStartIndex] = useState(0);
+
+// const VISIBLE_COUNT = 7;
+
+
+//   const extractedData = useSelector((state) => state.extractedData.data);
+// console.log("extractedData1958:-", extractedData);
+
+
+// useEffect(() => {
+//   if (typeof window === "undefined") return;
+//   if (!extractedData) return; 
+
+//   try {
+//     localStorage.setItem("extractedData", JSON.stringify(extractedData));
+//   } catch (err) {
+//     console.error("Failed to save extractedData to localStorage", err);
+//   }
+// }, [extractedData]);
+
+
+//   const visibleDays = allDays.slice(
+//   windowStartIndex,
+//   windowStartIndex + VISIBLE_COUNT
+// );
+
+
+//   // Get plan summary from localStorage
+//   useEffect(() => {
+//     if (typeof window !== 'undefined') {
+//       const storedPlanSummary = localStorage.getItem('planSummary');
+//       if (storedPlanSummary) {
+//         setPlanSummary(JSON.parse(storedPlanSummary));
+//       }
+//     }
+//   }, []);
+
+//   // Function to get day name from date
+//   const getDayName = (date) => {
+//     const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+//     return days[date.getDay()];
+//   };
+
+//   // Function to get meal data for a specific day - FIXED: Use only dayDate parameter
+//   const getMealDataForDay = (dayDate) => {
+//     // Check if there's an error in extracted data
+//     if (extractedData?.result?.error) {
+//       console.error("PDF Extraction Error:", extractedData.result.error);
+//       return [];
+//     }
+
+//     if (!extractedData?.result) {
+//       return [];
+//     }
+
+//     // Get day name from the date
+//     const dayName = getDayName(dayDate).toLowerCase();
+
+//     const dayData = extractedData.result[dayName];
+
+//     if (!dayData?.meals) {
+//       return [];
+//     }
+
+
+//     // Transform the API data to match your component structure
+//     return dayData.meals.map((meal, index) => {
+//       const timeParts = meal.time.split(' at ');
+//       const time = timeParts[0];
+//       const timeRange = timeParts[1] || '';
+
+//       // Dynamic icon selection based on meal time
+//       const getIcon = (mealTime) => {
+//         const timeLower = mealTime.toLowerCase();
+//         if (timeLower.includes('waking') || timeLower.includes('wake up') || timeLower.includes('early morning')) {
+//           return "/icons/hugeicons_bubble-tea-02.svg";
+//         } else if (timeLower.includes('breakfast')) {
+//           return "/icons/hugeicons_dish-02.svg";
+//         } else if (timeLower.includes('lunch')) {
+//           return "/icons/hugeicons_dish-02.svg";
+//         } else if (timeLower.includes('dinner')) {
+//           return "/icons/hugeicons_dish-02.svg";
+//         } else if (timeLower.includes('mid morning') || timeLower.includes('evening') || timeLower.includes('snack')) {
+//           return "/icons/hugeicons_vegetarian-food.svg";
+//         } else {
+//           return "/icons/hugeicons_vegetarian-food.svg";
+//         }
+//       };
+
+//       // Create multiple meal sections if there are multiple food items
+//       const meals = meal.items.map((item, itemIndex) => ({
+//         id: itemIndex + 1,
+//         icon: getIcon(time),
+//         number: (itemIndex + 1).toString(),
+//         status: "100% Filled",
+//         statusColor: "#E1F6E6",
+//         textColor: "#3FAF58",
+//         foodItems: [{
+//           name: item.name,
+//           details: [
+//             item.portion,
+//             `${item.calories_kcal}kcal`,
+
+//             `Protein: ${item.protein}g`,
+//             `Carbs: ${item.carbs}g`,
+//             `Fat: ${item.fat}g`
+//           ]
+//         }],
+//         totals: {
+//           calories_kcal: item.calories_kcal,
+//           protein: item.protein,
+//           carbs: item.carbs,
+//           fat: item.fat
+//         }
+//       }));
+
+//       return {
+//         id: index + 1,
+//         time: time,
+//         timeRange: timeRange,
+//         foodsCount: `${meal.items.length} food${meal.items.length > 1 ? 's' : ''} added`,
+//         meals: meals,
+//       };
+//     });
+//   };
+
+//   // Function to generate 7 days array based on plan start date
+//  const generateAllDays = (startDate, endDate) => {
+//   const list = [];
+//   const start = new Date(startDate);
+//   const end = new Date(endDate);
+
+//   const daysDiff =
+//     Math.floor((end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
+
+//   for (let i = 0; i < daysDiff; i++) {
+//     const date = new Date(start);
+//     date.setDate(start.getDate() + i);
+
+//     list.push({
+//       id: i,
+//       day: `Day ${i + 1}`,
+//       date: date.toLocaleDateString("en-US", {
+//         day: "2-digit",
+//         month: "short"
+//       }),
+//       fullDate: date
+//     });
+//   }
+
+//   return list;
+// };
+
+
+//  useEffect(() => {
+//   if (!planSummary) return;
+
+//   const start = new Date(planSummary.plan_start_date);
+//   const end = new Date(planSummary.plan_end_date);
+
+//   const generated = generateAllDays(start, end);
+//   setAllDays(generated);
+
+//   // always reset window to first 7
+//   setWindowStartIndex(0);
+//   setActiveDay(0);
+// }, [planSummary]);
+
+
+//   // Function to navigate to previous days
+// const handlePreviousDays = () => {
+//   if (windowStartIndex === 0) return; // can't go backward
+
+//   setWindowStartIndex((prev) => Math.max(prev - VISIBLE_COUNT, 0));
+//   setActiveDay(windowStartIndex - VISIBLE_COUNT);
+// };
+
+//   // Function to navigate to next days
+// const handleNextDays = () => {
+//   if (windowStartIndex + VISIBLE_COUNT >= allDays.length) return; // can't go beyond
+
+//   setWindowStartIndex((prev) =>
+//     Math.min(prev + VISIBLE_COUNT, allDays.length - VISIBLE_COUNT)
+//   );
+//   setActiveDay(windowStartIndex + VISIBLE_COUNT);
+// };
+
+//   // Function to handle edit button click
+//   const handleEditClick = (section) => {  
+//     setSelectedMeal({
+//        section,
+//     day: allDays[activeDay],
+//     dayTotals: getDayTotals()
+//     });
+//     setIsModalOpen(true);
+//   };
+
+//   // Function to close modal
+//   const handleCloseModal = () => {
+//     setIsModalOpen(false);
+//     setSelectedMeal(null);
+//   };
+
+//   // Get diet plan data for current active day - FIXED: Pass only the date
+//   const getDietPlanDataForActiveDay = () => {
+//     if (!allDays[activeDay]?.fullDate) {
+//       return [];
+//     }
+
+//     const currentDay = allDays[activeDay];
+
+//     const meals = getMealDataForDay(currentDay.fullDate);
+
+//     return meals;
+//   };
+
+//  const selectedDayObj = allDays.find((d) => d.id === activeDay);
+//   const formatDisplayDate = (dateObj) => {
+//     if (!dateObj) return "";
+//     const ddMon = dateObj.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+//     const wk = dateObj.toLocaleDateString("en-US", { weekday: "long" });
+//     return `${ddMon}, ${wk}`;
+//   };
+
+//   // Calculate dietPlanData - THIS UPDATES WHEN activeDay CHANGES
+//   const dietPlanData = getDietPlanDataForActiveDay();
+// console.log("dietPlanData2164:-", dietPlanData);
+// // Get day totals for the active day
+// const getDayTotals = () => {
+//   if (!extractedData?.result || !allDays[activeDay]?.fullDate) return null;
+
+//   const dayName = getDayName(allDays[activeDay].fullDate).toLowerCase();
+//   const dayData = extractedData.result[dayName];
+
+//   return dayData?.totals || null;
+// };
+
+//   const dayTotals = getDayTotals();
+
+//   return (
+//     <>
+//       <div className='w-full max-w-full min-w-0 overflow-x-hidden relative flex flex-col gap-[310px]'>
+
+//         <div className="">
+//           <div className="flex justify-between pl-[15px] pr-[20px]">
+//             <p className='text-[#252525] pb-[18px] pt-[23px] text-[20px] font-semibold leading-[110%] tracking-[0.4px] whitespace-nowrap'>Diet Plan</p>
+//           </div>
+
+//           <div className="flex flex-col gap-[15px]">
+//             <div className="w-full  border-b border-[#E1E6ED]"></div>
+
+//             {/* <div className="flex gap-5">
+//               <div className="w-fit flex justify-center">
+//                 <div className="rounded-l-[10px] border border-[#D9D9D9] pl-4 py-2 pr-2.5 bg-[#F0F0F0] text-center">
+//                   <p className="text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
+//                     Diet Changes
+//                   </p>
+//                 </div>
+//                 <div className="flex rounded-r-[10px] border border-[#D9D9D9] gap-[37px] text-center items-center pl-4 py-2 pr-2.5 bg-white">
+//                   <p className="cursor-pointer text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
+//                     Daily
+//                   </p>
+//                   <IoIosArrowDown className="text-[#A1A1A1] cursor-pointer" />
+//                 </div>
+//               </div>
+
+//               <div className="w-fit flex justify-center">
+//                 <div className="rounded-l-[10px] border border-[#D9D9D9] pl-4 py-2 pr-2.5 bg-[#F0F0F0] text-center">
+//                   <p className="text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
+//                     Type
+//                   </p>
+//                 </div>
+//                 <div className="flex rounded-r-[10px] border border-[#D9D9D9] gap-[37px] text-center items-center pl-4 py-2 pr-2.5 bg-white">
+//                   <p className="cursor-pointer text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
+//                     Not specified
+//                   </p>
+//                   <IoIosArrowDown className="text-[#A1A1A1] cursor-pointer" />
+//                 </div>
+//               </div>
+//             </div> */}
+
+//             <div className="flex flex-col gap-9 bg-[#F5F7FA] rounded-[15px]">
+//               <div className="flex items-center bg-[#E1E6ED] rounded-[15px] border-4 border-[#F5F7FA]">
+
+//                 <div className="flex justify-between w-[170px] py-[30px] pl-[26px]">
+//                   <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">Select a day</span>
+//                   <IoIosArrowBack
+//                     className="text-[#252525] cursor-pointer"
+//                     onClick={handlePreviousDays}
+//                   />
+//                 </div>
+
+//                 <div className="flex items-center">
+              
+// {visibleDays.map((day, index) => (
+//   <div key={day.id} className="flex items-center">
+//     <div
+//       className={`flex flex-col w-[140px] gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer ${
+//         activeDay === day.id ? 'bg-[#308BF9]' : 'bg-white'
+//       }`}
+//       onClick={() => {
+//         setActiveDay(day.id);
+//       }}
+//     >
+//       <span className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] ${
+//         activeDay === day.id ? 'text-white' : 'text-[#252525]'
+//       }`}>
+//         {day.day}
+//       </span>
+//       <span className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] ${
+//         activeDay === day.id ? 'text-white' : 'text-[#252525]'
+//       }`}>
+//         {day.date}
+//       </span>
+//     </div>
+
+//     {index < visibleDays.length - 1 && (
+//       <div className="border-white border-r h-8 mx-2"></div>
+//     )}
+//   </div>
+// ))}
+//                   <IoIosArrowForward
+//                     className="text-[#252525] ml-2 cursor-pointer"
+//                     onClick={handleNextDays}
+//                   />
+//                 </div>
+//               </div>
+
+//               {/* Dynamic header that matches the selected day */}
+//               <div className="flex flex-col gap-2.5 ml-[30px]">
+//                 <span className="text-[#252525] text-[12px] font-normal leading-normal tracking-[-0.24px]">
+//                   {selectedDayObj?.day ?? `Day ${activeDay + 1}`}
+//                 </span>
+//                 <span className="text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]">
+//                   {formatDisplayDate(selectedDayObj?.fullDate)}
+//                 </span>
+
+//                 {/* Day Totals Display */}
+//                 {dayTotals ? (
+//                   // <div className="flex gap-4 mt-2 p-3 bg-blue-50 rounded-lg">
+//                   //   <span className="text-[#252525] text-[12px] font-semibold">
+//                   //     Day Totals: 
+//                   //   </span>
+//                   //   <span className="text-[#252525] text-[12px]">
+//                   //     Calories: {dayTotals.calories_kcal}kcal
+//                   //   </span>
+//                   //   <span className="text-[#252525] text-[12px]">
+//                   //     Protein: {dayTotals.protein}g
+//                   //   </span>
+//                   //   <span className="text-[#252525] text-[12px]">
+//                   //     Carbs: {dayTotals.carbs}g
+//                   //   </span>
+//                   //   <span className="text-[#252525] text-[12px]">
+//                   //     Fat: {dayTotals.fat}g
+//                   //   </span>
+//                   // </div>
+//                   ""
+//                 ) : (
+//                   <div className="flex gap-4 mt-2 p-3 bg-gray-100 rounded-lg">
+//                     <span className="text-gray-500 text-[12px] font-semibold">
+//                       No meal data available for this day
+//                     </span>
+//                   </div>
+//                 )}
+//               </div>
+
+//               {/* Render diet plan sections from dynamic data - THIS SHOWS FILTERED DATA */}
+//               {dietPlanData.length > 0 ? (
+//                 dietPlanData.map((section) => (
+//                   <div key={section.id} className="flex py-5 bg-white rounded-[15px] border-4 border-[#F5F7FA]">
+//                     <div className="flex flex-col gap-[30px] pt-[15px] pl-[15px] pr-2.5 pb-2.5 min-w-[200px]">
+//                       <div className="flex flex-col gap-2.5">
+//                         <span className="text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.48px]">{section.time}</span>
+//                         <span className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px]">{section.timeRange}</span>
+//                       </div>
+
+//                       <div className="max-w-fit py-1.5 px-2 rounded-[20px] bg-[#E1E6ED] text-[#535359] text-[10px] font-normal leading-normal tracking-[-0.2px] whitespace-nowrap">
+//                         {section.foodsCount}
+//                       </div>
+//                     </div>
+
+// <div className="flex items-start justify-between flex-1">
+//                     <div className="flex flex-col py-5 pl-5 gap-[30px] border-l border-l-[#E1E6ED] flex-1">
+//                       {section.meals.map((meal) => (
+//                         <div key={meal.id} className="flex gap-5 justify-between">
+//                           <div className="flex gap-5 items-start py-[5px]">
+//                             <div className="flex items-center gap-1">
+//                               {/* <Image
+//                                 src={meal.icon}
+//                                 alt={meal.icon}
+//                                 width={24}
+//                                 height={24}
+//                               /> */}
+//                               <span className="text-[#252525] text-[15px] font-bold leading-none tracking-[-0.3px]">{meal.number}</span>
+//                             </div>
+//                             {/* <div
+//                               className="rounded-[21px] p-2 text-[10px] font-semibold leading-[110%] tracking-[-0.2px]"
+//                               style={{ backgroundColor: meal.statusColor, color: meal.textColor }}
+//                             >
+//                               {meal.status}
+//                             </div> */}
+//                           </div>
+
+//                           <div className="flex gap-[33px] flex-1">
+//                             <div className="flex-1">
+//                               {meal.foodItems.map((foodItem, index) => (
+//                                 <div key={index} className="mb-4 last:mb-0">
+//                                   <div className="flex flex-col gap-1">
+//                                     <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">{foodItem.name}</span>
+//                                     <div className="flex flex-wrap gap-[5px]">
+//                                       {foodItem.details.map((detail, detailIndex) => (
+//                                         // <span key={detailIndex} className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px] bg-gray-100 px-2 py-1 rounded">
+//                                         //   {detail}
+//                                         // </span>
+
+//                                         <span
+//                                           key={detailIndex}
+//                                           className={`text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px] px-2 py-1 rounded ${detailIndex === 0 ? 'bg-white ' : 'bg-gray-100'
+//                                             }`}
+//                                         >
+//                                           {detail}
+//                                         </span>
+
+//                                       ))}
+//                                       {/* <Image
+//                                         src="/icons/hugeicons_information-circle.svg"
+//                                         alt="hugeicons_information-circle"
+//                                         width={12}
+//                                         height={12}
+//                                       /> */}
+//                                     </div>
+//                                   </div>
+//                                 </div>
+//                               ))}
+//                             </div>
+//                           </div>
+//                         </div>
+//                       ))}
+//                     </div>
+
+//                    <div className="flex flex-col ml-[33px] mb-[44px] mr-2.5 gap-2.5 border border-[#D9D9D9] rounded-[10px] py-[15px] px-5 cursor-pointer"
+//                    onClick={() => handleEditClick(section)}
+//                    >
+//                        <Image
+//                           src="/icons/hugeicons_edit-03.svg"
+//                            alt="hugeicons_edit-03"
+//                          height={24}
+//                       width={24}
+//                        />
+//                          <span className="text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[0.24px]">Edit</span>
+//                      </div>
+// </div>
+//                   </div>
+//                 ))
+//               ) : (
+//                 <div className="flex justify-center items-center py-10">
+//                   <span className="text-[#252525] text-[16px] font-normal">
+//                     {extractedData?.result?.error
+//                       ? `PDF Extraction Error: ${extractedData.result.error}`
+//                       : planSummary && extractedData?.result
+//                         ? `No diet plan data available for ${selectedDayObj?.day}.`
+//                         : 'Please Repload the pdf'
+//                     }
+//                   </span>
+//                 </div>
+//               )}
+
+//             </div>
+
+//             <div>
+//               <div className="w-full border-b border-[#E1E6ED] mt-[30px]"></div>
+
+//               {/* <div className='py-[23px]'>
+//                 <div className='flex gap-5 justify-end'>
+//                   <div className='px-5 py-[15px] bg-white border border-[#D9D9D9] rounded-[10px] text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[-0.24px] cursor-pointer'>
+//                     Save as draft
+//                   </div>
+
+//                   <div className='px-20 py-[15px] bg-[#308BF9] rounded-[10px] text-white text-[12px] font-semibold leading-normal tracking-[-0.24px] cursor-pointer'>
+//                     Confirm & Next
+//                   </div>
+//                 </div>
+//               </div> */}
+//             </div>
+
+//           </div>
+
+//         </div>
+//       </div>
+
+//       <DietEvent
+//         open={isModalOpen}
+//         onClose={handleCloseModal}
+//         selectedMeal={selectedMeal}
+//       />
+//     </>
+//   )
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// "use client"
+
+// import { IoIosArrowDown } from "react-icons/io";
+// import { IoIosArrowBack } from "react-icons/io";
+// import { IoIosArrowForward } from "react-icons/io";
+// import { useState, useEffect } from "react";
+// import Image from "next/image";
+// import DietEvent from "./modal/diet-event-popup";
+// import { useSelector } from "react-redux";
+
+// export default function DietPlanCreated() {
+//   const [activeDay, setActiveDay] = useState(0);
+//   const [days, setDays] = useState([]);
+//   const [currentDate, setCurrentDate] = useState(new Date());
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [selectedMeal, setSelectedMeal] = useState(null);
+//   const [planSummary, setPlanSummary] = useState(null);
+//   const [allDays, setAllDays] = useState([]);
+//   const [windowStartIndex, setWindowStartIndex] = useState(0);
+//   const [extractedData, setExtractedData] = useState(null);
+
+//   const VISIBLE_COUNT = 7;
+
+//   useEffect(() => {
+//     if (typeof window === "undefined") return;
+    
+//     // Fetch extractedData from localStorage
+//     const storedData = localStorage.getItem("extractedData");
+//     if (storedData) {
+//       setExtractedData(JSON.parse(storedData));
+//     }
+//   }, []);
+
+//   const visibleDays = allDays.slice(windowStartIndex, windowStartIndex + VISIBLE_COUNT);
+
+//   // Get plan summary from localStorage
+//   useEffect(() => {
+//     if (typeof window !== 'undefined') {
+//       const storedPlanSummary = localStorage.getItem('planSummary');
+//       if (storedPlanSummary) {
+//         setPlanSummary(JSON.parse(storedPlanSummary));
+//       }
+//     }
+//   }, []);
+
+//   const getDayName = (date) => {
+//     const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+//     return days[date.getDay()];
+//   };
+
+//   const getMealDataForDay = (dayDate) => {
+//     if (!extractedData?.result) return [];
+
+//     const dayName = getDayName(dayDate).toLowerCase();
+//     const dayData = extractedData.result[dayName];
+
+//     if (!dayData?.meals) {
+//       return [];
+//     }
+
+//     return dayData.meals.map((meal, index) => {
+//       const timeParts = meal.time.split(' at ');
+//       const time = timeParts[0];
+//       const timeRange = timeParts[1] || '';
+
+//       const getIcon = (mealTime) => {
+//         const timeLower = mealTime.toLowerCase();
+//         if (timeLower.includes('waking') || timeLower.includes('wake up') || timeLower.includes('early morning')) {
+//           return "/icons/hugeicons_bubble-tea-02.svg";
+//         } else if (timeLower.includes('breakfast')) {
+//           return "/icons/hugeicons_dish-02.svg";
+//         } else if (timeLower.includes('lunch')) {
+//           return "/icons/hugeicons_dish-02.svg";
+//         } else if (timeLower.includes('dinner')) {
+//           return "/icons/hugeicons_dish-02.svg";
+//         } else if (timeLower.includes('mid morning') || timeLower.includes('evening') || timeLower.includes('snack')) {
+//           return "/icons/hugeicons_vegetarian-food.svg";
+//         } else {
+//           return "/icons/hugeicons_vegetarian-food.svg";
+//         }
+//       };
+
+//       const meals = meal.items.map((item, itemIndex) => ({
+//         id: itemIndex + 1,
+//         icon: getIcon(time),
+//         number: (itemIndex + 1).toString(),
+//         status: "100% Filled",
+//         statusColor: "#E1F6E6",
+//         textColor: "#3FAF58",
+//         foodItems: [{
+//           name: item.name,
+//           details: [
+//             item.portion,
+//             `${item.calories_kcal}kcal`,
+//             `Protein: ${item.protein}g`,
+//             `Carbs: ${item.carbs}g`,
+//             `Fat: ${item.fat}g`
+//           ]
+//         }],
+//         totals: {
+//           calories_kcal: item.calories_kcal,
+//           protein: item.protein,
+//           carbs: item.carbs,
+//           fat: item.fat
+//         }
+//       }));
+
+//       return {
+//         id: index + 1,
+//         time: time,
+//         timeRange: timeRange,
+//         foodsCount: `${meal.items.length} food${meal.items.length > 1 ? 's' : ''} added`,
+//         meals: meals,
+//       };
+//     });
+//   };
+
+//   const generateAllDays = (startDate, endDate) => {
+//     const list = [];
+//     const start = new Date(startDate);
+//     const end = new Date(endDate);
+
+//     const daysDiff = Math.floor((end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
+
+//     for (let i = 0; i < daysDiff; i++) {
+//       const date = new Date(start);
+//       date.setDate(start.getDate() + i);
+
+//       list.push({
+//         id: i,
+//         day: `Day ${i + 1}`,
+//         date: date.toLocaleDateString("en-US", { day: "2-digit", month: "short" }),
+//         fullDate: date
+//       });
+//     }
+
+//     return list;
+//   };
+
+//   useEffect(() => {
+//     if (!planSummary) return;
+
+//     const start = new Date(planSummary.plan_start_date);
+//     const end = new Date(planSummary.plan_end_date);
+
+//     const generated = generateAllDays(start, end);
+//     setAllDays(generated);
+
+//     setWindowStartIndex(0);
+//     setActiveDay(0);
+//   }, [planSummary]);
+
+//   const handlePreviousDays = () => {
+//     if (windowStartIndex === 0) return;
+//     setWindowStartIndex((prev) => Math.max(prev - VISIBLE_COUNT, 0));
+//     setActiveDay(windowStartIndex - VISIBLE_COUNT);
+//   };
+
+//   const handleNextDays = () => {
+//     if (windowStartIndex + VISIBLE_COUNT >= allDays.length) return;
+//     setWindowStartIndex((prev) => Math.min(prev + VISIBLE_COUNT, allDays.length - VISIBLE_COUNT));
+//     setActiveDay(windowStartIndex + VISIBLE_COUNT);
+//   };
+
+//   const handleEditClick = (section) => {
+//     setSelectedMeal({ section, day: allDays[activeDay], dayTotals: getDayTotals() });
+//     setIsModalOpen(true);
+//   };
+
+//   const handleCloseModal = () => {
+//     setIsModalOpen(false);
+//     setSelectedMeal(null);
+//   };
+
+//   const getDietPlanDataForActiveDay = () => {
+//     if (!allDays[activeDay]?.fullDate) {
+//       return [];
+//     }
+
+//     const currentDay = allDays[activeDay];
+//     const meals = getMealDataForDay(currentDay.fullDate);
+
+//     return meals;
+//   };
+
+//   const selectedDayObj = allDays.find((d) => d.id === activeDay);
+//   const formatDisplayDate = (dateObj) => {
+//     if (!dateObj) return "";
+//     return `${dateObj.toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}, ${dateObj.toLocaleDateString("en-US", { weekday: "long" })}`;
+//   };
+
+//   const dietPlanData = getDietPlanDataForActiveDay();
+//   const dayTotals = getDayTotals();
+
+//   return (
+//     <>
+//       <div className="w-full max-w-full min-w-0 overflow-x-hidden relative flex flex-col gap-[310px]">
+//         <div>
+//           <div className="flex justify-between pl-[15px] pr-[20px]">
+//             <p className="text-[#252525] pb-[18px] pt-[23px] text-[20px] font-semibold leading-[110%] tracking-[0.4px] whitespace-nowrap">Diet Plan</p>
+//           </div>
+//           <div className="flex flex-col gap-[15px]">
+//             <div className="w-full border-b border-[#E1E6ED]"></div>
+
+//             <div className="flex flex-col gap-9 bg-[#F5F7FA] rounded-[15px]">
+//               <div className="flex items-center bg-[#E1E6ED] rounded-[15px] border-4 border-[#F5F7FA]">
+//                 <div className="flex justify-between w-[170px] py-[30px] pl-[26px]">
+//                   <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">Select a day</span>
+//                   <IoIosArrowBack
+//                     className="text-[#252525] cursor-pointer"
+//                     onClick={handlePreviousDays}
+//                   />
+//                 </div>
+//                 <div className="flex items-center">
+//                   {visibleDays.map((day, index) => (
+//                     <div key={day.id} className="flex items-center">
+//                       <div
+//                         className={`flex flex-col w-[140px] gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer ${
+//                           activeDay === day.id ? 'bg-[#308BF9]' : 'bg-white'
+//                         }`}
+//                         onClick={() => setActiveDay(day.id)}
+//                       >
+//                         <span className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] ${
+//                           activeDay === day.id ? 'text-white' : 'text-[#252525]'
+//                         }`}>
+//                           {day.day}
+//                         </span>
+//                         <span className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] ${
+//                           activeDay === day.id ? 'text-white' : 'text-[#252525]'
+//                         }`}>
+//                           {day.date}
+//                         </span>
+//                       </div>
+//                       {index < visibleDays.length - 1 && <div className="border-white border-r h-8 mx-2"></div>}
+//                     </div>
+//                   ))}
+//                   <IoIosArrowForward
+//                     className="text-[#252525] ml-2 cursor-pointer"
+//                     onClick={handleNextDays}
+//                   />
+//                 </div>
+//               </div>
+//               {/* Render dynamic content for the selected day */}
+//               <div className="flex flex-col gap-2.5 ml-[30px]">
+//                 <span className="text-[#252525] text-[12px] font-normal leading-normal tracking-[-0.24px]">{selectedDayObj?.day ?? `Day ${activeDay + 1}`}</span>
+//                 <span className="text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]">{formatDisplayDate(selectedDayObj?.fullDate)}</span>
+//               </div>
+//               {dietPlanData.length > 0 ? (
+//                 dietPlanData.map((section) => (
+//                   <div key={section.id} className="flex py-5 bg-white rounded-[15px] border-4 border-[#F5F7FA]">
+//                     <div className="flex flex-col gap-[30px] pt-[15px] pl-[15px] pr-2.5 pb-2.5 min-w-[200px]">
+//                       <div className="flex flex-col gap-2.5">
+//                         <span className="text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.48px]">{section.time}</span>
+//                         <span className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px]">{section.timeRange}</span>
+//                       </div>
+//                     </div>
+//                     <div className="flex items-start justify-between flex-1">
+//                       <div className="flex flex-col py-5 pl-5 gap-[30px] border-l border-l-[#E1E6ED] flex-1">
+//                         {section.meals.map((meal) => (
+//                           <div key={meal.id} className="flex gap-5 justify-between">
+//                             <div className="flex gap-5 items-start py-[5px]">
+//                               <div className="flex items-center gap-1">
+//                                 <span className="text-[#252525] text-[15px] font-bold leading-none tracking-[-0.3px]">{meal.number}</span>
+//                               </div>
+//                             </div>
+//                             <div className="flex gap-[33px] flex-1">
+//                               <div className="flex-1">
+//                                 {meal.foodItems.map((foodItem, index) => (
+//                                   <div key={index} className="mb-4 last:mb-0">
+//                                     <div className="flex flex-col gap-1">
+//                                       <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">{foodItem.name}</span>
+//                                       <div className="flex flex-wrap gap-[5px]">
+//                                         {foodItem.details.map((detail, detailIndex) => (
+//                                           <span key={detailIndex} className={`text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px] px-2 py-1 rounded ${detailIndex === 0 ? 'bg-white ' : 'bg-gray-100'}`}>{detail}</span>
+//                                         ))}
+//                                       </div>
+//                                     </div>
+//                                   </div>
+//                                 ))}
+//                               </div>
+//                             </div>
+//                           </div>
+//                         ))}
+//                       </div>
+//                       <div className="flex flex-col ml-[33px] mb-[44px] mr-2.5 gap-2.5 border border-[#D9D9D9] rounded-[10px] py-[15px] px-5 cursor-pointer" onClick={() => handleEditClick(section)}>
+//                         <Image src="/icons/hugeicons_edit-03.svg" alt="hugeicons_edit-03" height={24} width={24} />
+//                         <span className="text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[0.24px]">Edit</span>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 ))
+//               ) : (
+//                 <div className="flex justify-center items-center py-10">
+//                   <span className="text-[#252525] text-[16px] font-normal">
+//                     {extractedData?.result?.error ? `PDF Extraction Error: ${extractedData.result.error}` : 'Please Repload the pdf'}
+//                   </span>
+//                 </div>
+//               )}
+//             </div>
+//           </div>
+//         </div>
+
+//         <DietEvent open={isModalOpen} onClose={handleCloseModal} selectedMeal={selectedMeal} />
+//       </div>
+//     </>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
 "use client"
 
 import { IoIosArrowDown } from "react-icons/io";
@@ -1949,18 +2796,76 @@ export default function DietPlanCreated() {
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [planSummary, setPlanSummary] = useState(null);
   const [allDays, setAllDays] = useState([]);
-const [windowStartIndex, setWindowStartIndex] = useState(0);
+  const [windowStartIndex, setWindowStartIndex] = useState(0);
+  const reduxExtractedData = useSelector((state) => state.extractedData.data);
 
-const VISIBLE_COUNT = 7;
+  // Initialize localExtractedData from localStorage synchronously to avoid race conditions
+  // This ensures user edits are preserved when navigating back
+  const [localExtractedData, setLocalExtractedData] = useState(() => {
+    if (typeof window === "undefined") return null;
+    
+    try {
+      const storedData = localStorage.getItem("updatedExtractedData");
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        console.log("Initialized localExtractedData from localStorage:", parsedData);
+        return parsedData;
+      }
+    } catch (err) {
+      console.error("Failed to get updatedExtractedData from localStorage:", err);
+    }
+    return null;
+  });
 
+  console.log("localExtractedData2802:-", localExtractedData);
+  const VISIBLE_COUNT = 7;
 
-  const extractedData = useSelector((state) => state.extractedData.data);
-console.log("extractedData1958:-", extractedData);
+  // Save Redux data to localStorage when it changes, but ONLY if:
+  // 1. localStorage doesn't have updatedExtractedData (no user edits exist)
+  // 2. localExtractedData is null (component just mounted and no localStorage data)
+  // This prevents overwriting user edits when navigating back
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!reduxExtractedData) return;
+    
+    // Check if localStorage has updated data - if it does, preserve it
+    try {
+      const storedData = localStorage.getItem("updatedExtractedData");
+      if (storedData) {
+        // localStorage has data, don't overwrite it with Redux data
+        console.log("Preserving localStorage data, skipping Redux update");
+        // Make sure localExtractedData is set from localStorage
+        if (localExtractedData === null) {
+          setLocalExtractedData(JSON.parse(storedData));
+        }
+        return;
+      }
+    } catch (err) {
+      console.error("Failed to check localStorage:", err);
+    }
+    
+    // Only update if localExtractedData is null AND localStorage is empty
+    // This means it's a fresh load with no user edits
+    if (localExtractedData !== null) return;
+
+    try {
+      localStorage.setItem("updatedExtractedData", JSON.stringify(reduxExtractedData)); // Save Redux data in localStorage
+      setLocalExtractedData(reduxExtractedData); // Set the Redux data as localExtractedData
+      console.log("Initialized with Redux data:", reduxExtractedData);
+    } catch (err) {
+      console.error("Failed to save updatedExtractedData to localStorage", err);
+    }
+  }, [reduxExtractedData, localExtractedData]);
+
+  // Use localExtractedData if available (has updates), otherwise use Redux data
+  // This ensures that when we update localExtractedData, it takes precedence
+  const extractedData = localExtractedData || reduxExtractedData;
+  console.log("extractedData:-", extractedData);
+
   const visibleDays = allDays.slice(
-  windowStartIndex,
-  windowStartIndex + VISIBLE_COUNT
-);
-
+    windowStartIndex,
+    windowStartIndex + VISIBLE_COUNT
+  );
 
   // Get plan summary from localStorage
   useEffect(() => {
@@ -1980,6 +2885,12 @@ console.log("extractedData1958:-", extractedData);
 
   // Function to get meal data for a specific day - FIXED: Use only dayDate parameter
   const getMealDataForDay = (dayDate) => {
+    // Check if extracted data exists
+    if (!extractedData) {
+      console.log("No extracted data available");
+      return [];
+    }
+
     // Check if there's an error in extracted data
     if (extractedData?.result?.error) {
       console.error("PDF Extraction Error:", extractedData.result.error);
@@ -1998,7 +2909,6 @@ console.log("extractedData1958:-", extractedData);
     if (!dayData?.meals) {
       return [];
     }
-
 
     // Transform the API data to match your component structure
     return dayData.meals.map((meal, index) => {
@@ -2037,7 +2947,6 @@ console.log("extractedData1958:-", extractedData);
           details: [
             item.portion,
             `${item.calories_kcal}kcal`,
-
             `Protein: ${item.protein}g`,
             `Carbs: ${item.carbs}g`,
             `Fat: ${item.fat}g`
@@ -2062,72 +2971,70 @@ console.log("extractedData1958:-", extractedData);
   };
 
   // Function to generate 7 days array based on plan start date
- const generateAllDays = (startDate, endDate) => {
-  const list = [];
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+  const generateAllDays = (startDate, endDate) => {
+    const list = [];
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-  const daysDiff =
-    Math.floor((end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
+    const daysDiff =
+      Math.floor((end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
 
-  for (let i = 0; i < daysDiff; i++) {
-    const date = new Date(start);
-    date.setDate(start.getDate() + i);
+    for (let i = 0; i < daysDiff; i++) {
+      const date = new Date(start);
+      date.setDate(start.getDate() + i);
 
-    list.push({
-      id: i,
-      day: `Day ${i + 1}`,
-      date: date.toLocaleDateString("en-US", {
-        day: "2-digit",
-        month: "short"
-      }),
-      fullDate: date
-    });
-  }
+      list.push({
+        id: i,
+        day: `Day ${i + 1}`,
+        date: date.toLocaleDateString("en-US", {
+          day: "2-digit",
+          month: "short"
+        }),
+        fullDate: date
+      });
+    }
 
-  return list;
-};
+    return list;
+  };
 
+  useEffect(() => {
+    if (!planSummary) return;
 
- useEffect(() => {
-  if (!planSummary) return;
+    const start = new Date(planSummary.plan_start_date);
+    const end = new Date(planSummary.plan_end_date);
 
-  const start = new Date(planSummary.plan_start_date);
-  const end = new Date(planSummary.plan_end_date);
+    const generated = generateAllDays(start, end);
+    setAllDays(generated);
 
-  const generated = generateAllDays(start, end);
-  setAllDays(generated);
-
-  // always reset window to first 7
-  setWindowStartIndex(0);
-  setActiveDay(0);
-}, [planSummary]);
-
+    // always reset window to first 7
+    setWindowStartIndex(0);
+    setActiveDay(0);
+  }, [planSummary]);
 
   // Function to navigate to previous days
-const handlePreviousDays = () => {
-  if (windowStartIndex === 0) return; // can't go backward
+  const handlePreviousDays = () => {
+    if (windowStartIndex === 0) return; // can't go backward
 
-  setWindowStartIndex((prev) => Math.max(prev - VISIBLE_COUNT, 0));
-  setActiveDay(windowStartIndex - VISIBLE_COUNT);
-};
+    setWindowStartIndex((prev) => Math.max(prev - VISIBLE_COUNT, 0));
+    setActiveDay(windowStartIndex - VISIBLE_COUNT);
+  };
 
   // Function to navigate to next days
-const handleNextDays = () => {
-  if (windowStartIndex + VISIBLE_COUNT >= allDays.length) return; // can't go beyond
+  const handleNextDays = () => {
+    if (windowStartIndex + VISIBLE_COUNT >= allDays.length) return; // can't go beyond
 
-  setWindowStartIndex((prev) =>
-    Math.min(prev + VISIBLE_COUNT, allDays.length - VISIBLE_COUNT)
-  );
-  setActiveDay(windowStartIndex + VISIBLE_COUNT);
-};
+    setWindowStartIndex((prev) =>
+      Math.min(prev + VISIBLE_COUNT, allDays.length - VISIBLE_COUNT)
+    );
+    setActiveDay(windowStartIndex + VISIBLE_COUNT);
+  };
 
   // Function to handle edit button click
   const handleEditClick = (section) => {  
     setSelectedMeal({
-       section,
-    day: allDays[activeDay],
-    dayTotals: getDayTotals()
+      section,
+      day: allDays[activeDay],
+      dayTotals: getDayTotals()
     });
     setIsModalOpen(true);
   };
@@ -2138,6 +3045,202 @@ const handleNextDays = () => {
     setSelectedMeal(null);
   };
 
+  // Function to handle save from modal - merges extractedData with updated data
+  const handleSaveFromModal = (updatedData) => {
+    if (!extractedData) return;
+
+    try {
+      // Get existing updatedExtractedData from localStorage if available
+      let existingUpdatedData = null;
+      try {
+        const storedData = localStorage.getItem("updatedExtractedData");
+        if (storedData) {
+          existingUpdatedData = JSON.parse(storedData);
+        }
+      } catch (err) {
+        console.error("Failed to get existing updatedExtractedData:", err);
+      }
+
+      // Start with extractedData as base to ensure all days are included
+      const mergedData = {
+        ...extractedData,
+        result: {}
+      };
+
+      // First, copy all days from extractedData
+      if (extractedData.result) {
+        Object.keys(extractedData.result).forEach(dayName => {
+          mergedData.result[dayName] = {
+            ...extractedData.result[dayName]
+          };
+        });
+      }
+
+      // Then merge existing updatedExtractedData day by day to preserve previous edits
+      if (existingUpdatedData?.result) {
+        Object.keys(existingUpdatedData.result).forEach(dayName => {
+          if (!mergedData.result[dayName]) {
+            mergedData.result[dayName] = {};
+          }
+          
+          // Merge meals array properly - update existing meals or add new ones
+          const existingMeals = mergedData.result[dayName].meals || [];
+          const updatedMeals = existingUpdatedData.result[dayName].meals || [];
+          
+          const mergedMeals = [...existingMeals];
+          updatedMeals.forEach(updatedMeal => {
+            // Normalize the meal time format - combine time and timeRange if they're separate
+            let normalizedTime = updatedMeal.time || "";
+            if (updatedMeal.timeRange && !normalizedTime.includes(" at ")) {
+              normalizedTime = `${normalizedTime} at ${updatedMeal.timeRange}`;
+            }
+            
+            // Create normalized meal object
+            const normalizedMeal = {
+              ...updatedMeal,
+              time: normalizedTime
+            };
+            
+            // Find matching meal by comparing base time (before " at ")
+            const baseTime = normalizedTime.split(" at ")[0].trim();
+            const mealIndex = mergedMeals.findIndex(m => {
+              const mBaseTime = (m.time || "").split(" at ")[0].trim();
+              return mBaseTime === baseTime;
+            });
+            
+            if (mealIndex !== -1) {
+              mergedMeals[mealIndex] = normalizedMeal;
+            } else {
+              mergedMeals.push(normalizedMeal);
+            }
+          });
+          
+          // Normalize all existing meals to ensure consistent format
+          const normalizedMergedMeals = mergedMeals.map(meal => {
+            // If meal has separate timeRange, combine it with time
+            if (meal.timeRange && !meal.time.includes(" at ")) {
+              return {
+                ...meal,
+                time: `${meal.time} at ${meal.timeRange}`
+              };
+            }
+            return meal;
+          });
+          
+          // Recalculate totals for the day
+          const totals = {
+            calories_kcal: 0,
+            protein: 0,
+            carbs: 0,
+            fat: 0
+          };
+          
+          normalizedMergedMeals.forEach(meal => {
+            if (meal.items) {
+              meal.items.forEach(item => {
+                totals.calories_kcal += parseInt(item.calories_kcal) || 0;
+                totals.protein += parseFloat(item.protein) || 0;
+                totals.carbs += parseFloat(item.carbs) || 0;
+                totals.fat += parseFloat(item.fat) || 0;
+              });
+            }
+          });
+          
+          mergedData.result[dayName] = {
+            ...mergedData.result[dayName],
+            meals: normalizedMergedMeals,
+            totals: totals
+          };
+        });
+      }
+
+      // Finally merge the new updatedData from modal day by day
+      if (updatedData?.result) {
+        Object.keys(updatedData.result).forEach(dayName => {
+          if (!mergedData.result[dayName]) {
+            mergedData.result[dayName] = {};
+          }
+          
+          const existingMeals = mergedData.result[dayName].meals || [];
+          const newMeals = updatedData.result[dayName].meals || [];
+          
+          // Normalize and merge meals
+          const mergedMeals = [...existingMeals];
+          newMeals.forEach(newMeal => {
+            // Normalize the meal time format - combine time and timeRange if they're separate
+            let normalizedTime = newMeal.time || "";
+            if (newMeal.timeRange && !normalizedTime.includes(" at ")) {
+              normalizedTime = `${normalizedTime} at ${newMeal.timeRange}`;
+            }
+            
+            // Create normalized meal object
+            const normalizedMeal = {
+              ...newMeal,
+              time: normalizedTime
+            };
+            
+            // Find matching meal by comparing base time (before " at ")
+            const baseTime = normalizedTime.split(" at ")[0].trim();
+            const mealIndex = mergedMeals.findIndex(m => {
+              const mBaseTime = (m.time || "").split(" at ")[0].trim();
+              return mBaseTime === baseTime;
+            });
+            
+            if (mealIndex !== -1) {
+              mergedMeals[mealIndex] = normalizedMeal;
+            } else {
+              mergedMeals.push(normalizedMeal);
+            }
+          });
+          
+          // Normalize all existing meals to ensure consistent format
+          const normalizedMergedMeals = mergedMeals.map(meal => {
+            // If meal has separate timeRange, combine it with time
+            if (meal.timeRange && !meal.time.includes(" at ")) {
+              return {
+                ...meal,
+                time: `${meal.time} at ${meal.timeRange}`
+              };
+            }
+            return meal;
+          });
+          
+          // Recalculate totals for the day
+          const totals = {
+            calories_kcal: 0,
+            protein: 0,
+            carbs: 0,
+            fat: 0
+          };
+          
+          normalizedMergedMeals.forEach(meal => {
+            if (meal.items) {
+              meal.items.forEach(item => {
+                totals.calories_kcal += parseInt(item.calories_kcal) || 0;
+                totals.protein += parseFloat(item.protein) || 0;
+                totals.carbs += parseFloat(item.carbs) || 0;
+                totals.fat += parseFloat(item.fat) || 0;
+              });
+            }
+          });
+          
+          mergedData.result[dayName] = {
+            ...mergedData.result[dayName],
+            meals: normalizedMergedMeals,
+            totals: totals
+          };
+        });
+      }
+
+      // Update localStorage with merged data
+      localStorage.setItem("updatedExtractedData", JSON.stringify(mergedData));
+      setLocalExtractedData(mergedData);
+      console.log("Updated extractedData merged and saved:", mergedData);
+    } catch (error) {
+      console.error("Failed to merge and save updatedExtractedData:", error);
+    }
+  };
+
   // Get diet plan data for current active day - FIXED: Pass only the date
   const getDietPlanDataForActiveDay = () => {
     if (!allDays[activeDay]?.fullDate) {
@@ -2145,13 +3248,12 @@ const handleNextDays = () => {
     }
 
     const currentDay = allDays[activeDay];
-
     const meals = getMealDataForDay(currentDay.fullDate);
 
     return meals;
   };
 
- const selectedDayObj = allDays.find((d) => d.id === activeDay);
+  const selectedDayObj = allDays.find((d) => d.id === activeDay);
   const formatDisplayDate = (dateObj) => {
     if (!dateObj) return "";
     const ddMon = dateObj.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
@@ -2161,16 +3263,17 @@ const handleNextDays = () => {
 
   // Calculate dietPlanData - THIS UPDATES WHEN activeDay CHANGES
   const dietPlanData = getDietPlanDataForActiveDay();
-console.log("dietPlanData2164:-", dietPlanData);
-// Get day totals for the active day
-const getDayTotals = () => {
-  if (!extractedData?.result || !allDays[activeDay]?.fullDate) return null;
+  console.log("dietPlanData2164:-", dietPlanData);
 
-  const dayName = getDayName(allDays[activeDay].fullDate).toLowerCase();
-  const dayData = extractedData.result[dayName];
+  // Get day totals for the active day
+  const getDayTotals = () => {
+    if (!extractedData?.result || !allDays[activeDay]?.fullDate) return null;
 
-  return dayData?.totals || null;
-};
+    const dayName = getDayName(allDays[activeDay].fullDate).toLowerCase();
+    const dayData = extractedData.result[dayName];
+
+    return dayData?.totals || null;
+  };
 
   const dayTotals = getDayTotals();
 
@@ -2186,36 +3289,6 @@ const getDayTotals = () => {
           <div className="flex flex-col gap-[15px]">
             <div className="w-full  border-b border-[#E1E6ED]"></div>
 
-            {/* <div className="flex gap-5">
-              <div className="w-fit flex justify-center">
-                <div className="rounded-l-[10px] border border-[#D9D9D9] pl-4 py-2 pr-2.5 bg-[#F0F0F0] text-center">
-                  <p className="text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
-                    Diet Changes
-                  </p>
-                </div>
-                <div className="flex rounded-r-[10px] border border-[#D9D9D9] gap-[37px] text-center items-center pl-4 py-2 pr-2.5 bg-white">
-                  <p className="cursor-pointer text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
-                    Daily
-                  </p>
-                  <IoIosArrowDown className="text-[#A1A1A1] cursor-pointer" />
-                </div>
-              </div>
-
-              <div className="w-fit flex justify-center">
-                <div className="rounded-l-[10px] border border-[#D9D9D9] pl-4 py-2 pr-2.5 bg-[#F0F0F0] text-center">
-                  <p className="text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
-                    Type
-                  </p>
-                </div>
-                <div className="flex rounded-r-[10px] border border-[#D9D9D9] gap-[37px] text-center items-center pl-4 py-2 pr-2.5 bg-white">
-                  <p className="cursor-pointer text-[#252525] text-[12px] tracking-[-0.24px] leading-[110%] font-normal">
-                    Not specified
-                  </p>
-                  <IoIosArrowDown className="text-[#A1A1A1] cursor-pointer" />
-                </div>
-              </div>
-            </div> */}
-
             <div className="flex flex-col gap-9 bg-[#F5F7FA] rounded-[15px]">
               <div className="flex items-center bg-[#E1E6ED] rounded-[15px] border-4 border-[#F5F7FA]">
 
@@ -2229,33 +3302,33 @@ const getDayTotals = () => {
 
                 <div className="flex items-center">
               
-{visibleDays.map((day, index) => (
-  <div key={day.id} className="flex items-center">
-    <div
-      className={`flex flex-col w-[140px] gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer ${
-        activeDay === day.id ? 'bg-[#308BF9]' : 'bg-white'
-      }`}
-      onClick={() => {
-        setActiveDay(day.id);
-      }}
-    >
-      <span className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] ${
-        activeDay === day.id ? 'text-white' : 'text-[#252525]'
-      }`}>
-        {day.day}
-      </span>
-      <span className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] ${
-        activeDay === day.id ? 'text-white' : 'text-[#252525]'
-      }`}>
-        {day.date}
-      </span>
-    </div>
+                  {visibleDays.map((day, index) => (
+                    <div key={day.id} className="flex items-center">
+                      <div
+                        className={`flex flex-col w-[140px] gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer ${
+                          activeDay === day.id ? 'bg-[#308BF9]' : 'bg-white'
+                        }`}
+                        onClick={() => {
+                          setActiveDay(day.id);
+                        }}
+                      >
+                        <span className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] ${
+                          activeDay === day.id ? 'text-white' : 'text-[#252525]'
+                        }`}>
+                          {day.day}
+                        </span>
+                        <span className={`text-[12px] font-semibold leading-[110%] tracking-[-0.48px] ${
+                          activeDay === day.id ? 'text-white' : 'text-[#252525]'
+                        }`}>
+                          {day.date}
+                        </span>
+                      </div>
 
-    {index < visibleDays.length - 1 && (
-      <div className="border-white border-r h-8 mx-2"></div>
-    )}
-  </div>
-))}
+                      {index < visibleDays.length - 1 && (
+                        <div className="border-white border-r h-8 mx-2"></div>
+                      )}
+                    </div>
+                  ))}
                   <IoIosArrowForward
                     className="text-[#252525] ml-2 cursor-pointer"
                     onClick={handleNextDays}
@@ -2274,23 +3347,6 @@ const getDayTotals = () => {
 
                 {/* Day Totals Display */}
                 {dayTotals ? (
-                  // <div className="flex gap-4 mt-2 p-3 bg-blue-50 rounded-lg">
-                  //   <span className="text-[#252525] text-[12px] font-semibold">
-                  //     Day Totals: 
-                  //   </span>
-                  //   <span className="text-[#252525] text-[12px]">
-                  //     Calories: {dayTotals.calories_kcal}kcal
-                  //   </span>
-                  //   <span className="text-[#252525] text-[12px]">
-                  //     Protein: {dayTotals.protein}g
-                  //   </span>
-                  //   <span className="text-[#252525] text-[12px]">
-                  //     Carbs: {dayTotals.carbs}g
-                  //   </span>
-                  //   <span className="text-[#252525] text-[12px]">
-                  //     Fat: {dayTotals.fat}g
-                  //   </span>
-                  // </div>
                   ""
                 ) : (
                   <div className="flex gap-4 mt-2 p-3 bg-gray-100 rounded-lg">
@@ -2316,77 +3372,54 @@ const getDayTotals = () => {
                       </div>
                     </div>
 
-<div className="flex items-start justify-between flex-1">
-                    <div className="flex flex-col py-5 pl-5 gap-[30px] border-l border-l-[#E1E6ED] flex-1">
-                      {section.meals.map((meal) => (
-                        <div key={meal.id} className="flex gap-5 justify-between">
-                          <div className="flex gap-5 items-start py-[5px]">
-                            <div className="flex items-center gap-1">
-                              {/* <Image
-                                src={meal.icon}
-                                alt={meal.icon}
-                                width={24}
-                                height={24}
-                              /> */}
-                              <span className="text-[#252525] text-[15px] font-bold leading-none tracking-[-0.3px]">{meal.number}</span>
+                    <div className="flex items-start justify-between flex-1">
+                      <div className="flex flex-col py-5 pl-5 gap-[30px] border-l border-l-[#E1E6ED] flex-1">
+                        {section.meals.map((meal) => (
+                          <div key={meal.id} className="flex gap-5 justify-between">
+                            <div className="flex gap-5 items-start py-[5px]">
+                              <div className="flex items-center gap-1">
+                                <span className="text-[#252525] text-[15px] font-bold leading-none tracking-[-0.3px]">{meal.number}</span>
+                              </div>
                             </div>
-                            {/* <div
-                              className="rounded-[21px] p-2 text-[10px] font-semibold leading-[110%] tracking-[-0.2px]"
-                              style={{ backgroundColor: meal.statusColor, color: meal.textColor }}
-                            >
-                              {meal.status}
-                            </div> */}
-                          </div>
 
-                          <div className="flex gap-[33px] flex-1">
-                            <div className="flex-1">
-                              {meal.foodItems.map((foodItem, index) => (
-                                <div key={index} className="mb-4 last:mb-0">
-                                  <div className="flex flex-col gap-1">
-                                    <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">{foodItem.name}</span>
-                                    <div className="flex flex-wrap gap-[5px]">
-                                      {foodItem.details.map((detail, detailIndex) => (
-                                        // <span key={detailIndex} className="text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px] bg-gray-100 px-2 py-1 rounded">
-                                        //   {detail}
-                                        // </span>
-
-                                        <span
-                                          key={detailIndex}
-                                          className={`text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px] px-2 py-1 rounded ${detailIndex === 0 ? 'bg-white ' : 'bg-gray-100'
-                                            }`}
-                                        >
-                                          {detail}
-                                        </span>
-
-                                      ))}
-                                      {/* <Image
-                                        src="/icons/hugeicons_information-circle.svg"
-                                        alt="hugeicons_information-circle"
-                                        width={12}
-                                        height={12}
-                                      /> */}
+                            <div className="flex gap-[33px] flex-1">
+                              <div className="flex-1">
+                                {meal.foodItems.map((foodItem, index) => (
+                                  <div key={index} className="mb-4 last:mb-0">
+                                    <div className="flex flex-col gap-1">
+                                      <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px]">{foodItem.name}</span>
+                                      <div className="flex flex-wrap gap-[5px]">
+                                        {foodItem.details.map((detail, detailIndex) => (
+                                          <span
+                                            key={detailIndex}
+                                            className={`text-[#252525] text-[10px] font-normal leading-normal tracking-[-0.2px] px-2 py-1 rounded ${detailIndex === 0 ? 'bg-white ' : 'bg-gray-100'
+                                              }`}
+                                          >
+                                            {detail}
+                                          </span>
+                                        ))}
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              ))}
+                                ))}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
 
-                   <div className="flex flex-col ml-[33px] mb-[44px] mr-2.5 gap-2.5 border border-[#D9D9D9] rounded-[10px] py-[15px] px-5 cursor-pointer"
-                   onClick={() => handleEditClick(section)}
-                   >
-                       <Image
+                      <div className="flex flex-col ml-[33px] mb-[44px] mr-2.5 gap-2.5 border border-[#D9D9D9] rounded-[10px] py-[15px] px-5 cursor-pointer"
+                        onClick={() => handleEditClick(section)}
+                      >
+                        <Image
                           src="/icons/hugeicons_edit-03.svg"
-                           alt="hugeicons_edit-03"
-                         height={24}
-                      width={24}
-                       />
-                         <span className="text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[0.24px]">Edit</span>
-                     </div>
-</div>
+                          alt="hugeicons_edit-03"
+                          height={24}
+                          width={24}
+                        />
+                        <span className="text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[0.24px]">Edit</span>
+                      </div>
+                    </div>
                   </div>
                 ))
               ) : (
@@ -2396,7 +3429,7 @@ const getDayTotals = () => {
                       ? `PDF Extraction Error: ${extractedData.result.error}`
                       : planSummary && extractedData?.result
                         ? `No diet plan data available for ${selectedDayObj?.day}.`
-                        : 'Please Repload the pdf'
+                        : !extractedData ? 'Loading data from storage...' : 'Please upload the PDF'
                     }
                   </span>
                 </div>
@@ -2406,18 +3439,6 @@ const getDayTotals = () => {
 
             <div>
               <div className="w-full border-b border-[#E1E6ED] mt-[30px]"></div>
-
-              {/* <div className='py-[23px]'>
-                <div className='flex gap-5 justify-end'>
-                  <div className='px-5 py-[15px] bg-white border border-[#D9D9D9] rounded-[10px] text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[-0.24px] cursor-pointer'>
-                    Save as draft
-                  </div>
-
-                  <div className='px-20 py-[15px] bg-[#308BF9] rounded-[10px] text-white text-[12px] font-semibold leading-normal tracking-[-0.24px] cursor-pointer'>
-                    Confirm & Next
-                  </div>
-                </div>
-              </div> */}
             </div>
 
           </div>
@@ -2429,6 +3450,7 @@ const getDayTotals = () => {
         open={isModalOpen}
         onClose={handleCloseModal}
         selectedMeal={selectedMeal}
+        onSave={handleSaveFromModal}
       />
     </>
   )

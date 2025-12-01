@@ -511,6 +511,12 @@ console.log("apiResponse249:-", apiResponse);
 
       const json = await res.json();
       dispatch(setExtractedData(json));
+       try {
+      localStorage.setItem("extractedData", JSON.stringify(json));
+      toast.success("PDF extracted successfully and data saved!");
+    } catch (err) {
+      console.error("Failed to save extractedData to localStorage", err);
+    }
 
       completeProgress();
       toast.success("PDF extracted successfully.");

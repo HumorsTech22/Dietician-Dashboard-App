@@ -259,7 +259,12 @@ export const ResultEvaluation = () => {
   const activePlan = hasActivePlan ? clientData?.plans_summary?.active[0] : null;
   const notStartedPlan = hasNotStartedPlan ? clientData?.plans_summary?.not_started[0] : null;
   const completedPlan = hasCompletedPlan ? clientData?.plans_summary?.completed[0] : null;
-  
+
+ const isCompletedAndFinished = completedPlan && completedPlan.status === "finished" && completedPlan.plan_status === "completed";
+
+
+
+
   // Determine which plan to use (priority order - active plans take precedence)
   const currentPlan = activePlan || notStartedPlan || completedPlan;
   
@@ -312,6 +317,8 @@ export const ResultEvaluation = () => {
 
   // State for the starting date of the visible calendar window
   const [windowStart, setWindowStart] = useState(() => getInitialWindowStart());
+
+
 
   // Update windowStart and selectedDate when plan dates become available
   useEffect(() => {
@@ -399,6 +406,14 @@ export const ResultEvaluation = () => {
       day: 'numeric'
     });
   };
+
+    if (!hasActivePlan && !hasNotStartedPlan && !hasCompletedPlan) {
+    return <NoPlans />;
+  }
+
+if (isCompletedAndFinished) {
+    return <NoPlans />;
+  }
 
   // =========================================================================
   // NO PLANS STATE - No active, not_started, or completed plans
