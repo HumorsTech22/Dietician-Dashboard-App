@@ -33,7 +33,7 @@ export default function WaterGraph() {
         borderWidth: 1,
         tension: 0, // Changed from 0.4 to 0 for straight lines
         fill: false,
- 
+  barThickness: 25,
       },
     ],
   };

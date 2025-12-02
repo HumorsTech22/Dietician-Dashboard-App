@@ -694,7 +694,7 @@ if (isCompletedAndFinished) {
       {/* Additional evaluation components */}
       <div className="flex flex-col gap-[50px]">
         <Trends selectedDate={selectedDate} />
-        {/* <WeightTracker/> */}
+         {/* <WeightTracker/>  */}
         <FoodEvaluation />
         <MealLogged />
       </div>
