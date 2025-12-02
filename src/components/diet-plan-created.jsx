@@ -2776,8 +2776,6 @@
 
 
 
-
-
 "use client"
 
 import { IoIosArrowDown } from "react-icons/io";
@@ -2785,8 +2783,12 @@ import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import DietEvent from "./modal/diet-event-popup";
+import DietEvent from "./modal/diet-event-popup"
+import Cookies from "js-cookie";;
 import { useSelector } from "react-redux";
+import { useSearchParams } from "next/navigation";
+import { updateDietPlanJsonService } from "../services/authService";
+import { toast } from "sonner";
 
 export default function DietPlanCreated() {
   const [activeDay, setActiveDay] = useState(0);
@@ -2794,10 +2796,42 @@ export default function DietPlanCreated() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
+  console.log("selectedMeal2801:-", selectedMeal);
   const [planSummary, setPlanSummary] = useState(null);
   const [allDays, setAllDays] = useState([]);
   const [windowStartIndex, setWindowStartIndex] = useState(0);
+   const [isSubmitting, setIsSubmitting] = useState(false);
   const reduxExtractedData = useSelector((state) => state.extractedData.data);
+  console.log("reduxExtractedData2801:-", reduxExtractedData);
+  const clientProfile = useSelector((state) => state.clientProfile.data);
+  console.log("clientProfile2803:-", clientProfile);
+
+
+   const searchParams = useSearchParams();
+  const profile_id = searchParams.get("profile_id") || clientProfile?.profile_id;
+
+
+  const getDieticianIdFromCookies = () => {
+    if (typeof window === 'undefined') return null;
+    
+    // Try to get from cookies
+    const cookieValue = Cookies.get("dietician");
+    if (cookieValue) {
+      try {
+        const parsedCookie = JSON.parse(cookieValue);
+        return parsedCookie.dietician_id;
+      } catch (e) {
+        console.error("Error parsing dietician cookie:", e);
+      }
+    }
+    
+    // Fallback: check if you have it in localStorage or other storage
+    const storedDieticianId = localStorage.getItem("dietician_id");
+    if (storedDieticianId) return storedDieticianId;
+    
+    return null;
+  };
+
 
   // Initialize localExtractedData from localStorage synchronously to avoid race conditions
   // This ensures user edits are preserved when navigating back
@@ -2883,92 +2917,114 @@ export default function DietPlanCreated() {
     return days[date.getDay()];
   };
 
-  // Function to get meal data for a specific day - FIXED: Use only dayDate parameter
-  const getMealDataForDay = (dayDate) => {
-    // Check if extracted data exists
-    if (!extractedData) {
-      console.log("No extracted data available");
-      return [];
-    }
-
-    // Check if there's an error in extracted data
-    if (extractedData?.result?.error) {
-      console.error("PDF Extraction Error:", extractedData.result.error);
-      return [];
-    }
-
+  // Function to get full diet plan data (all days)
+  const getFullDietPlanData = () => {
     if (!extractedData?.result) {
+      return {};
+    }
+    
+    return extractedData.result;
+  };
+
+  // Get full diet plan data - This contains the entire structure
+  const dietPlanData = getFullDietPlanData();
+  console.log("dietPlanData (full structure2931):", dietPlanData);
+
+  // Function to get UI formatted meal data for a specific day FROM dietPlanData
+  const getMealDataForDayFromDietPlan = (dayDate) => {
+    if (!dietPlanData || Object.keys(dietPlanData).length === 0) {
+      console.log("No diet plan data available");
       return [];
     }
 
-    // Get day name from the date
+    if (dietPlanData?.error) {
+      console.error("PDF Extraction Error:", dietPlanData.error);
+      return [];
+    }
+
     const dayName = getDayName(dayDate).toLowerCase();
+    const dayData = dietPlanData[dayName];
 
-    const dayData = extractedData.result[dayName];
+    if (!dayData?.meals) return [];
 
-    if (!dayData?.meals) {
-      return [];
-    }
-
-    // Transform the API data to match your component structure
     return dayData.meals.map((meal, index) => {
-      const timeParts = meal.time.split(' at ');
+      const timeParts = meal.time.split(" at ");
       const time = timeParts[0];
-      const timeRange = timeParts[1] || '';
+      const timeRange = timeParts[1] || "";
 
-      // Dynamic icon selection based on meal time
       const getIcon = (mealTime) => {
         const timeLower = mealTime.toLowerCase();
-        if (timeLower.includes('waking') || timeLower.includes('wake up') || timeLower.includes('early morning')) {
+        if (
+          timeLower.includes("waking") ||
+          timeLower.includes("wake up") ||
+          timeLower.includes("early morning")
+        ) {
           return "/icons/hugeicons_bubble-tea-02.svg";
-        } else if (timeLower.includes('breakfast')) {
+        } else if (timeLower.includes("breakfast")) {
           return "/icons/hugeicons_dish-02.svg";
-        } else if (timeLower.includes('lunch')) {
+        } else if (timeLower.includes("lunch")) {
           return "/icons/hugeicons_dish-02.svg";
-        } else if (timeLower.includes('dinner')) {
+        } else if (timeLower.includes("dinner")) {
           return "/icons/hugeicons_dish-02.svg";
-        } else if (timeLower.includes('mid morning') || timeLower.includes('evening') || timeLower.includes('snack')) {
+        } else if (
+          timeLower.includes("mid morning") ||
+          timeLower.includes("evening") ||
+          timeLower.includes("snack")
+        ) {
           return "/icons/hugeicons_vegetarian-food.svg";
         } else {
           return "/icons/hugeicons_vegetarian-food.svg";
         }
       };
 
-      // Create multiple meal sections if there are multiple food items
-      const meals = meal.items.map((item, itemIndex) => ({
-        id: itemIndex + 1,
-        icon: getIcon(time),
-        number: (itemIndex + 1).toString(),
-        status: "100% Filled",
-        statusColor: "#E1F6E6",
-        textColor: "#3FAF58",
-        foodItems: [{
-          name: item.name,
-          details: [
-            item.portion,
-            `${item.calories_kcal}kcal`,
-            `Protein: ${item.protein}g`,
-            `Carbs: ${item.carbs}g`,
-            `Fat: ${item.fat}g`
-          ]
-        }],
-        totals: {
-          calories_kcal: item.calories_kcal,
-          protein: item.protein,
-          carbs: item.carbs,
-          fat: item.fat
-        }
-      }));
+      const meals = (meal.items || []).map((item, itemIndex) => {
+        // ✅ If your saved item already has `details`, use them (they include user units)
+        const details =
+          item.details && Array.isArray(item.details) && item.details.length
+            ? item.details
+            : [
+                item.portion ?? "",
+                item.calories_kcal != null ? `${item.calories_kcal}kcal` : "",
+                item.protein != null ? `Protein: ${item.protein}g` : "",
+                item.carbs != null ? `Carbs: ${item.carbs}g` : "",
+                item.fat != null ? `Fat: ${item.fat}g` : "",
+              ];
+
+        return {
+          id: itemIndex + 1,
+          icon: getIcon(time),
+          number: (itemIndex + 1).toString(),
+          status: "100% Filled",
+          statusColor: "#E1F6E6",
+          textColor: "#3FAF58",
+          foodItems: [
+            {
+              name: item.name,
+              details, // ✅ use user-defined units from details
+            },
+          ],
+          totals: {
+            calories_kcal: item.calories_kcal,
+            protein: item.protein,
+            carbs: item.carbs,
+            fat: item.fat,
+          },
+        };
+      });
 
       return {
         id: index + 1,
-        time: time,
-        timeRange: timeRange,
-        foodsCount: `${meal.items.length} food${meal.items.length > 1 ? 's' : ''} added`,
-        meals: meals,
+        time,
+        timeRange,
+        foodsCount: `${meal.items.length} food${
+          meal.items.length > 1 ? "s" : ""
+        } added`,
+        meals,
       };
     });
   };
+
+
 
   // Function to generate 7 days array based on plan start date
   const generateAllDays = (startDate, endDate) => {
@@ -3029,15 +3085,39 @@ export default function DietPlanCreated() {
     setActiveDay(windowStartIndex + VISIBLE_COUNT);
   };
 
-  // Function to handle edit button click
-  const handleEditClick = (section) => {  
-    setSelectedMeal({
-      section,
-      day: allDays[activeDay],
-      dayTotals: getDayTotals()
-    });
-    setIsModalOpen(true);
+ 
+// SIMPLE: use what you already rendered in activeDayMeals
+const handleEditClick = (section) => {
+  if (!section || !allDays[activeDay]?.fullDate) return;
+
+  const dayObj = allDays[activeDay];
+  const dayName = getDayName(dayObj.fullDate).toLowerCase();
+
+  // Build a clean object for the modal
+  const selected = {
+    dayName,                         // "monday"
+    dayLabel: dayObj.day,            // "Day 1"
+    fullDate: dayObj.fullDate,       // Date object
+    time: section.time,              // "Breakfast"
+    timeRange: section.timeRange,    // "10:00 AM"
+    foodsCount: section.foodsCount,  // "1 food added"
+
+    // Take meals + foodItems exactly as shown in activeDayMeals
+    meals: section.meals.map((meal) => ({
+      id: meal.id,
+      number: meal.number,
+      foodItems: meal.foodItems,     // [{ name, details: [...] }]
+      totals: meal.totals ?? null,
+    })),
   };
+
+  // This is what DietEvent will receive
+  setSelectedMeal(selected);
+  setIsModalOpen(true);
+};
+
+
+
 
   // Function to close modal
   const handleCloseModal = () => {
@@ -3240,15 +3320,116 @@ export default function DietPlanCreated() {
       console.error("Failed to merge and save updatedExtractedData:", error);
     }
   };
+  
 
-  // Get diet plan data for current active day - FIXED: Pass only the date
-  const getDietPlanDataForActiveDay = () => {
+
+const handleFinishClick = async () => {
+  try {
+    setIsSubmitting(true);
+    
+    // 1. Get required data
+    const login_id = getDieticianIdFromCookies(); // From cookies
+    
+    if (!login_id) {
+      toast.error("Please log in again. Dietician ID not found.");
+      return;
+    }
+    
+    if (!profile_id) {
+      toast.error("Profile ID not found.");
+      return;
+    }
+    
+    // 2. Get diet_plan_id from clientProfile - FIXED
+    console.log("Full clientProfile:", clientProfile);
+    
+    // Check if clientProfile exists
+    if (!clientProfile) {
+      toast.error("Client profile not loaded. Please try again.");
+      return;
+    }
+    
+    // Check if plans_summary exists
+    if (!clientProfile.plans_summary) {
+      toast.error("No plan summary found in client profile.");
+      return;
+    }
+    
+    // Check if active plans exist
+    const activePlans = clientProfile.plans_summary.active;
+    console.log("Active plans:", activePlans);
+    
+    if (!activePlans || !Array.isArray(activePlans) || activePlans.length === 0) {
+      toast.error("No active diet plan found.");
+      return;
+    }
+    
+    // Get the first active plan
+    const firstActivePlan = activePlans[0];
+    const diet_plan_id = firstActivePlan?.id;
+    console.log("diet_plan_id3351:-", diet_plan_id);
+    
+    if (!diet_plan_id) {
+      toast.error("Active diet plan ID is missing.");
+      return;
+    }
+    
+    // 3. Prepare diet_json from updatedExtractedData
+    let diet_json = {};
+    try {
+      const storedData = localStorage.getItem("updatedExtractedData");
+      if (storedData) {
+        diet_json = JSON.parse(storedData);
+      } else if (extractedData) {
+        diet_json = extractedData;
+      }
+    } catch (error) {
+      console.error("Error getting diet plan data:", error);
+      diet_json = extractedData || {};
+    }
+    
+    // 4. Call the API with loading toast
+    const toastId = toast.loading("Saving diet plan...");
+    
+    const response = await updateDietPlanJsonService(
+      login_id,
+      profile_id,
+      diet_plan_id,
+      diet_json.result   
+    );
+    
+    if (response.success) {
+      console.log("response3341:-", response);
+      toast.success("Diet plan saved successfully!", {
+        id: toastId,
+        duration: 3000,
+      });
+      
+    } else {
+      toast.error(`Failed to save diet plan: ${response.message || "Unknown error"}`, {
+        id: toastId,
+        duration: 5000,
+      });
+    }
+    
+  } catch (error) {
+    console.error("Error saving diet plan:", error);
+    toast.error(`Error saving diet plan: ${error.message}`, {
+      duration: 5000,
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+  // Function to get meal data for active day (for UI rendering) FROM dietPlanData
+  const getActiveDayMealsFromDietPlan = () => {
     if (!allDays[activeDay]?.fullDate) {
       return [];
     }
 
     const currentDay = allDays[activeDay];
-    const meals = getMealDataForDay(currentDay.fullDate);
+    const meals = getMealDataForDayFromDietPlan(currentDay.fullDate);
 
     return meals;
   };
@@ -3261,21 +3442,21 @@ export default function DietPlanCreated() {
     return `${ddMon}, ${wk}`;
   };
 
-  // Calculate dietPlanData - THIS UPDATES WHEN activeDay CHANGES
-  const dietPlanData = getDietPlanDataForActiveDay();
-  console.log("dietPlanData2164:-", dietPlanData);
+  // Get active day meals for UI rendering FROM dietPlanData
+  const activeDayMeals = getActiveDayMealsFromDietPlan();
+  console.log("activeDayMeals (for UI3462):", activeDayMeals);
 
-  // Get day totals for the active day
-  const getDayTotals = () => {
-    if (!extractedData?.result || !allDays[activeDay]?.fullDate) return null;
+  // Get day totals for the active day FROM dietPlanData
+  const getDayTotalsFromDietPlan = () => {
+    if (!dietPlanData || !allDays[activeDay]?.fullDate) return null;
 
     const dayName = getDayName(allDays[activeDay].fullDate).toLowerCase();
-    const dayData = extractedData.result[dayName];
+    const dayData = dietPlanData[dayName];
 
     return dayData?.totals || null;
   };
 
-  const dayTotals = getDayTotals();
+  const dayTotals = getDayTotalsFromDietPlan();
 
   return (
     <>
@@ -3334,9 +3515,11 @@ export default function DietPlanCreated() {
                     onClick={handleNextDays}
                   />
                 </div>
-              </div>
+              </div> 
 
               {/* Dynamic header that matches the selected day */}
+                <div className="flex-1 overflow-y-auto max-h-[420px] pr-[10px] pt-4 pb-4  [scrollbar-width:none] 
+                [&::-webkit-scrollbar]:hidden">
               <div className="flex flex-col gap-2.5 ml-[30px]">
                 <span className="text-[#252525] text-[12px] font-normal leading-normal tracking-[-0.24px]">
                   {selectedDayObj?.day ?? `Day ${activeDay + 1}`}
@@ -3358,8 +3541,8 @@ export default function DietPlanCreated() {
               </div>
 
               {/* Render diet plan sections from dynamic data - THIS SHOWS FILTERED DATA */}
-              {dietPlanData.length > 0 ? (
-                dietPlanData.map((section) => (
+              {activeDayMeals.length > 0 ? (
+                activeDayMeals.map((section) => (
                   <div key={section.id} className="flex py-5 bg-white rounded-[15px] border-4 border-[#F5F7FA]">
                     <div className="flex flex-col gap-[30px] pt-[15px] pl-[15px] pr-2.5 pb-2.5 min-w-[200px]">
                       <div className="flex flex-col gap-2.5">
@@ -3425,21 +3608,32 @@ export default function DietPlanCreated() {
               ) : (
                 <div className="flex justify-center items-center py-10">
                   <span className="text-[#252525] text-[16px] font-normal">
-                    {extractedData?.result?.error
-                      ? `PDF Extraction Error: ${extractedData.result.error}`
-                      : planSummary && extractedData?.result
+                    {dietPlanData?.error
+                      ? `PDF Extraction Error: ${dietPlanData.error}`
+                      : planSummary && Object.keys(dietPlanData).length > 0
                         ? `No diet plan data available for ${selectedDayObj?.day}.`
-                        : !extractedData ? 'Loading data from storage...' : 'Please upload the PDF'
+                        : !dietPlanData || Object.keys(dietPlanData).length === 0 ? 'Loading data from storage...' : 'Please upload the PDF'
                     }
                   </span>
                 </div>
               )}
-
+</div>
             </div>
 
-            <div>
-              <div className="w-full border-b border-[#E1E6ED] mt-[30px]"></div>
-            </div>
+           <div className="mt-[30px]">
+  <div className="w-full border-b border-[#E1E6ED]"></div>
+  <div className="flex justify-end my-[23px] mr-5">
+    <button 
+              onClick={handleFinishClick}
+              disabled={isSubmitting}
+              className={`cursor-pointer text-[#FFFFFF] text-[12px] font-semibold leading-normal tracking-[-0.24px] px-5 py-[15px] rounded-[10px] ${
+                isSubmitting ? 'bg-gray-400' : 'bg-[#308BF9]'
+              }`}
+            >
+              {isSubmitting ? 'Saving...' : 'Finish'}
+            </button>
+  </div>
+</div>
 
           </div>
 

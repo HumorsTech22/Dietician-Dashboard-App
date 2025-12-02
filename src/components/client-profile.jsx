@@ -573,32 +573,61 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
     ];
 
     // Fetch client profile data
+    // useEffect(() => {
+    //     const loadClientProfile = async () => {
+    //         try {
+    //             setLoading(true);
+
+    //             const response = await fetchClientProfileData(dieticianId, profileId);
+    //             if (response.success && response.data) {
+    //                 setClientData(response.data);
+    //                 dispatch(setClientProfile(response.data));
+    //             } else {
+    //                 // toast.error("Failed to load client data");
+    //                 dispatch(setClientProfileError("Failed to load client data"));
+    //             }
+    //         } catch (error) {
+    //             console.error("Error fetching client profile:", error);
+    //             toast.error("Error loading client data");
+    //             dispatch(setClientProfileError(error?.message || "Error loading client data"));
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+
+    //     if (!hideClientBits) {
+    //         loadClientProfile();
+    //     }
+    // }, [dieticianId, profileId, hideClientBits, dispatch]);
+
+
     useEffect(() => {
-        const loadClientProfile = async () => {
-            try {
-                setLoading(true);
+  const loadClientProfile = async () => {
+    if (!dieticianId || !profileId) return;
 
-                const response = await fetchClientProfileData(dieticianId, profileId);
-                if (response.success && response.data) {
-                    setClientData(response.data);
-                    dispatch(setClientProfile(response.data));
-                } else {
-                    // toast.error("Failed to load client data");
-                    dispatch(setClientProfileError("Failed to load client data"));
-                }
-            } catch (error) {
-                console.error("Error fetching client profile:", error);
-                toast.error("Error loading client data");
-                dispatch(setClientProfileError(error?.message || "Error loading client data"));
-            } finally {
-                setLoading(false);
-            }
-        };
+    try {
+      setLoading(true);
 
-        if (!hideClientBits) {
-            loadClientProfile();
-        }
-    }, [dieticianId, profileId, hideClientBits, dispatch]);
+      const response = await fetchClientProfileData(dieticianId, profileId);
+      if (response.success && response.data) {
+        setClientData(response.data);
+        dispatch(setClientProfile(response.data));
+      } else {
+        dispatch(setClientProfileError("Failed to load client data"));
+      }
+    } catch (error) {
+      console.error("Error fetching client profile:", error);
+      toast.error("Error loading client data");
+      dispatch(setClientProfileError(error?.message || "Error loading client data"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadClientProfile();
+}, [dieticianId, profileId, dispatch]);
+
+
 
     // Helper function to get active plan or first available plan
     const getActivePlan = () => {
@@ -728,7 +757,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                 </span>
                             ) : (
                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>
-                                    {clientData?.profile_name || 'sagar'}
+                                    {clientData?.profile_name || "-" }
                                 </span>
                             )}
                         </div>

@@ -203,3 +203,20 @@ export const fetchClientLog = async (dieticianId, clientId) => {
     }),
   });
 };
+
+
+
+export const updateDietPlanJsonService = async (login_id, profile_id, diet_plan_id, diet_json) => {
+  return apiFetcher(API_ENDPOINTS.PLAN.DIETPLAN, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      login_id: login_id,
+      profile_id: profile_id,
+      diet_plan_id: diet_plan_id,
+      diet_json: JSON.stringify(diet_json), 
+    }),
+  });
+};

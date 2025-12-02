@@ -20,7 +20,8 @@ export const API_ENDPOINTS = {
     SCORESINSIGHT:"/dietitian/api/web/get_latest_test_by_date.php"
   },
   PLAN:{
-    PLANSUMMARYFORM:"/dietitian/api/web/insert_diet_plan_strategy.php"
+    PLANSUMMARYFORM:"/dietitian/api/web/insert_diet_plan_strategy.php",
+    DIETPLAN:"/dietitian/api/web/update_diet_plan_json.php"
   },
   CLIENTPROFILE:{
     CLIENTPROFILEDATA:"/dietitian/api/web/get_client_data.php"

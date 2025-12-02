@@ -9,7 +9,7 @@ export default function WeightTracker() {
         selectedOption: "Weekly",
         isOpen: false
     });
-    
+
     const [secondDropdown, setSecondDropdown] = useState({
         selectedOption: "Weekly",
         isOpen: false
@@ -80,44 +80,44 @@ export default function WeightTracker() {
                         </div>
                     </div>
 
-                  
-                        <div className="flex justify-between ml-5 mr-[350px] mt-[13px] mb-7">
-    <div className="relative w-full">
-        <div
-            className="flex justify-between items-center rounded-[5px] border border-[#D9D9D9] bg-white py-[11px] px-[15px] cursor-pointer w-full"
-            onClick={toggleFirstDropdown}
-        >
-            <span className="text-[#535359] text-[12px] not-italic font-normal leading-[110%] tracking-[-0.24px] capitalize">
-                {firstDropdown.selectedOption} 
-            </span>
-            <IoIosArrowDown className={`w-5 h-5 cursor-pointer transition-transform ${firstDropdown.isOpen ? 'rotate-180' : ''}`} />
-        </div>
 
-        {firstDropdown.isOpen && (
-            <div className="absolute top-full left-0 right-0 bg-white border border-[#D9D9D9] rounded-[5px] shadow-lg z-10 mt-1">
-                <div
-                    className="py-[11px] px-[15px] hover:bg-gray-50 cursor-pointer"
-                    onClick={() => handleFirstOptionSelect("Weekly")} 
-                >
-                    <span className="text-[#535359] text-[12px] font-normal leading-[110%] tracking-[-0.24px] capitalize">
-                        Weekly
-                    </span>
-                </div>
-                <div
-                    className="py-[11px] px-[15px] hover:bg-gray-50 cursor-pointer"
-                    onClick={() => handleFirstOptionSelect("Monthly")} 
-                >
-                    <span className="text-[#535359] text-[12px] font-normal leading-[110%] tracking-[-0.24px] capitalize">
-                        Monthly
-                    </span>
-                </div>
-            </div>
-        )}
-    </div>
-</div>
-                  
+                    <div className="flex justify-between ml-5 mr-[350px] mt-[13px] mb-7">
+                        <div className="relative w-full">
+                            <div
+                                className="flex justify-between items-center rounded-[5px] border border-[#D9D9D9] bg-white py-[11px] px-[15px] cursor-pointer w-full"
+                                onClick={toggleFirstDropdown}
+                            >
+                                <span className="text-[#535359] text-[12px] not-italic font-normal leading-[110%] tracking-[-0.24px] capitalize">
+                                    {firstDropdown.selectedOption}
+                                </span>
+                                <IoIosArrowDown className={`w-5 h-5 cursor-pointer transition-transform ${firstDropdown.isOpen ? 'rotate-180' : ''}`} />
+                            </div>
 
-                    <WeightGraph/>
+                            {firstDropdown.isOpen && (
+                                <div className="absolute top-full left-0 right-0 bg-white border border-[#D9D9D9] rounded-[5px] shadow-lg z-10 mt-1">
+                                    <div
+                                        className="py-[11px] px-[15px] hover:bg-gray-50 cursor-pointer"
+                                        onClick={() => handleFirstOptionSelect("Weekly")}
+                                    >
+                                        <span className="text-[#535359] text-[12px] font-normal leading-[110%] tracking-[-0.24px] capitalize">
+                                            Weekly
+                                        </span>
+                                    </div>
+                                    <div
+                                        className="py-[11px] px-[15px] hover:bg-gray-50 cursor-pointer"
+                                        onClick={() => handleFirstOptionSelect("Monthly")}
+                                    >
+                                        <span className="text-[#535359] text-[12px] font-normal leading-[110%] tracking-[-0.24px] capitalize">
+                                            Monthly
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+
+                    <WeightGraph />
                 </div>
 
                 {/* Second Card */}
@@ -154,42 +154,42 @@ export default function WeightTracker() {
                         </div>
                     </div>
 
-             <div className="flex justify-between ml-5 mr-[350px] mt-[13px] mb-7">
-    <div className="relative w-full">
-        <div
-            className="flex justify-between items-center rounded-[5px] border border-[#D9D9D9] bg-white py-[11px] px-[15px] cursor-pointer w-full"
-            onClick={toggleSecondDropdown} 
-        >
-            <span className="text-[#535359] text-[12px] not-italic font-normal leading-[110%] tracking-[-0.24px] capitalize">
-                {secondDropdown.selectedOption} 
-            </span>
-            <IoIosArrowDown className={`w-5 h-5 cursor-pointer transition-transform ${secondDropdown.isOpen ? 'rotate-180' : ''}`} />
-        </div>
+                    <div className="flex justify-between ml-5 mr-[350px] mt-[13px] mb-7">
+                        <div className="relative w-full">
+                            <div
+                                className="flex justify-between items-center rounded-[5px] border border-[#D9D9D9] bg-white py-[11px] px-[15px] cursor-pointer w-full"
+                                onClick={toggleSecondDropdown}
+                            >
+                                <span className="text-[#535359] text-[12px] not-italic font-normal leading-[110%] tracking-[-0.24px] capitalize">
+                                    {secondDropdown.selectedOption}
+                                </span>
+                                <IoIosArrowDown className={`w-5 h-5 cursor-pointer transition-transform ${secondDropdown.isOpen ? 'rotate-180' : ''}`} />
+                            </div>
 
-        {secondDropdown.isOpen && (
-            <div className="absolute top-full left-0 right-0 bg-white border border-[#D9D9D9] rounded-[5px] shadow-lg z-10 mt-1">
-                <div
-                    className="py-[11px] px-[15px] hover:bg-gray-50 cursor-pointer"
-                    onClick={() => handleSecondOptionSelect("Weekly")} 
-                >
-                    <span className="text-[#535359] text-[12px] font-normal leading-[110%] tracking-[-0.24px] capitalize">
-                        Weekly
-                    </span>
-                </div>
-                <div
-                    className="py-[11px] px-[15px] hover:bg-gray-50 cursor-pointer"
-                    onClick={() => handleSecondOptionSelect("Monthly")} 
-                >
-                    <span className="text-[#535359] text-[12px] font-normal leading-[110%] tracking-[-0.24px] capitalize">
-                        Monthly
-                    </span>
-                </div>
-            </div>
-        )}
-    </div>
-</div>
+                            {secondDropdown.isOpen && (
+                                <div className="absolute top-full left-0 right-0 bg-white border border-[#D9D9D9] rounded-[5px] shadow-lg z-10 mt-1">
+                                    <div
+                                        className="py-[11px] px-[15px] hover:bg-gray-50 cursor-pointer"
+                                        onClick={() => handleSecondOptionSelect("Weekly")}
+                                    >
+                                        <span className="text-[#535359] text-[12px] font-normal leading-[110%] tracking-[-0.24px] capitalize">
+                                            Weekly
+                                        </span>
+                                    </div>
+                                    <div
+                                        className="py-[11px] px-[15px] hover:bg-gray-50 cursor-pointer"
+                                        onClick={() => handleSecondOptionSelect("Monthly")}
+                                    >
+                                        <span className="text-[#535359] text-[12px] font-normal leading-[110%] tracking-[-0.24px] capitalize">
+                                            Monthly
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
-                    <WaterGraph/>
+                    <WaterGraph />
                 </div>
             </div>
         </>

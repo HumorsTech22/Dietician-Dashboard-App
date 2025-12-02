@@ -131,6 +131,7 @@ export default function MealLogged() {
   const visibleWeeksCount = 4;
 
   const clientProfile = useSelector((state) => state.clientProfile.data);
+  console.log("clientProfile134:-", clientProfile);
 
   const handleFilterChange = (filter) => setActiveFilter(filter);
 

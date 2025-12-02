@@ -304,26 +304,27 @@ export default function TestEvaluation() {
 
   // Get scores from the nested structure
   const scores = scoresInsight?.latest_test?.scores;
+  console.log("score307:-", scores);
   const testDate = scoresInsight?.latest_test?.date_time;
   const metabolismScores = scoresInsight?.latest_test?.test_json?.Metabolism_Score_Analysis;
   const fatLossMetabolism =
     scoresInsight?.latest_test?.test_json?.fat_loss_metabolism_score;
-    const scientificInterpretation =
-  scoresInsight?.latest_test?.test_json?.fat_loss_metabolism_score
-    ?.scientific_interpretation || "";
+  const scientificInterpretation =
+    scoresInsight?.latest_test?.test_json?.fat_loss_metabolism_score
+      ?.scientific_interpretation || "";
 
-let fatImpact = "-";
-let liverImpact = "-";
-let gutImpact = "-";
+  let fatImpact = "-";
+  let liverImpact = "-";
+  let gutImpact = "-";
 
-// Split using comma
-const parts = scientificInterpretation.split(",");
+  // Split using comma
+  const parts = scientificInterpretation.split(",");
 
-if (parts.length >= 3) {
-  fatImpact = parts[0].trim();   // First part
-  liverImpact = parts[1].trim(); // Second part
-  gutImpact = parts[2].trim();   // Third part
-}
+  if (parts.length >= 3) {
+    fatImpact = parts[0].trim();   // First part
+    liverImpact = parts[1].trim(); // Second part
+    gutImpact = parts[2].trim();   // Third part
+  }
 
 
   return (
@@ -379,7 +380,11 @@ if (parts.length >= 3) {
                       </span>
                       <div className="flex items-center">
                         <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
-                          {scores?.hepatic_stress ?? '-'}%
+                          {/* {scores?.hepatic_stress ?? '-'}% */}
+                          {typeof scores?.hepatic_stress === "number"
+                            ? Math.floor(scores.hepatic_stress)
+                            : "-"
+                          }%
                         </p>
                         <div className="mx-3 h-4 w-px bg-[#252525]"></div>
                         <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.hepatic_stress?.zone)}`}>
@@ -394,7 +399,11 @@ if (parts.length >= 3) {
                       </span>
                       <div className="flex items-center">
                         <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
-                          {scores?.detoxification ?? '-'}%
+                          {/* {scores?.detoxification ?? '-'}% */}
+                          {typeof scores?.detoxification === "number"
+                            ? Math.floor(scores.detoxification)
+                            : "-"
+                          }%
                         </p>
                         <div className="mx-3 h-4 w-px bg-[#252525]"></div>
                         <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.detoxification?.zone)}`}>
@@ -428,7 +437,11 @@ if (parts.length >= 3) {
                       </span>
                       <div className="flex items-center">
                         <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
-                          {scores?.fat ?? '-'}%
+                          {/* {scores?.fat ?? '-'}% */}
+                          {typeof scores?.fat === "number"
+                            ? Math.floor(scores.fat)
+                            : "-"
+                          }%
                         </p>
                         <div className="mx-3 h-4 w-px bg-[#252525]"></div>
                         <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.fat_metabolism?.zone)}`}>
@@ -443,7 +456,11 @@ if (parts.length >= 3) {
                       </span>
                       <div className="flex items-center">
                         <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
-                          {scores?.glucose ?? '-'}%
+                          {/* {scores?.glucose ?? '-'}% */}
+                          {typeof scores?.glucose === "number"
+                            ? Math.floor(scores.glucose)
+                            : "-"
+                          }%
                         </p>
                         <div className="mx-3 h-4 w-px bg-[#252525]"></div>
                         <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.glucose_metabolism?.zone)}`}>
@@ -477,7 +494,11 @@ if (parts.length >= 3) {
                       </span>
                       <div className="flex items-center">
                         <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
-                          {scores?.absorptive ?? '-'}%
+                          {/* {scores?.absorptive ?? '-'}% */}
+                          {typeof scores?.absorptive === "number"
+                            ? Math.floor(scores.absorptive)
+                            : "-"
+                          }%
                         </p>
                         <div className="mx-3 h-4 w-px bg-[#252525]"></div>
                         <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.absorption?.zone)}`}>
@@ -492,7 +513,11 @@ if (parts.length >= 3) {
                       </span>
                       <div className="flex items-center">
                         <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
-                          {scores?.fermentative ?? '-'}%
+                          {/* {scores?.fermentative ?? '-'}% */}
+                          {typeof scores?.fermentative === "number"
+                            ? Math.floor(scores.fermentative)
+                            : "-"
+                          }%
                         </p>
                         <div className="mx-3 h-4 w-px bg-[#252525]"></div>
                         <p className={`text-[20px] md:text-[25px] font-semibold ${getZoneColor(metabolismScores?.fermentation?.zone)}`}>
@@ -517,58 +542,58 @@ if (parts.length >= 3) {
               <div className="flex flex-col gap-5">
                 <div className="flex justify-center items-center">
                   <span className="text-[#252525] font-normal leading-normal tracking-[-2px] text-[100px]">{typeof fatLossMetabolism?.score === "number"
-    ? Math.round(fatLossMetabolism.score)
-    : 'N/A'}</span>
+                    ? Math.floor(fatLossMetabolism.score)
+                    : 'N/A'}</span>
                   <span className="flex items-end pb-[10px] text-[#252525] text-[20px] font-semibold leading-[126%] tracking-[-0.4px]">%</span>
                 </div>
 
-               <span
-  className={`flex justify-center text-[25px] font-semibold leading-[126%] tracking-[-0.5px] ${getZoneColor(fatLossMetabolism?.zone)}`}
->
-  {fatLossMetabolism?.zone ?? "-"}
-</span>
+                <span
+                  className={`flex justify-center text-[25px] font-semibold leading-[126%] tracking-[-0.5px] ${getZoneColor(fatLossMetabolism?.zone)}`}
+                >
+                  {fatLossMetabolism?.zone ?? "-"}
+                </span>
 
               </div>
             </div>
 
             <div className="flex flex-col justify-between">
-            <div className="flex gap-[72px] items-start">
-              <div className="text-[#252525] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">
-                intervention
+              <div className="flex gap-[72px] items-start">
+                <div className="text-[#252525] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">
+                  intervention
+                </div>
+                <div className="flex gap-3 items-start">
+                  {/* Left column */}
+                  <div className="space-y-6">
+                    {[
+                      "Fat/Glucose Impact",
+                      "Liver Impact",
+                      "Gut Impact",
+                    ].map((item, index) => (
+                      <p
+                        key={index}
+                        className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]"
+                      >
+                        {item}
+                      </p>
+                    ))}
+                  </div>
+
+                  {/* Right column */}
+                  <div className="space-y-6">
+                    {[fatImpact, liverImpact, gutImpact].map((item, index) => (
+                      <p
+                        key={index}
+                        className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]"
+                      >
+                        {item}
+                      </p>
+                    ))}
+                  </div>
+
+                </div>
+
               </div>
-             <div className="flex gap-3 items-start">
-  {/* Left column */}
-  <div className="space-y-6">
-    {[
-      "Fat/Glucose Impact",
-      "Liver Impact",
-      "Gut Impact",
-    ].map((item, index) => (
-      <p
-        key={index}
-        className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]"
-      >
-        {item}
-      </p>
-    ))}
-  </div>
-
-  {/* Right column */}
-<div className="space-y-6">
-  {[fatImpact, liverImpact, gutImpact].map((item, index) => (
-    <p
-      key={index}
-      className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]"
-    >
-      {item}
-    </p>
-  ))}
-</div>
-
-</div>
-
-            </div>
-{/* 
+              {/* 
 <div className="flex items-start gap-3 bg-[#F0F5FD] rounded-[10px] pl-2.5 pt-[15px] pb-[18px] pr-[21px]">
  
   <div className="flex items-center gap-2 shrink-0">
@@ -591,7 +616,7 @@ if (parts.length >= 3) {
   </p>
 </div> */}
 
-</div>
+            </div>
 
 
           </div>

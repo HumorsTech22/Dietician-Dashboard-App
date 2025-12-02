@@ -1259,11 +1259,18 @@ export default function Trends({ selectedDate }) {
         </div>
       </div>
       <div className="flex items-center">
-        <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
+        {/* <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
           {config.percentage === "-"
             ? "-"
             : `${Number(config.percentage).toFixed(0)}%`}
-        </p>
+        </p> */}
+
+        <p className="text-[#252525] text-[20px] md:text-[25px] font-semibold">
+  {config.percentage === "-"
+    ? "-"
+    : `${Math.floor(Number(config.percentage) || 0)}%`}
+</p>
+
         <div className="mx-3 h-4 w-px bg-[#252525]"></div>
         <p
           className="text-[20px] md:text-[25px] font-semibold"
