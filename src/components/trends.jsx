@@ -1222,7 +1222,7 @@ export default function Trends({ selectedDate }) {
   const ProgressBarSection = ({ config }) => (
     <div className="flex flex-col gap-5 w-full lg:w-auto">
       <div className="flex flex-col gap-[5px] w-full relative">
-        <div className="w-full rounded-full h-2.5 flex gap-0.5 overflow-hidden relative">
+        <div className="w-full rounded-[10px] h-[22px] flex gap-0.5 relative items-center">
           {config.colors.map((colorConfig, index) => (
             <div
               key={index}
@@ -1234,7 +1234,7 @@ export default function Trends({ selectedDate }) {
             />
           ))}
           <div
-            className="absolute top-1/2 w-[11px] h-[22px] border-[10px] border-[#252525] rounded-[10px] transform -translate-y-1/2"
+            className="absolute top-1/2 w-1 h-[22px] border-[10px] border-[#252525] rounded-[10px] transform -translate-y-1/2"
             style={{
               left:
                 config.percentage === "-"
