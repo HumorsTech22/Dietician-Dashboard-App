@@ -256,6 +256,8 @@ console.log("apiResponse249:-", apiResponse);
 
   const [errors, setErrors] = useState({ testsAllotted: "" });
 
+    const clientProfile = useSelector((state) => state.clientProfile.data);
+console.log("clientProfiletestInfo260:-", clientProfile);
   const dispatch = useDispatch();
 
   // ========= 1) Fetch remaining from TESTREMAINING API =========

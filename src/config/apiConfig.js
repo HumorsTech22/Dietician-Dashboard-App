@@ -21,7 +21,8 @@ export const API_ENDPOINTS = {
   },
   PLAN:{
     PLANSUMMARYFORM:"/dietitian/api/web/insert_diet_plan_strategy.php",
-    DIETPLAN:"/dietitian/api/web/update_diet_plan_json.php"
+    DIETPLAN:"/dietitian/api/web/update_diet_plan_json.php",
+    DIETPLANJSON:"/dietitian/api/web/fetch_diet_json.php"
   },
   CLIENTPROFILE:{
     CLIENTPROFILEDATA:"/dietitian/api/web/get_client_data.php"

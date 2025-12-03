@@ -601,8 +601,8 @@
 import { useState, useEffect } from "react";
 import { Modal } from "react-responsive-modal";
 import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
-import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import Image from "next/image";
+import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
 // Split "1.0 bowl" → { quantityValue: "1.0", quantityUnit: "bowl" }
 const parseQuantityDetail = (detail) => {
@@ -663,6 +663,8 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
   const [planName, setPlanName] = useState("");
   const [foodItems, setFoodItems] = useState([emptyFoodItem]);
   const [updatedExtractedData, setUpdatedExtractedData] = useState(null);
+  const UNIT_OPTIONS = ["Bowl", "Cup", "Plate", "Glass"];
+
 
   // When selectedMeal changes, rebuild foodItems from selectedMeal.meals
   useEffect(() => {
@@ -946,28 +948,49 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
                         </div>
 
                         {/* Quantity Unit */}
-                        <div className="relative w-[120px]">
-                          <input
-                            id={`quantity-unit-${index}`}
-                            type="text"
-                            placeholder=" "
-                            className="peer block w-full py-[15px] pl-[19px] pr-[13px] text-[14px] text-[#252525] bg-white border border-[#E1E6ED] rounded-[8px] outline-none placeholder-transparent focus:border-blue-600"
-                            value={item.quantityUnit}
-                            onChange={(e) =>
-                              updateFoodItem(
-                                index,
-                                "quantityUnit",
-                                sanitizeUnitInput(e.target.value)
-                              )
-                            }
-                          />
-                          <label
-                            htmlFor={`quantity-unit-${index}`}
-                            className="whitespace-nowrap pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]"
-                          >
-                            Unit
-                          </label>
-                        </div>
+                  <div className="relative w-[120px]">
+  <select
+    id={`quantity-unit-${index}`}
+    className="appearance-none peer block w-full py-[15px] pl-[19px] pr-[40px] text-[14px] text-[#252525] bg-white border border-[#E1E6ED] rounded-[8px] outline-none focus:border-blue-600"
+    value={item.quantityUnit || ""}
+    onChange={(e) =>
+      updateFoodItem(
+        index,
+        "quantityUnit",
+        sanitizeUnitInput(e.target.value)
+      )
+    }
+  >
+    <option value="" disabled>
+      Select
+    </option>
+
+    {item.quantityUnit &&
+      !UNIT_OPTIONS.map((u) => u.toLowerCase()).includes(
+        item.quantityUnit.toLowerCase()
+      ) && (
+        <option value={item.quantityUnit}>{item.quantityUnit}</option>
+      )}
+
+    <option value="Bowl">Bowl</option>
+    <option value="Cup">Cup</option>
+    <option value="Plate">Plate</option>
+    <option value="Glass">Glass</option>
+  </select>
+
+  {/* CUSTOM DROPDOWN ICON */}
+  <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+    <MdOutlineKeyboardArrowDown size={20} color="#252525" />
+  </span>
+
+  <label
+    htmlFor={`quantity-unit-${index}`}
+    className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] top-[-9px] leading-none"
+  >
+    Unit
+  </label>
+</div>
+
                       </div>
 
                       {/* Nutrition Info */}
@@ -999,6 +1022,7 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
 
                           <div className="relative w-[90px]">
                             <input
+                            readOnly
                               type="text"
                               placeholder=" "
                               className="peer block w-full py-[15px] pl-[19px] pr-[15px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] bg-white border border-[#E1E6ED] rounded-[8px] placeholder-transparent focus:border-blue-600"
@@ -1042,6 +1066,7 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
                               </div>
                               <div className="relative max-w-[70px]">
                                 <input
+                                readOnly
                                   type="text"
                                   placeholder=" "
                                   className="peer block w-full py-[15px] pl-[19px] pr-[15px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] bg-white border  rounded-[8px] placeholder-transparent"
@@ -1084,6 +1109,7 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
                               </div>
                               <div className="relative max-w-[70px]">
                                 <input
+                                readOnly
                                   type="text"
                                   placeholder=" "
                                   className="peer block w-full py-[15px] pl-[19px] pr-[15px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] bg-white border  rounded-[8px] placeholder-transparent"
@@ -1126,6 +1152,7 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
                               </div>
                               <div className="relative max-w-[70px]">
                                 <input
+                                readOnly
                                   type="text"
                                   placeholder=" "
                                   className="peer block w-full py-[15px] pl-[19px] pr-[15px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] bg-white border  rounded-[8px] placeholder-transparent"
