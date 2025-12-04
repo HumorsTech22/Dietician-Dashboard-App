@@ -1562,7 +1562,6 @@ export default function Summary({ onConfirmNext }) {
 
   // to keep all plans from API (active + completed + not_started)
   const [allPlans, setAllPlans] = useState([]);
-console.log("allPlans1565:-", allPlans);
   // ---------- Helpers for date format ----------
   const ymdToDmy = (v) => {
     if (!v) return "";
@@ -1645,28 +1644,58 @@ console.log("allPlans1565:-", allPlans);
             const loadedGoals = [];
             const loadedGoalUnits = [];
 
-            goalArray.forEach((goalItem, index) => {
-              const goalId = index + 1;
+            // goalArray.forEach((goalItem, index) => {
+            //   const goalId = index + 1;
 
-              // Matches e.g. "125kg" → ["125kg", "125", "kg"]
-              const currentMatch =
-                goalItem.current_stat?.toString().match(/(\d*\.?\d*)(.*)/) || ["", "", "Unit"];
-              const targetMatch =
-                goalItem.target_stat?.toString().match(/(\d*\.?\d*)(.*)/) || ["", "", "Unit"];
+            //   // Matches e.g. "125kg" → ["125kg", "125", "kg"]
+            //   const currentMatch =
+            //     goalItem.current_stat?.toString().match(/(\d*\.?\d*)(.*)/) || ["", "", "Unit"];
+            //   const targetMatch =
+            //     goalItem.target_stat?.toString().match(/(\d*\.?\d*)(.*)/) || ["", "", "Unit"];
 
-              loadedGoals.push({
-                id: goalId,
-                title: goalItem.name || "",
-                current: currentMatch[1] || "",
-                target: targetMatch[1] || ""
-              });
+            //   loadedGoals.push({
+            //     id: goalId,
+            //     title: goalItem.name || "",
+            //     current: currentMatch[1] || "",
+            //     target: targetMatch[1] || ""
+            //   });
 
-              loadedGoalUnits.push({
-                id: goalId,
-                currentUnit: (currentMatch[2] || "Unit").trim() || "Unit",
-                targetUnit: (targetMatch[2] || "Unit").trim() || "Unit"
-              });
-            });
+            //   loadedGoalUnits.push({
+            //     id: goalId,
+            //     currentUnit: (currentMatch[2] || "Unit").trim() || "Unit",
+            //     targetUnit: (targetMatch[2] || "Unit").trim() || "Unit"
+            //   });
+            // });
+
+goalArray.forEach((goalItem, index) => {
+  const goalId = index + 1;
+
+  // Matches e.g. "125kg" → ["125kg", "125", "kg"]
+  const currentMatch =
+    goalItem.current_stat?.toString().match(/(\d*\.?\d*)(.*)/) || ["", "", "Unit"];
+  const targetMatch =
+    goalItem.target_stat?.toString().match(/(\d*\.?\d*)(.*)/) || ["", "", "Unit"];
+
+  // 🔹 Use stored unit as fallback (this comes from prepareFormData -> unit)
+  const fallbackUnit = goalItem.unit || "";
+
+  loadedGoals.push({
+    id: goalId,
+    title: goalItem.name || "",
+    current: currentMatch[1] || "",
+    target: targetMatch[1] || ""
+  });
+
+  loadedGoalUnits.push({
+    id: goalId,
+    currentUnit:
+      (currentMatch[2] || fallbackUnit || "Unit").trim() || "Unit",
+    targetUnit:
+      (targetMatch[2] || fallbackUnit || "Unit").trim() || "Unit"
+  });
+});
+
+
 
             setGoals(loadedGoals);
             setGoalUnits(loadedGoalUnits);
@@ -1691,7 +1720,6 @@ console.log("allPlans1565:-", allPlans);
 
     // 2️⃣ Else fetch from API using profile_id + dietician cookie
     const profileId = searchParams.get("profile_id");
-console.log("profileId1694:-", profileId);
     // Get dietician_id / login_id from cookie "dietician"
     const dieticianCookie = Cookies.get("dietician");
     let dieticianId  = null;
@@ -1701,7 +1729,6 @@ console.log("profileId1694:-", profileId);
         const dietician = JSON.parse(dieticianCookie);
     dieticianId = dietician?.dietician_id;
 
-        console.log("dieticianId1704:-", dieticianId);
       } catch (e) {
         console.error("Error parsing dietician cookie:", e);
       }
@@ -1715,7 +1742,6 @@ console.log("profileId1694:-", profileId);
     const fetchProfile = async () => {
       try {
        const res = await fetchClientProfileData(dieticianId, profileId);
-        console.log("res1717:-", res);
 
         if (!res?.success) {
           console.warn("fetchClientProfileData failed:", res);
@@ -1723,7 +1749,6 @@ console.log("profileId1694:-", profileId);
         }
 
         const data = res.data;
-        console.log("data1728:-", data);
         const plansSummary = data?.plans_summary || {};
 
         const activePlans = plansSummary.active || [];

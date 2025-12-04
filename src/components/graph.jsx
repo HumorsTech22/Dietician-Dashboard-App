@@ -106,9 +106,6 @@ export default function Graph({
   values = [],
   color = "#DA5747", // fallback if title not matched
 }) {
-  console.log("title112:-", title);
-  console.log("labels:-", labels);
-  console.log("values:-", values);
 
   // 🔹 THIS decides "second graph" behaviour
   const isSecondScore =

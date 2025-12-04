@@ -304,7 +304,6 @@ export default function TestEvaluation() {
 
   // Get scores from the nested structure
   const scores = scoresInsight?.latest_test?.scores;
-  console.log("score307:-", scores);
   const testDate = scoresInsight?.latest_test?.date_time;
   const metabolismScores = scoresInsight?.latest_test?.test_json?.Metabolism_Score_Analysis;
   const fatLossMetabolism =
