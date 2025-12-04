@@ -6,7 +6,9 @@ import { usePathname } from "next/navigation";
 import { UserPlus } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosArrowRoundDown } from "react-icons/io";
-import { cookieManager } from "../lib/cookies"
+import { cookieManager } from "../lib/cookies";
+import PendingRequest from "./modal/pending-popup";
+import PendingPopUp from "./modal/pending-popup";
 
 export const UserProfile = ({
   searchQuery = "",
@@ -23,6 +25,7 @@ export const UserProfile = ({
 
    const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState('Recently Added');
+  const [pendingRequest, setPendingRequest] = useState(false);
 
   const options = [
     'Recently Added',
@@ -51,8 +54,13 @@ export const UserProfile = ({
     setCurrentDate(date);
   }, []);
 
+  const handlePendingRequest = () =>{
+    setPendingRequest(true);
+  }
+
 
   return (
+    <>
     <div
       className={`flex w-full flex-wrap items-center justify-between gap-10 ${
         isClientPage || isMessagesPage ? "" : "mt-[130px] mb-[102px]"
@@ -189,12 +197,14 @@ export const UserProfile = ({
       </div>
 
       {/* RIGHT: Actions (hide on messages page) */}
-      {/* {!isMessagesPage && (
+   {!isMessagesPage && (
         <div className="flex flex-wrap gap-[15px] shrink-0">
-          <div className="flex gap-1.5 px-[20px] py-[15px] items-center bg-[#308BF9] rounded-[15px] cursor-pointer">
+          <div className="flex gap-1.5 px-[20px] py-[15px] items-center bg-[#308BF9] rounded-[15px] cursor-pointer"
+          onClick={handlePendingRequest}
+          >
             <UserPlus size={20} className="text-white" />
             <p className="text-[12px] leading-[100%] font-semibold text-white space-x-0">
-              Add Client
+              Pending Request(6)
             </p>
           </div>
 
@@ -210,7 +220,13 @@ export const UserProfile = ({
             </p>
           </div>
         </div>
-      )} */}
+      )} 
     </div>
+
+    <PendingPopUp
+    open={pendingRequest}
+    onClose={() => setPendingRequest(false)}
+    />
+    </>
   );
 };
