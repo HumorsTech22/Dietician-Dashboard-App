@@ -6,11 +6,13 @@ import DashboardGraph from "./dashboard-graph";
 import { useState, useRef, useEffect } from 'react';
 import { fetchTestAnalytics } from "../services/authService";
 import { cookieManager } from "../lib/cookies";
+import DietPlanMonitor from "./diet-plan-monitor";
 
 export default function TestMonitor() {
   const [selectedDate, setSelectedDate] = useState("");
   const [showCalendar, setShowCalendar] = useState(false);
   const [testAnalyticsData, setTestAnalyticsData] = useState(null);
+ 
   const [loading, setLoading] = useState(false);
   const [dieticianId, setDieticianId] = useState("");   
 
@@ -246,8 +248,21 @@ export default function TestMonitor() {
             Tests Results
           </span>
           <ClientRisk hideDietGoal={true} />
+         
         </div>
       </div>
     </>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+

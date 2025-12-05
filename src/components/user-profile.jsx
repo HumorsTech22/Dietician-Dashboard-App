@@ -197,7 +197,7 @@ export const UserProfile = ({
       </div>
 
       {/* RIGHT: Actions (hide on messages page) */}
-   {!isMessagesPage && (
+   {/* {!isMessagesPage && (
         <div className="flex flex-wrap gap-[15px] shrink-0">
           <div className="flex gap-1.5 px-[20px] py-[15px] items-center bg-[#308BF9] rounded-[15px] cursor-pointer"
           onClick={handlePendingRequest}
@@ -220,7 +220,7 @@ export const UserProfile = ({
             </p>
           </div>
         </div>
-      )} 
+      )}  */}
     </div>
 
     <PendingPopUp
