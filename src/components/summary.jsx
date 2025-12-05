@@ -1,353 +1,36 @@
-// "use client"
-// import { IoIosArrowDown } from "react-icons/io";
-// import { RxCross2 } from "react-icons/rx";
-// import React, { useState, useRef, useEffect } from 'react'
-// import Image from 'next/image'
-// export default function Summary() {
-//   const [approachInput, setApproachInput] = useState('');
-//   const [approachTags, setApproachTags] = useState([]);
-
-//   const [currentUnit, setCurrentUnit] = useState('Unit');
-//   const [targetUnit, setTargetUnit] = useState('Unit');
-//   const [showCurrentDropdown, setShowCurrentDropdown] = useState(false);
-//   const [showTargetDropdown, setShowTargetDropdown] = useState(false);
-
-//   // Ref for dropdown containers
-//   const currentDropdownRef = useRef(null);
-//   const targetDropdownRef = useRef(null);
-
-//   // Common units for weight/measurement
-//   const unitOptions = [
-//     'kg', 'g', 'lb', 'oz', 'cm', 'm', 'inch', 'ft', '%', 'bpm', 'cal', 'kcal'
-//   ];
-
-//   useEffect(() => {
-//     const handleClickOutside = (event) => {
-//       if (currentDropdownRef.current && !currentDropdownRef.current.contains(event.target)) {
-//         setShowCurrentDropdown(false);
-//       }
-//       if (targetDropdownRef.current && !targetDropdownRef.current.contains(event.target)) {
-//         setShowTargetDropdown(false);
-//       }
-//     };
-
-//     document.addEventListener('mousedown', handleClickOutside);
-//     return () => {
-//       document.removeEventListener('mousedown', handleClickOutside);
-//     };
-//   }, []);
-
-//   const addTag = () => {
-//     const t = approachInput.trim();
-//     if (!t) return;
-//     const exists = approachTags.some(a => a.toLowerCase() === t.toLowerCase());
-//     if (!exists) setApproachTags(prev => [...prev, t]);
-//     setApproachInput('');
-//   };
-
-//   const removeTag = (i) => {
-//     setApproachTags(prev => prev.filter((_, idx) => idx !== i));
-//   };
-
-//   const handleKeyDown = (e) => {
-//     if (e.key === 'Enter' || e.key === ',') {
-//       e.preventDefault();
-//       addTag();
-//     }
-//   };
-
-
-//   const handleUnitSelect = (unit, type) => {
-//     if (type === 'current') {
-//       setCurrentUnit(unit);
-//       setShowCurrentDropdown(false);
-//     } else {
-//       setTargetUnit(unit);
-//       setShowTargetDropdown(false);
-//     }
-//   };
-
-//   const toggleCurrentDropdown = () => {
-//     setShowCurrentDropdown(!showCurrentDropdown);
-//     setShowTargetDropdown(false);
-//   };
-
-//   const toggleTargetDropdown = () => {
-//     setShowTargetDropdown(!showTargetDropdown); 
-//     setShowCurrentDropdown(false);
-//   };
-
-//   return (
-//     <>
-//       <div className='w-full'>
-//         <div className='pt-[23px]'>
-//           <p className='text-[#252525] pb-[18px] pt-[23px] text-[20px] font-semibold leading-[110%] tracking-[0.4px] whitespace-nowrap'>Plan Summary1</p>
-
-//           <div className="w-full border-b border-[#E1E6ED]"></div>
-
-//           <div className='mt-[15px]'>
-//             <div className="flex gap-5 items-end">
-//               {/* Name of the plan */}
-//               <div className="relative flex-1">
-//                 <input type="text" id="floating_outlined"
-//                   className="block py-[15px] pl-[19px] pr-[13px] w-full text-[14px] text-[#252525] bg-white rounded-[8px] border border-[#E1E6ED] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " />
-//                 <label htmlFor="floating_outlined" className="absolute text-[14px] text-[#9CA3AF] duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1">Name of the plan</label>
-//               </div>
-
-//               {/* Duration */}
-//               <div className="flex-1">
-//                 <span className="px-[9px] text-[#252525] text-[12px] leading-normal font-semibold tracking-[-0.24px]">
-//                   Duration
-//                 </span>
-
-//                 <div className="flex gap-2 mt-2">
-//                   {/* From */}
-//                   <div className="relative flex-1">
-//                     <span className="absolute -top-2 left-4 bg-white px-[9px] text-[12px] font-medium text-[#535359]">
-//                       From
-//                     </span>
-//                     <div className="flex py-[15px] pl-[19px] pr-[13px] border border-[#E1E6ED] rounded-[8px] bg-white">
-//                       <input
-//                         type="text"
-//                         placeholder="DD/MM/YYYY"
-//                         className="w-full outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#9CA3AF]"
-//                       />
-//                       <Image src="/icons/hugeicons_calendar-03.svg" alt="calendar" width={20} height={20} />
-//                     </div>
-//                   </div>
-
-//                   {/* To */}
-//                   <div className="relative flex-1">
-//                     <span className="absolute -top-2 left-4 bg-white px-[9px] text-[12px] font-medium text-[#535359]">
-//                       To
-//                     </span>
-//                     <div className="flex py-[15px] pl-[19px] pr-[13px] border border-[#E1E6ED] rounded-[8px] bg-white">
-//                       <input
-//                         type="text"
-//                         placeholder="DD/MM/YYYY"
-//                         className="w-full outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#9CA3AF]"
-//                       />
-//                       <Image src="/icons/hugeicons_calendar-03.svg" alt="calendar" width={20} height={20} />
-//                     </div>
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-
-//             <div className='px-[9px] py-[5px] text-[#252525] text-[12px] leading-normal font-semibold tracking-[-0.24px]'>Goal 1</div>
-
-//             <div className='flex gap-[7px]'>
-//               <div className="relative flex-1">
-//                 <input
-//                   id="goalTitle"
-//                   type="text"
-//                   placeholder=" "
-//                   className="peer block w-full py-[15px] pl-[19px] pr-[13px] text-[14px] text-[#252525] bg-white border border-[#E1E6ED] rounded-[8px] outline-none placeholder-transparent focus:border-blue-600"
-//                 />
-//                 <label
-//                   htmlFor="goalTitle"
-//                   className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF]
-//                    transition-all duration-200 ease-out
-//                    top-1/2 -translate-y-1/2
-//                    peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600
-//                    peer-[&:not(:placeholder-shown)]:top-2
-//                    peer-[&:not(:placeholder-shown)]:-translate-y-4
-//                    peer-[&:not(:placeholder-shown)]:scale-75
-//                    peer-[&:not(:placeholder-shown)]:text-[#535359]"
-//                 >
-//                   Goal Title
-//                 </label>
-//               </div>
-
-//               <div className="flex gap-10">
-//                 {/* Current Stat with error and dropdown */}
-//                 <div className="flex flex-col" ref={currentDropdownRef}>
-//                   <div className="flex items-center py-[15px] pl-[19px] pr-[15px] border border-[#DA5747] rounded-[8px] bg-white relative">
-//                     <input
-//                       type="text"
-//                       placeholder="Current Stat"
-//                       className="w-full max-w-[90px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#A1A1A1]"
-//                     />
-
-//                     <div className="h-[20px] border-l border-[#E1E6ED] mx-3"></div>
-
-//                     <div
-//                       className="flex items-center gap-2 cursor-pointer relative"
-//                       onClick={toggleCurrentDropdown}
-//                     >
-//                       <span className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
-//                         {currentUnit}
-//                       </span>
-//                       <IoIosArrowDown className={`text-[#A1A1A1] w-[15px] h-[15px] transition-transform ${showCurrentDropdown ? 'rotate-180' : ''}`} />
-
-//                       {/* Dropdown Menu */}
-//                       {showCurrentDropdown && (
-//                         <div className="absolute top-full right-0 mt-1 bg-white border border-[#E1E6ED] rounded-[8px] shadow-lg z-10 min-w-[100px] max-h-[200px] overflow-y-auto">
-//                           {unitOptions.map((unit) => (
-//                             <div
-//                               key={unit}
-//                               className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-[12px] text-[#252525]"
-//                               onClick={() => handleUnitSelect(unit, 'current')}
-//                             >
-//                               {unit}
-//                             </div>
-//                           ))}
-//                         </div>
-//                       )}
-//                     </div>
-//                   </div>
-
-//                   {/* Error text below */}
-//                   <div className="flex gap-[5px] items-center mt-1">
-//                     <Image
-//                       src="/icons/hugeicons_information-circle-redd.png"
-//                       alt="info"
-//                       width={15}
-//                       height={15}
-//                     />
-//                     <span className="text-[#DA5747] text-[10px] font-normal leading-[110%] tracking-[-0.2px]">
-//                       Enter current stat
-//                     </span>
-//                   </div>
-//                 </div>
-
-//                 {/* Target Stat with error and dropdown */}
-//                 <div className="flex flex-col" ref={targetDropdownRef}>
-//                   <div className="flex items-center py-[15px] pl-[19px] pr-[15px] border border-[#DA5747] rounded-[8px] bg-white relative">
-//                     <input
-//                       type="text"
-//                       placeholder="Target Stat"
-//                       className="w-full max-w-[90px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#A1A1A1]"
-//                     />
-
-//                     <div className="h-[20px] border-l border-[#E1E6ED] mx-3"></div>
-
-//                     <div
-//                       className="flex items-center gap-2 cursor-pointer relative"
-//                       onClick={toggleTargetDropdown}
-//                     >
-//                       <span className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
-//                         {targetUnit}
-//                       </span>
-//                       <IoIosArrowDown className={`text-[#A1A1A1] w-[15px] h-[15px] transition-transform ${showTargetDropdown ? 'rotate-180' : ''}`} />
-
-//                       {/* Dropdown Menu */}
-//                       {showTargetDropdown && (
-//                         <div className="absolute top-full right-0 mt-1 bg-white border border-[#E1E6ED] rounded-[8px] shadow-lg z-10 min-w-[100px] max-h-[200px] overflow-y-auto">
-//                           {unitOptions.map((unit) => (
-//                             <div
-//                               key={unit}
-//                               className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-[12px] text-[#252525]"
-//                               onClick={() => handleUnitSelect(unit, 'target')}
-//                             >
-//                               {unit}
-//                             </div>
-//                           ))}
-//                         </div>
-//                       )}
-//                     </div>
-//                   </div>
-
-//                   {/* Error text below */}
-//                   <div className="flex gap-[5px] items-center mt-1">
-//                     <Image
-//                       src="/icons/hugeicons_information-circle-redd.png"
-//                       alt="info"
-//                       width={15}
-//                       height={15}
-//                     />
-//                     <span className="text-[#DA5747] text-[10px] font-normal leading-[110%] tracking-[-0.2px]">
-//                       Enter target stat
-//                     </span>
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-
-//         <div className='flex flex-col gap-[15px]'>
-//           <div className='px-5 py-[15px]'>
-//             <span className='text-[#308BF9] font-semibold text-[12px] leading-normal tracking-[-0.24px] cursor-pointer'>Add Another Goal</span>
-//           </div>
-
-//           <div className='flex flex-col gap-3.5'>
-//             <div className='flex justify-between pr-[15px] items-center py-[15px] pl-5 border border-[#E1E6ED] rounded-[8px]'>
-//               <input
-//                 value={approachInput}
-//                 onChange={(e) => setApproachInput(e.target.value)}
-//                 onKeyDown={handleKeyDown}
-//                 onBlur={addTag}
-//                 placeholder='Enter approach (Ex. Low GI, High Proteins, Calories Deficit)'
-//                 className="flex-1 outline-none text-[#252525] text-[14px] font-normal placeholder:text-[#9CA3AF] leading-[110%] tracking-[-0.24px]"
-//               />
-//               <IoIosArrowDown
-//                 className="text-[#A1A1A1] w-[15px] h-[15px] cursor-pointer"
-//                 onClick={addTag}
-//                 title="Add"
-//               />
-//             </div>
-
-//             <div className="flex flex-wrap gap-2">
-//               {approachTags.map((tag, idx) => (
-//                 <div
-//                   key={`${tag}-${idx}`}
-//                   className='flex items-center gap-2.5 px-5 py-2.5 rounded-[20px] border border-[#E48326] bg-[#FFF7F0] max-w-full'
-//                 >
-//                   <span className='text-[#E48326] text-[12px] whitespace-nowrap font-semibold leading-[110%] tracking-[-0.24px]'>
-//                     {tag}
-//                   </span>
-//                   <button
-//                     type="button"
-//                     onClick={() => removeTag(idx)}
-//                     aria-label={`Remove ${tag}`}
-//                   >
-//                     <RxCross2 className='text-[#252525] w-[15px] h-[15px] cursor-pointer' />
-//                   </button>
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-//         </div>
-
-//         <div className="w-full border-b border-[#E1E6ED] mt-[30px]"></div>
-
-//         <div className='py-[23px]'>
-//           <div className='flex gap-5 justify-end'>
-//             <div className='px-5 py-[15px] bg-white border border-[#D9D9D9] rounded-[10px]'>
-//               <span className='text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[-0.24px] cursor-pointer'>Save as draft</span>
-//             </div>
-
-//             <div className='px-5 py-[15px] bg-[#308BF9] rounded-[10px]'>
-//               <span className='text-white text-[12px] font-semibold leading-normal tracking-[-0.24px] cursor-pointer'>Confirm & Next</span>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </>
-//   )
-// };
-
-
-
-
-
-
 // "use client";
+
 // import { IoIosArrowDown } from "react-icons/io";
 // import { RxCross2 } from "react-icons/rx";
 // import React, { useState, useRef, useEffect } from "react";
 // import Image from "next/image";
 // import { toast } from "sonner";
+// import { useSearchParams } from "next/navigation";
+// import Cookies from "js-cookie";
+// import { fetchClientProfileData } from "../services/authService"; // 🔹 make sure path is correct
+
+
+// function normalizeNumber(value) {
+//   if (value === null || value === undefined || value === "") {
+//     return "0";
+//   }
+//   return String(value);
+// }
+
 
 // export default function Summary({ onConfirmNext }) {
+//   const searchParams = useSearchParams();
+
 //   const [planTitle, setPlanTitle] = useState("");
 //   const [approachInput, setApproachInput] = useState("");
 //   const [approachTags, setApproachTags] = useState([]);
 //   const [goals, setGoals] = useState([{ id: 1, title: "", current: "", target: "" }]);
-//   const [goalUnits, setGoalUnits] = useState([{ id: 1, currentUnit: "Unit", targetUnit: "Unit" }]);
+//   const [goalUnits, setGoalUnits] = useState([
+//     { id: 1, currentUnit: "Unit", targetUnit: "Unit" }
+//   ]);
 //   const [isDiabetic, setIsDiabetic] = useState(false);
 //   const [dietType, setDietType] = useState("");
+//   console.log("dietType24:-", dietType);
 //   const [showDietDropdown, setShowDietDropdown] = useState(false);
 
 //   const dietDropdownRef = useRef(null);
@@ -386,7 +69,23 @@
 //   const currentDropdownRef = useRef(null);
 //   const targetDropdownRef = useRef(null);
 
-//   const unitOptions = ["kg", "g", "lb", "oz", "cm", "m", "inch", "ft", "%", "bpm", "cal", "kcal"];
+//   const unitOptions = [
+//     "kg",
+//     "g",
+//     "lb",
+//     "oz",
+//     "cm",
+//     "m",
+//     "inch",
+//     "ft",
+//     "%",
+//     "bpm",
+//     "cal",
+//     "kcal"
+//   ];
+
+//   // to keep all plans from API (active + completed + not_started)
+//   const [allPlans, setAllPlans] = useState([]);
 
 //   // ---------- Helpers for date format ----------
 //   const ymdToDmy = (v) => {
@@ -411,7 +110,8 @@
 //   // ---------- Load from localStorage ----------
 //   const loadFromLocalStorage = () => {
 //     try {
-//       const savedData = typeof window !== "undefined" ? localStorage.getItem("planSummary") : null;
+//       const savedData =
+//         typeof window !== "undefined" ? localStorage.getItem("planSummary") : null;
 //       if (savedData) {
 //         const data = JSON.parse(savedData);
 
@@ -431,13 +131,17 @@
 //           setIsDiabetic(false);
 //         }
 
-//         setDietType(data.diet_type || "");
-//         setCaloriesTarget(data.calories_target || "");
-//         setProteinTarget(data.protein_target || "");
-//         setFiberTarget(data.fiber_target || "");
-//         setCarbsTarget(data.carbs_target || "");
-//         setFatTarget(data.fat_target || "");
-//         setWaterTarget(data.water_target || "");
+//         // diet_type -> only set if non-empty to avoid overriding with blank
+//         if (data.diet_type && data.diet_type.trim()) {
+//           setDietType(data.diet_type);
+//         }
+
+//         setCaloriesTarget(normalizeNumber(data.calories_target || ""));
+//         setProteinTarget(normalizeNumber(data.protein_target || ""));
+//         setFiberTarget(normalizeNumber(data.fiber_target || ""));
+//         setCarbsTarget(normalizeNumber(data.carbs_target || ""));
+//         setFatTarget(normalizeNumber(data.fat_target || ""));
+//         setWaterTarget(normalizeNumber(data.water_target || ""));
 
 //         // approach tags
 //         if (data.approach) {
@@ -474,9 +178,14 @@
 
 //               // Matches e.g. "125kg" → ["125kg", "125", "kg"]
 //               const currentMatch =
-//                 goalItem.current_stat?.toString().match(/(\d*\.?\d*)(.*)/) || ["", "", "Unit"];
+//                 goalItem.current_stat?.toString().match(/(\d*\.?\d*)(.*)/) ||
+//                 ["", "", "Unit"];
 //               const targetMatch =
-//                 goalItem.target_stat?.toString().match(/(\d*\.?\d*)(.*)/) || ["", "", "Unit"];
+//                 goalItem.target_stat?.toString().match(/(\d*\.?\d*)(.*)/) ||
+//                 ["", "", "Unit"];
+
+//               // 🔹 Use stored unit as fallback (this comes from prepareFormData -> unit)
+//               const fallbackUnit = goalItem.unit || "";
 
 //               loadedGoals.push({
 //                 id: goalId,
@@ -487,8 +196,10 @@
 
 //               loadedGoalUnits.push({
 //                 id: goalId,
-//                 currentUnit: (currentMatch[2] || "Unit").trim() || "Unit",
-//                 targetUnit: (targetMatch[2] || "Unit").trim() || "Unit"
+//                 currentUnit:
+//                   (currentMatch[2] || fallbackUnit || "Unit").trim() || "Unit",
+//                 targetUnit:
+//                   (targetMatch[2] || fallbackUnit || "Unit").trim() || "Unit"
 //               });
 //             });
 
@@ -502,18 +213,172 @@
 //     }
 //   };
 
-//   // On mount
+//   // ---------- On mount: prefer draft, else fetch from API ----------
 //   useEffect(() => {
-//     loadFromLocalStorage();
-//   }, []);
+//     if (typeof window === "undefined") return;
+
+//     // 1️⃣ If there's a local draft, load and exit
+//     const saved = localStorage.getItem("planSummary");
+//     if (saved) {
+//       loadFromLocalStorage();
+//       return;
+//     }
+
+//     // 2️⃣ Else fetch from API using profile_id + dietician cookie
+//     const profileId = searchParams.get("profile_id");
+//     console.log("profileId1723:-", profileId);
+
+//     // Get dietician_id / login_id from cookie "dietician"
+//     const dieticianCookie = Cookies.get("dietician");
+//     let dieticianId = null;
+
+//     if (dieticianCookie) {
+//       try {
+//         const dietician = JSON.parse(dieticianCookie);
+//         dieticianId = dietician?.dietician_id;
+//       } catch (e) {
+//         console.error("Error parsing dietician cookie:", e);
+//       }
+//     }
+
+//     if (!profileId || !dieticianId) {
+//       console.warn("Missing profile_id or login_id for fetchClientProfileData");
+//       return;
+//     }
+
+//     const fetchProfile = async () => {
+//       try {
+//         const res = await fetchClientProfileData(dieticianId, profileId);
+
+//         if (!res?.success) {
+//           console.warn("fetchClientProfileData failed:", res);
+//           return;
+//         }
+
+//         const data = res.data;
+//         const plansSummary = data?.plans_summary || {};
+
+//         const activePlans = plansSummary.active || [];
+//         const completedPlans = plansSummary.completed || [];
+//         const notStartedPlans = plansSummary.not_started || [];
+
+//         const all = [...activePlans, ...completedPlans, ...notStartedPlans];
+//         setAllPlans(all);
+
+//         if (!all.length) {
+//           // no plans at all
+//           return;
+//         }
+
+//         // Priority for Summary: active → not_started → completed
+//         const selectedPlan =
+//           activePlans[0] || notStartedPlans[0] || completedPlans[0];
+
+//         if (!selectedPlan) return;
+
+//         // Basic fields
+//         setPlanTitle(selectedPlan.plan_title || "");
+//         setFromDate(ymdToDmy(selectedPlan.plan_start_date) || "");
+//         setToDate(ymdToDmy(selectedPlan.plan_end_date) || "");
+
+//        setCaloriesTarget(normalizeNumber(selectedPlan.calories_target));
+// setProteinTarget(normalizeNumber(selectedPlan.protein_target));
+// setFiberTarget(normalizeNumber(selectedPlan.fiber_target));
+// setCarbsTarget(normalizeNumber(selectedPlan.carbs_target));
+// setFatTarget(normalizeNumber(selectedPlan.fat_target));
+// setWaterTarget(normalizeNumber(selectedPlan.water_target));
+//         setDietType(selectedPlan.diet_type || ""); // 🔹 bind diet_type from API
+
+//         // Approach
+//         if (selectedPlan.approach) {
+//           setApproachTags(
+//             selectedPlan.approach.split(",").filter((t) => t.trim())
+//           );
+//         }
+
+//         // Goals: JSON string → array
+//         if (selectedPlan.goal) {
+//           try {
+//             const parsedGoals = JSON.parse(selectedPlan.goal);
+//             if (Array.isArray(parsedGoals) && parsedGoals.length > 0) {
+//               const loadedGoals = [];
+//               const loadedGoalUnits = [];
+
+//               parsedGoals.forEach((goalItem, index) => {
+//                 const goalId = index + 1;
+
+//                 const currentMatch =
+//                   goalItem.current_stat?.toString().match(/(\d*\.?\d*)(.*)/) ||
+//                   ["", "", "Unit"];
+//                 const targetMatch =
+//                   goalItem.target_stat?.toString().match(/(\d*\.?\d*)(.*)/) ||
+//                   ["", "", "Unit"];
+
+//                 loadedGoals.push({
+//                   id: goalId,
+//                   title: goalItem.name || "",
+//                   current: currentMatch[1] || "0",
+//                   target: targetMatch[1] || "0"
+//                 });
+
+//                 const fallbackUnit = goalItem.unit || "";
+//                 loadedGoalUnits.push({
+//                   id: goalId,
+//                   currentUnit:
+//                     (currentMatch[2] || fallbackUnit || "Unit").trim() || "Unit",
+//                   targetUnit:
+//                     (targetMatch[2] || fallbackUnit || "Unit").trim() || "Unit"
+//                 });
+//               });
+
+//               setGoals(loadedGoals);
+//               setGoalUnits(loadedGoalUnits);
+//             }
+//           } catch (e) {
+//             console.error("Error parsing selectedPlan.goal:", e, selectedPlan.goal);
+//           }
+//         }
+
+//         // Also store normalized planSummary in localStorage
+//         const formData = {
+//           plan_id: selectedPlan.id,
+//           plan_title: selectedPlan.plan_title || "",
+//           plan_start_date: selectedPlan.plan_start_date || "",
+//           plan_end_date: selectedPlan.plan_end_date || "",
+//           is_diabetic: isDiabetic,
+//           diet_type: selectedPlan.diet_type || "",
+//           calories_target: selectedPlan.calories_target || "",
+//           protein_target: selectedPlan.protein_target || "",
+//           fiber_target: selectedPlan.fiber_target || "",
+//           carbs_target: selectedPlan.carbs_target || "",
+//           fat_target: selectedPlan.fat_target || "",
+//           water_target: selectedPlan.water_target || "",
+//           goal: selectedPlan.goal,
+//           approach: selectedPlan.approach || ""
+//         };
+
+//         localStorage.setItem("planSummary", JSON.stringify(formData));
+//       } catch (error) {
+//         console.error("Error fetching client profile:", error);
+//       }
+//     };
+
+//     fetchProfile();
+//   }, [searchParams]);
 
 //   // -------- Click outside handlers --------
 //   useEffect(() => {
 //     const handleClickOutside = (event) => {
-//       if (currentDropdownRef.current && !currentDropdownRef.current.contains(event.target)) {
+//       if (
+//         currentDropdownRef.current &&
+//         !currentDropdownRef.current.contains(event.target)
+//       ) {
 //         setShowCurrentDropdown(null);
 //       }
-//       if (targetDropdownRef.current && !targetDropdownRef.current.contains(event.target)) {
+//       if (
+//         targetDropdownRef.current &&
+//         !targetDropdownRef.current.contains(event.target)
+//       ) {
 //         setShowTargetDropdown(null);
 //       }
 //       if (dietDropdownRef.current && !dietDropdownRef.current.contains(event.target)) {
@@ -536,7 +401,8 @@
 //     setApproachInput("");
 //   };
 
-//   const removeTag = (i) => setApproachTags((prev) => prev.filter((_, idx) => idx !== i));
+//   const removeTag = (i) =>
+//     setApproachTags((prev) => prev.filter((_, idx) => idx !== i));
 
 //   const handleKeyDown = (e) => {
 //     if (e.key === "Enter" || e.key === ",") {
@@ -584,7 +450,11 @@
 //   };
 
 //   const updateGoal = (goalId, field, value) => {
-//     setGoals((prev) => prev.map((goal) => (goal.id === goalId ? { ...goal, [field]: value } : goal)));
+//     setGoals((prev) =>
+//       prev.map((goal) =>
+//         goal.id === goalId ? { ...goal, [field]: value } : goal
+//       )
+//     );
 //     setErrors((prev) => ({
 //       ...prev,
 //       goals: {
@@ -596,8 +466,14 @@
 
 //   const addNewGoal = () => {
 //     const newGoalId = goals.length > 0 ? Math.max(...goals.map((g) => g.id)) + 1 : 1;
-//     setGoals((prev) => [...prev, { id: newGoalId, title: "", current: "", target: "" }]);
-//     setGoalUnits((prev) => [...prev, { id: newGoalId, currentUnit: "Unit", targetUnit: "Unit" }]);
+//     setGoals((prev) => [
+//       ...prev,
+//       { id: newGoalId, title: "", current: "", target: "" }
+//     ]);
+//     setGoalUnits((prev) => [
+//       ...prev,
+//       { id: newGoalId, currentUnit: "Unit", targetUnit: "Unit" }
+//     ]);
 //   };
 
 //   const removeGoal = (goalId) => {
@@ -791,7 +667,9 @@
 //                     width={15}
 //                     height={15}
 //                   />
-//                   <span className="text-[#DA5747] text-[10px]">{errors.planTitle}</span>
+//                   <span className="text-[#DA5747] text-[10px]">
+//                     {errors.planTitle}
+//                   </span>
 //                 </div>
 //               ) : null}
 //             </div>
@@ -819,7 +697,11 @@
 //                       placeholder="DD/MM/YYYY"
 //                       className="w-full outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#9CA3AF] cursor-pointer"
 //                     />
-//                     <button type="button" onClick={openFromPicker} className="cursor-pointer">
+//                     <button
+//                       type="button"
+//                       onClick={openFromPicker}
+//                       className="cursor-pointer"
+//                     >
 //                       <Image
 //                         src="/icons/hugeicons_calendar-03.svg"
 //                         alt="calendar"
@@ -845,7 +727,9 @@
 //                         width={15}
 //                         height={15}
 //                       />
-//                       <span className="text-[#DA5747] text-[10px]">{errors.fromDate}</span>
+//                       <span className="text-[#DA5747] text-[10px]">
+//                         {errors.fromDate}
+//                       </span>
 //                     </div>
 //                   ) : null}
 //                 </div>
@@ -907,7 +791,9 @@
 //                         width={15}
 //                         height={15}
 //                       />
-//                       <span className="text-[#DA5747] text-[10px]">{errors.toDate}</span>
+//                       <span className="text-[#DA5747] text-[10px]">
+//                         {errors.toDate}
+//                       </span>
 //                     </div>
 //                   ) : null}
 //                 </div>
@@ -962,25 +848,25 @@
 //                       Eggitarian
 //                     </div>
 //                     <div
-//                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525]"
+//                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525] border-b border-[#E1E6ED]"
 //                       onClick={() => handleDietSelect("Fishitarian")}
 //                     >
 //                       Fishitarian
 //                     </div>
 //                     <div
-//                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525]"
+//                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525] border-b border-[#E1E6ED]"
 //                       onClick={() => handleDietSelect("Vegan")}
 //                     >
 //                       Vegan
 //                     </div>
 //                     <div
-//                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525]"
+//                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525] border-b border-[#E1E6ED]"
 //                       onClick={() => handleDietSelect("Lacto-Ovo Vegetarian")}
 //                     >
 //                       Lacto-Ovo Vegetarian
 //                     </div>
 //                     <div
-//                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525]"
+//                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[14px] text-[#252525] border-b border-[#E1E6ED]"
 //                       onClick={() => handleDietSelect("Pescatarian")}
 //                     >
 //                       Pescatarian
@@ -1002,7 +888,9 @@
 //                       width={15}
 //                       height={15}
 //                     />
-//                     <span className="text-[#DA5747] text-[10px]">{errors.dietType}</span>
+//                     <span className="text-[#DA5747] text-[10px]">
+//                       {errors.dietType}
+//                     </span>
 //                   </div>
 //                 )}
 //               </div>
@@ -1018,7 +906,9 @@
 //                     width={15}
 //                     height={15}
 //                   />
-//                   <span className="text-[#DA5747] text-[10px]">{errors.isDiabetic}</span>
+//                   <span className="text-[#DA5747] text-[10px]">
+//                     {errors.isDiabetic}
+//                   </span>
 //                 </div>
 //               )}
 //             </div>
@@ -1037,7 +927,9 @@
 //                   onChange={onChangeAndClear(setCaloriesTarget, "caloriesTarget")}
 //                   placeholder=""
 //                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent ${
-//                     errors.caloriesTarget ? "border border-[#DA5747]" : "border border-[#E1E6ED]"
+//                     errors.caloriesTarget
+//                       ? "border border-[#DA5747]"
+//                       : "border border-[#E1E6ED]"
 //                   } focus:border-blue-600`}
 //                 />
 //                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
@@ -1054,7 +946,9 @@
 //                       width={15}
 //                       height={15}
 //                     />
-//                     <span className="text-[#DA5747] text-[10px]">{errors.caloriesTarget}</span>
+//                     <span className="text-[#DA5747] text-[10px]">
+//                       {errors.caloriesTarget}
+//                     </span>
 //                   </div>
 //                 ) : null}
 //               </div>
@@ -1068,7 +962,9 @@
 //                   onChange={onChangeAndClear(setProteinTarget, "proteinTarget")}
 //                   placeholder=""
 //                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent ${
-//                     errors.proteinTarget ? "border border-[#DA5747]" : "border border-[#E1E6ED]"
+//                     errors.proteinTarget
+//                       ? "border border-[#DA5747]"
+//                       : "border border-[#E1E6ED]"
 //                   } focus:border-blue-600`}
 //                 />
 //                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
@@ -1085,7 +981,9 @@
 //                       width={15}
 //                       height={15}
 //                     />
-//                     <span className="text-[#DA5747] text-[10px]">{errors.proteinTarget}</span>
+//                     <span className="text-[#DA5747] text-[10px]">
+//                       {errors.proteinTarget}
+//                     </span>
 //                   </div>
 //                 ) : null}
 //               </div>
@@ -1099,7 +997,9 @@
 //                   onChange={onChangeAndClear(setFiberTarget, "fiberTarget")}
 //                   placeholder=""
 //                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent ${
-//                     errors.fiberTarget ? "border border-[#DA5747]" : "border border-[#E1E6ED]"
+//                     errors.fiberTarget
+//                       ? "border border-[#DA5747]"
+//                       : "border border-[#E1E6ED]"
 //                   } focus:border-blue-600`}
 //                 />
 //                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
@@ -1116,7 +1016,9 @@
 //                       width={15}
 //                       height={15}
 //                     />
-//                     <span className="text-[#DA5747] text-[10px]">{errors.fiberTarget}</span>
+//                     <span className="text-[#DA5747] text-[10px]">
+//                       {errors.fiberTarget}
+//                     </span>
 //                   </div>
 //                 ) : null}
 //               </div>
@@ -1130,7 +1032,9 @@
 //                   onChange={onChangeAndClear(setCarbsTarget, "carbsTarget")}
 //                   placeholder=""
 //                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent ${
-//                     errors.carbsTarget ? "border border-[#DA5747]" : "border border-[#E1E6ED]"
+//                     errors.carbsTarget
+//                       ? "border border-[#DA5747]"
+//                       : "border border-[#E1E6ED]"
 //                   } focus:border-blue-600`}
 //                 />
 //                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
@@ -1147,7 +1051,9 @@
 //                       width={15}
 //                       height={15}
 //                     />
-//                     <span className="text-[#DA5747] text-[10px]">{errors.carbsTarget}</span>
+//                     <span className="text-[#DA5747] text-[10px]">
+//                       {errors.carbsTarget}
+//                     </span>
 //                   </div>
 //                 ) : null}
 //               </div>
@@ -1161,7 +1067,9 @@
 //                   onChange={onChangeAndClear(setFatTarget, "fatTarget")}
 //                   placeholder=""
 //                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent ${
-//                     errors.fatTarget ? "border border-[#DA5747]" : "border border-[#E1E6ED]"
+//                     errors.fatTarget
+//                       ? "border border-[#DA5747]"
+//                       : "border border-[#E1E6ED]"
 //                   } focus:border-blue-600`}
 //                 />
 //                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
@@ -1178,7 +1086,9 @@
 //                       width={15}
 //                       height={15}
 //                     />
-//                     <span className="text-[#DA5747] text-[10px]">{errors.fatTarget}</span>
+//                     <span className="text-[#DA5747] text-[10px]">
+//                       {errors.fatTarget}
+//                     </span>
 //                   </div>
 //                 ) : null}
 //               </div>
@@ -1192,7 +1102,9 @@
 //                   onChange={onChangeAndClear(setWaterTarget, "waterTarget")}
 //                   placeholder=""
 //                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent ${
-//                     errors.waterTarget ? "border border-[#DA5747]" : "border border-[#E1E6ED]"
+//                     errors.waterTarget
+//                       ? "border border-[#DA5747]"
+//                       : "border border-[#E1E6ED]"
 //                   } focus:border-blue-600`}
 //                 />
 //                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
@@ -1209,7 +1121,9 @@
 //                       width={15}
 //                       height={15}
 //                     />
-//                     <span className="text-[#DA5747] text-[10px]">{errors.waterTarget}</span>
+//                     <span className="text-[#DA5747] text-[10px]">
+//                       {errors.waterTarget}
+//                     </span>
 //                   </div>
 //                 ) : null}
 //               </div>
@@ -1246,7 +1160,9 @@
 //                       onChange={(e) => updateGoal(goal.id, "title", e.target.value)}
 //                       placeholder=""
 //                       className={`peer block w-full py-[15px] pl-[19px] pr-[13px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent ${
-//                         gErr.title ? "border border-[#DA5747]" : "border border-[#E1E6ED]"
+//                         gErr.title
+//                           ? "border border-[#DA5747]"
+//                           : "border border-[#E1E6ED]"
 //                       } focus:border-blue-600`}
 //                     />
 //                     <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
@@ -1260,7 +1176,9 @@
 //                           width={15}
 //                           height={15}
 //                         />
-//                         <span className="text-[#DA5747] text-[10px]">{gErr.title}</span>
+//                         <span className="text-[#DA5747] text-[10px]">
+//                           {gErr.title}
+//                         </span>
 //                       </div>
 //                     ) : null}
 //                   </div>
@@ -1279,7 +1197,9 @@
 //                           min="0"
 //                           step="0.1"
 //                           value={goal.current}
-//                           onChange={(e) => updateGoal(goal.id, "current", e.target.value)}
+//                           onChange={(e) =>
+//                             updateGoal(goal.id, "current", e.target.value)
+//                           }
 //                           placeholder="Current Stat"
 //                           className="w-full max-w-[90px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#A1A1A1]"
 //                         />
@@ -1293,7 +1213,9 @@
 //                           </span>
 //                           <IoIosArrowDown
 //                             className={`transition-transform ${
-//                               showCurrentDropdown === goal.id ? "rotate-180" : ""
+//                               showCurrentDropdown === goal.id
+//                                 ? "rotate-180"
+//                                 : ""
 //                             } text-[#A1A1A1]`}
 //                           />
 //                         </div>
@@ -1342,7 +1264,9 @@
 //                           min="0"
 //                           step="0.1"
 //                           value={goal.target}
-//                           onChange={(e) => updateGoal(goal.id, "target", e.target.value)}
+//                           onChange={(e) =>
+//                             updateGoal(goal.id, "target", e.target.value)
+//                           }
 //                           placeholder="Target Stat"
 //                           className="w-full max-w-[90px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#A1A1A1]"
 //                         />
@@ -1356,7 +1280,9 @@
 //                           </span>
 //                           <IoIosArrowDown
 //                             className={`transition-transform ${
-//                               showTargetDropdown === goal.id ? "rotate-180" : ""
+//                               showTargetDropdown === goal.id
+//                                 ? "rotate-180"
+//                                 : ""
 //                             } text-[#A1A1A1]`}
 //                           />
 //                         </div>
@@ -1426,7 +1352,10 @@
 //             placeholder="Enter approach (Ex. Low GI, High Proteins, Calories Deficit)"
 //             className="flex-1 outline-none text-[#252525] text-[14px] placeholder:text-[#9CA3AF]"
 //           />
-//           <IoIosArrowDown className="text-[#A1A1A1] cursor-pointer" onClick={addTag} />
+//           <IoIosArrowDown
+//             className="text-[#A1A1A1] cursor-pointer"
+//             onClick={addTag}
+//           />
 //         </div>
 //         {errors.approach ? (
 //           <div className="flex gap-[5px] items-center mt-1 pl-5">
@@ -1436,7 +1365,9 @@
 //               width={15}
 //               height={15}
 //             />
-//             <span className="text-[#DA5747] text-[10px]">{errors.approach}</span>
+//             <span className="text-[#DA5747] text-[10px]">
+//               {errors.approach}
+//             </span>
 //           </div>
 //         ) : null}
 
@@ -1446,7 +1377,9 @@
 //               key={idx}
 //               className="flex items-center gap-2.5 px-5 py-2.5 rounded-[20px] border border-[#E48326] bg-[#FFF7F0]"
 //             >
-//               <span className="text-[#E48326] text-[12px] font-semibold">{tag}</span>
+//               <span className="text-[#E48326] text-[12px] font-semibold">
+//                 {tag}
+//               </span>
 //               <button onClick={() => removeTag(idx)}>
 //                 <RxCross2 className="text-[#252525] cursor-pointer" />
 //               </button>
@@ -1463,21 +1396,23 @@
 //             className="px-5 py-[15px] bg-white border border-[#D9D9D9] rounded-[10px] cursor-pointer"
 //             onClick={handleSaveAsDraft}
 //           >
-//             <span className="text-[#308BF9] text-[12px] font-semibold">Save as draft</span>
+//             <span className="text-[#308BF9] text-[12px] font-semibold">
+//               Save as draft
+//             </span>
 //           </div>
 //           <div
 //             className="px-5 py-[15px] bg-[#308BF9] rounded-[10px] cursor-pointer"
 //             onClick={handleConfirmNext}
 //           >
-//             <span className="text-white text-[12px] font-semibold">Confirm &amp; Next</span>
+//             <span className="text-white text-[12px] font-semibold">
+//               Confirm &amp; Next
+//             </span>
 //           </div>
 //         </div>
 //       </div>
 //     </div>
 //   );
 // }
-
-
 
 
 
@@ -1510,14 +1445,27 @@ import { useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
 import { fetchClientProfileData } from "../services/authService"; // 🔹 make sure path is correct
 
+function normalizeNumber(value) {
+  if (value === null || value === undefined || value === "") {
+    return "0";
+  }
+  return String(value);
+}
+
 export default function Summary({ onConfirmNext }) {
   const searchParams = useSearchParams();
+  const profileId = searchParams.get("profile_id");
+
+  // 🔑 unique localStorage key per client
+  const storageKey = profileId ? `planSummary_${profileId}` : "planSummary_default";
 
   const [planTitle, setPlanTitle] = useState("");
   const [approachInput, setApproachInput] = useState("");
   const [approachTags, setApproachTags] = useState([]);
   const [goals, setGoals] = useState([{ id: 1, title: "", current: "", target: "" }]);
-  const [goalUnits, setGoalUnits] = useState([{ id: 1, currentUnit: "Unit", targetUnit: "Unit" }]);
+  const [goalUnits, setGoalUnits] = useState([
+    { id: 1, currentUnit: "Unit", targetUnit: "Unit" }
+  ]);
   const [isDiabetic, setIsDiabetic] = useState(false);
   const [dietType, setDietType] = useState("");
   const [showDietDropdown, setShowDietDropdown] = useState(false);
@@ -1558,10 +1506,24 @@ export default function Summary({ onConfirmNext }) {
   const currentDropdownRef = useRef(null);
   const targetDropdownRef = useRef(null);
 
-  const unitOptions = ["kg", "g", "lb", "oz", "cm", "m", "inch", "ft", "%", "bpm", "cal", "kcal"];
+  const unitOptions = [
+    "kg",
+    "g",
+    "lb",
+    "oz",
+    "cm",
+    "m",
+    "inch",
+    "ft",
+    "%",
+    "bpm",
+    "cal",
+    "kcal"
+  ];
 
   // to keep all plans from API (active + completed + not_started)
   const [allPlans, setAllPlans] = useState([]);
+
   // ---------- Helpers for date format ----------
   const ymdToDmy = (v) => {
     if (!v) return "";
@@ -1586,7 +1548,7 @@ export default function Summary({ onConfirmNext }) {
   const loadFromLocalStorage = () => {
     try {
       const savedData =
-        typeof window !== "undefined" ? localStorage.getItem("planSummary") : null;
+        typeof window !== "undefined" ? localStorage.getItem(storageKey) : null;
       if (savedData) {
         const data = JSON.parse(savedData);
 
@@ -1606,13 +1568,17 @@ export default function Summary({ onConfirmNext }) {
           setIsDiabetic(false);
         }
 
-        setDietType(data.diet_type || "");
-        setCaloriesTarget(data.calories_target || "");
-        setProteinTarget(data.protein_target || "");
-        setFiberTarget(data.fiber_target || "");
-        setCarbsTarget(data.carbs_target || "");
-        setFatTarget(data.fat_target || "");
-        setWaterTarget(data.water_target || "");
+        // diet_type -> only set if non-empty to avoid overriding with blank
+        if (data.diet_type && data.diet_type.trim()) {
+          setDietType(data.diet_type);
+        }
+
+        setCaloriesTarget(normalizeNumber(data.calories_target || ""));
+        setProteinTarget(normalizeNumber(data.protein_target || ""));
+        setFiberTarget(normalizeNumber(data.fiber_target || ""));
+        setCarbsTarget(normalizeNumber(data.carbs_target || ""));
+        setFatTarget(normalizeNumber(data.fat_target || ""));
+        setWaterTarget(normalizeNumber(data.water_target || ""));
 
         // approach tags
         if (data.approach) {
@@ -1644,58 +1610,35 @@ export default function Summary({ onConfirmNext }) {
             const loadedGoals = [];
             const loadedGoalUnits = [];
 
-            // goalArray.forEach((goalItem, index) => {
-            //   const goalId = index + 1;
+            goalArray.forEach((goalItem, index) => {
+              const goalId = index + 1;
 
-            //   // Matches e.g. "125kg" → ["125kg", "125", "kg"]
-            //   const currentMatch =
-            //     goalItem.current_stat?.toString().match(/(\d*\.?\d*)(.*)/) || ["", "", "Unit"];
-            //   const targetMatch =
-            //     goalItem.target_stat?.toString().match(/(\d*\.?\d*)(.*)/) || ["", "", "Unit"];
+              // Matches e.g. "125kg" → ["125kg", "125", "kg"]
+              const currentMatch =
+                goalItem.current_stat?.toString().match(/(\d*\.?\d*)(.*)/) ||
+                ["", "", "Unit"];
+              const targetMatch =
+                goalItem.target_stat?.toString().match(/(\d*\.?\d*)(.*)/) ||
+                ["", "", "Unit"];
 
-            //   loadedGoals.push({
-            //     id: goalId,
-            //     title: goalItem.name || "",
-            //     current: currentMatch[1] || "",
-            //     target: targetMatch[1] || ""
-            //   });
+              // 🔹 Use stored unit as fallback (this comes from prepareFormData -> unit)
+              const fallbackUnit = goalItem.unit || "";
 
-            //   loadedGoalUnits.push({
-            //     id: goalId,
-            //     currentUnit: (currentMatch[2] || "Unit").trim() || "Unit",
-            //     targetUnit: (targetMatch[2] || "Unit").trim() || "Unit"
-            //   });
-            // });
+              loadedGoals.push({
+                id: goalId,
+                title: goalItem.name || "",
+                current: currentMatch[1] || "",
+                target: targetMatch[1] || ""
+              });
 
-goalArray.forEach((goalItem, index) => {
-  const goalId = index + 1;
-
-  // Matches e.g. "125kg" → ["125kg", "125", "kg"]
-  const currentMatch =
-    goalItem.current_stat?.toString().match(/(\d*\.?\d*)(.*)/) || ["", "", "Unit"];
-  const targetMatch =
-    goalItem.target_stat?.toString().match(/(\d*\.?\d*)(.*)/) || ["", "", "Unit"];
-
-  // 🔹 Use stored unit as fallback (this comes from prepareFormData -> unit)
-  const fallbackUnit = goalItem.unit || "";
-
-  loadedGoals.push({
-    id: goalId,
-    title: goalItem.name || "",
-    current: currentMatch[1] || "",
-    target: targetMatch[1] || ""
-  });
-
-  loadedGoalUnits.push({
-    id: goalId,
-    currentUnit:
-      (currentMatch[2] || fallbackUnit || "Unit").trim() || "Unit",
-    targetUnit:
-      (targetMatch[2] || fallbackUnit || "Unit").trim() || "Unit"
-  });
-});
-
-
+              loadedGoalUnits.push({
+                id: goalId,
+                currentUnit:
+                  (currentMatch[2] || fallbackUnit || "Unit").trim() || "Unit",
+                targetUnit:
+                  (targetMatch[2] || fallbackUnit || "Unit").trim() || "Unit"
+              });
+            });
 
             setGoals(loadedGoals);
             setGoalUnits(loadedGoalUnits);
@@ -1711,37 +1654,35 @@ goalArray.forEach((goalItem, index) => {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // 1️⃣ If there's a local draft, load and exit
-    const saved = localStorage.getItem("planSummary");
+    // 1️⃣ If there's a local draft for THIS profile, load and exit
+    const saved = localStorage.getItem(storageKey);
     if (saved) {
       loadFromLocalStorage();
       return;
     }
 
     // 2️⃣ Else fetch from API using profile_id + dietician cookie
-    const profileId = searchParams.get("profile_id");
-    // Get dietician_id / login_id from cookie "dietician"
+    const profileIdLocal = searchParams.get("profile_id");
     const dieticianCookie = Cookies.get("dietician");
-    let dieticianId  = null;
+    let dieticianId = null;
 
     if (dieticianCookie) {
       try {
         const dietician = JSON.parse(dieticianCookie);
-    dieticianId = dietician?.dietician_id;
-
+        dieticianId = dietician?.dietician_id;
       } catch (e) {
         console.error("Error parsing dietician cookie:", e);
       }
     }
 
-    if (!profileId || !dieticianId) {
+    if (!profileIdLocal || !dieticianId) {
       console.warn("Missing profile_id or login_id for fetchClientProfileData");
       return;
     }
 
     const fetchProfile = async () => {
       try {
-       const res = await fetchClientProfileData(dieticianId, profileId);
+        const res = await fetchClientProfileData(dieticianId, profileIdLocal);
 
         if (!res?.success) {
           console.warn("fetchClientProfileData failed:", res);
@@ -1774,12 +1715,24 @@ goalArray.forEach((goalItem, index) => {
         setFromDate(ymdToDmy(selectedPlan.plan_start_date) || "");
         setToDate(ymdToDmy(selectedPlan.plan_end_date) || "");
 
-        setCaloriesTarget(selectedPlan.calories_target || "");
-        setProteinTarget(selectedPlan.protein_target || "");
-        setFiberTarget(selectedPlan.fiber_target || "");
-        setCarbsTarget(selectedPlan.carbs_target || "");
-        setFatTarget(selectedPlan.fat_target || "");
-        setWaterTarget(selectedPlan.water_target || "");
+        setCaloriesTarget(normalizeNumber(selectedPlan.calories_target));
+        setProteinTarget(normalizeNumber(selectedPlan.protein_target));
+        setFiberTarget(normalizeNumber(selectedPlan.fiber_target));
+        setCarbsTarget(normalizeNumber(selectedPlan.carbs_target));
+        setFatTarget(normalizeNumber(selectedPlan.fat_target));
+        setWaterTarget(normalizeNumber(selectedPlan.water_target));
+        setDietType(selectedPlan.diet_type || ""); // 🔹 bind diet_type from API
+
+        // is_diabetic from API (boolean or yes/no)
+        let isDiabeticValue = false;
+        if (typeof selectedPlan.is_diabetic === "boolean") {
+          isDiabeticValue = selectedPlan.is_diabetic;
+        } else if (selectedPlan.is_diabetic === "yes") {
+          isDiabeticValue = true;
+        } else if (selectedPlan.is_diabetic === "no") {
+          isDiabeticValue = false;
+        }
+        setIsDiabetic(isDiabeticValue);
 
         // Approach
         if (selectedPlan.approach) {
@@ -1809,8 +1762,8 @@ goalArray.forEach((goalItem, index) => {
                 loadedGoals.push({
                   id: goalId,
                   title: goalItem.name || "",
-                  current: currentMatch[1] || "",
-                  target: targetMatch[1] || ""
+                  current: currentMatch[1] || "0",
+                  target: targetMatch[1] || "0"
                 });
 
                 const fallbackUnit = goalItem.unit || "";
@@ -1831,14 +1784,14 @@ goalArray.forEach((goalItem, index) => {
           }
         }
 
-        // Also store normalized planSummary in localStorage
+        // Also store normalized planSummary in localStorage for THIS profile
         const formData = {
           plan_id: selectedPlan.id,
           plan_title: selectedPlan.plan_title || "",
           plan_start_date: selectedPlan.plan_start_date || "",
           plan_end_date: selectedPlan.plan_end_date || "",
-          is_diabetic: isDiabetic,
-          diet_type: dietType,
+          is_diabetic: isDiabeticValue,
+          diet_type: selectedPlan.diet_type || "",
           calories_target: selectedPlan.calories_target || "",
           protein_target: selectedPlan.protein_target || "",
           fiber_target: selectedPlan.fiber_target || "",
@@ -1849,22 +1802,28 @@ goalArray.forEach((goalItem, index) => {
           approach: selectedPlan.approach || ""
         };
 
-        localStorage.setItem("planSummary", JSON.stringify(formData));
+        localStorage.setItem(storageKey, JSON.stringify(formData));
       } catch (error) {
         console.error("Error fetching client profile:", error);
       }
     };
 
     fetchProfile();
-  }, [searchParams]);
+  }, [searchParams, storageKey]);
 
   // -------- Click outside handlers --------
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (currentDropdownRef.current && !currentDropdownRef.current.contains(event.target)) {
+      if (
+        currentDropdownRef.current &&
+        !currentDropdownRef.current.contains(event.target)
+      ) {
         setShowCurrentDropdown(null);
       }
-      if (targetDropdownRef.current && !targetDropdownRef.current.contains(event.target)) {
+      if (
+        targetDropdownRef.current &&
+        !targetDropdownRef.current.contains(event.target)
+      ) {
         setShowTargetDropdown(null);
       }
       if (dietDropdownRef.current && !dietDropdownRef.current.contains(event.target)) {
@@ -1887,7 +1846,8 @@ goalArray.forEach((goalItem, index) => {
     setApproachInput("");
   };
 
-  const removeTag = (i) => setApproachTags((prev) => prev.filter((_, idx) => idx !== i));
+  const removeTag = (i) =>
+    setApproachTags((prev) => prev.filter((_, idx) => idx !== i));
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" || e.key === ",") {
@@ -1935,7 +1895,11 @@ goalArray.forEach((goalItem, index) => {
   };
 
   const updateGoal = (goalId, field, value) => {
-    setGoals((prev) => prev.map((goal) => (goal.id === goalId ? { ...goal, [field]: value } : goal)));
+    setGoals((prev) =>
+      prev.map((goal) =>
+        goal.id === goalId ? { ...goal, [field]: value } : goal
+      )
+    );
     setErrors((prev) => ({
       ...prev,
       goals: {
@@ -1947,8 +1911,14 @@ goalArray.forEach((goalItem, index) => {
 
   const addNewGoal = () => {
     const newGoalId = goals.length > 0 ? Math.max(...goals.map((g) => g.id)) + 1 : 1;
-    setGoals((prev) => [...prev, { id: newGoalId, title: "", current: "", target: "" }]);
-    setGoalUnits((prev) => [...prev, { id: newGoalId, currentUnit: "Unit", targetUnit: "Unit" }]);
+    setGoals((prev) => [
+      ...prev,
+      { id: newGoalId, title: "", current: "", target: "" }
+    ]);
+    setGoalUnits((prev) => [
+      ...prev,
+      { id: newGoalId, currentUnit: "Unit", targetUnit: "Unit" }
+    ]);
   };
 
   const removeGoal = (goalId) => {
@@ -2085,7 +2055,7 @@ goalArray.forEach((goalItem, index) => {
     if (!isDraft && !validateForm()) return;
     const formData = prepareFormData();
     if (isDraft) formData.isDraft = true;
-    localStorage.setItem("planSummary", JSON.stringify(formData));
+    localStorage.setItem(storageKey, JSON.stringify(formData));
     if (isDraft) {
       // optional toast here
     } else {
@@ -2142,7 +2112,9 @@ goalArray.forEach((goalItem, index) => {
                     width={15}
                     height={15}
                   />
-                  <span className="text-[#DA5747] text-[10px]">{errors.planTitle}</span>
+                  <span className="text-[#DA5747] text-[10px]">
+                    {errors.planTitle}
+                  </span>
                 </div>
               ) : null}
             </div>
@@ -2170,7 +2142,11 @@ goalArray.forEach((goalItem, index) => {
                       placeholder="DD/MM/YYYY"
                       className="w-full outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#9CA3AF] cursor-pointer"
                     />
-                    <button type="button" onClick={openFromPicker} className="cursor-pointer">
+                    <button
+                      type="button"
+                      onClick={openFromPicker}
+                      className="cursor-pointer"
+                    >
                       <Image
                         src="/icons/hugeicons_calendar-03.svg"
                         alt="calendar"
@@ -2196,7 +2172,9 @@ goalArray.forEach((goalItem, index) => {
                         width={15}
                         height={15}
                       />
-                      <span className="text-[#DA5747] text-[10px]">{errors.fromDate}</span>
+                      <span className="text-[#DA5747] text-[10px]">
+                        {errors.fromDate}
+                      </span>
                     </div>
                   ) : null}
                 </div>
@@ -2258,7 +2236,9 @@ goalArray.forEach((goalItem, index) => {
                         width={15}
                         height={15}
                       />
-                      <span className="text-[#DA5747] text-[10px]">{errors.toDate}</span>
+                      <span className="text-[#DA5747] text-[10px]">
+                        {errors.toDate}
+                      </span>
                     </div>
                   ) : null}
                 </div>
@@ -2353,7 +2333,9 @@ goalArray.forEach((goalItem, index) => {
                       width={15}
                       height={15}
                     />
-                    <span className="text-[#DA5747] text-[10px]">{errors.dietType}</span>
+                    <span className="text-[#DA5747] text-[10px]">
+                      {errors.dietType}
+                    </span>
                   </div>
                 )}
               </div>
@@ -2369,7 +2351,9 @@ goalArray.forEach((goalItem, index) => {
                     width={15}
                     height={15}
                   />
-                  <span className="text-[#DA5747] text-[10px]">{errors.isDiabetic}</span>
+                  <span className="text-[#DA5747] text-[10px]">
+                    {errors.isDiabetic}
+                  </span>
                 </div>
               )}
             </div>
@@ -2388,7 +2372,9 @@ goalArray.forEach((goalItem, index) => {
                   onChange={onChangeAndClear(setCaloriesTarget, "caloriesTarget")}
                   placeholder=""
                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent ${
-                    errors.caloriesTarget ? "border border-[#DA5747]" : "border border-[#E1E6ED]"
+                    errors.caloriesTarget
+                      ? "border border-[#DA5747]"
+                      : "border border-[#E1E6ED]"
                   } focus:border-blue-600`}
                 />
                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
@@ -2405,7 +2391,9 @@ goalArray.forEach((goalItem, index) => {
                       width={15}
                       height={15}
                     />
-                    <span className="text-[#DA5747] text-[10px]">{errors.caloriesTarget}</span>
+                    <span className="text-[#DA5747] text-[10px]">
+                      {errors.caloriesTarget}
+                    </span>
                   </div>
                 ) : null}
               </div>
@@ -2419,7 +2407,9 @@ goalArray.forEach((goalItem, index) => {
                   onChange={onChangeAndClear(setProteinTarget, "proteinTarget")}
                   placeholder=""
                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent ${
-                    errors.proteinTarget ? "border border-[#DA5747]" : "border border-[#E1E6ED]"
+                    errors.proteinTarget
+                      ? "border border-[#DA5747]"
+                      : "border border-[#E1E6ED]"
                   } focus:border-blue-600`}
                 />
                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
@@ -2436,7 +2426,9 @@ goalArray.forEach((goalItem, index) => {
                       width={15}
                       height={15}
                     />
-                    <span className="text-[#DA5747] text-[10px]">{errors.proteinTarget}</span>
+                    <span className="text-[#DA5747] text-[10px]">
+                      {errors.proteinTarget}
+                    </span>
                   </div>
                 ) : null}
               </div>
@@ -2450,7 +2442,9 @@ goalArray.forEach((goalItem, index) => {
                   onChange={onChangeAndClear(setFiberTarget, "fiberTarget")}
                   placeholder=""
                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent ${
-                    errors.fiberTarget ? "border border-[#DA5747]" : "border border-[#E1E6ED]"
+                    errors.fiberTarget
+                      ? "border border-[#DA5747]"
+                      : "border border-[#E1E6ED]"
                   } focus:border-blue-600`}
                 />
                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
@@ -2467,7 +2461,9 @@ goalArray.forEach((goalItem, index) => {
                       width={15}
                       height={15}
                     />
-                    <span className="text-[#DA5747] text-[10px]">{errors.fiberTarget}</span>
+                    <span className="text-[#DA5747] text-[10px]">
+                      {errors.fiberTarget}
+                    </span>
                   </div>
                 ) : null}
               </div>
@@ -2481,7 +2477,9 @@ goalArray.forEach((goalItem, index) => {
                   onChange={onChangeAndClear(setCarbsTarget, "carbsTarget")}
                   placeholder=""
                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent ${
-                    errors.carbsTarget ? "border border-[#DA5747]" : "border border-[#E1E6ED]"
+                    errors.carbsTarget
+                      ? "border border-[#DA5747]"
+                      : "border border-[#E1E6ED]"
                   } focus:border-blue-600`}
                 />
                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
@@ -2498,7 +2496,9 @@ goalArray.forEach((goalItem, index) => {
                       width={15}
                       height={15}
                     />
-                    <span className="text-[#DA5747] text-[10px]">{errors.carbsTarget}</span>
+                    <span className="text-[#DA5747] text-[10px]">
+                      {errors.carbsTarget}
+                    </span>
                   </div>
                 ) : null}
               </div>
@@ -2512,7 +2512,9 @@ goalArray.forEach((goalItem, index) => {
                   onChange={onChangeAndClear(setFatTarget, "fatTarget")}
                   placeholder=""
                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent ${
-                    errors.fatTarget ? "border border-[#DA5747]" : "border border-[#E1E6ED]"
+                    errors.fatTarget
+                      ? "border border-[#DA5747]"
+                      : "border border-[#E1E6ED]"
                   } focus:border-blue-600`}
                 />
                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
@@ -2529,7 +2531,9 @@ goalArray.forEach((goalItem, index) => {
                       width={15}
                       height={15}
                     />
-                    <span className="text-[#DA5747] text-[10px]">{errors.fatTarget}</span>
+                    <span className="text-[#DA5747] text-[10px]">
+                      {errors.fatTarget}
+                    </span>
                   </div>
                 ) : null}
               </div>
@@ -2543,7 +2547,9 @@ goalArray.forEach((goalItem, index) => {
                   onChange={onChangeAndClear(setWaterTarget, "waterTarget")}
                   placeholder=""
                   className={`peer block w-full py-[15px] pl-[19px] pr-[48px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent ${
-                    errors.waterTarget ? "border border-[#DA5747]" : "border border-[#E1E6ED]"
+                    errors.waterTarget
+                      ? "border border-[#DA5747]"
+                      : "border border-[#E1E6ED]"
                   } focus:border-blue-600`}
                 />
                 <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
@@ -2560,7 +2566,9 @@ goalArray.forEach((goalItem, index) => {
                       width={15}
                       height={15}
                     />
-                    <span className="text-[#DA5747] text-[10px]">{errors.waterTarget}</span>
+                    <span className="text-[#DA5747] text-[10px]">
+                      {errors.waterTarget}
+                    </span>
                   </div>
                 ) : null}
               </div>
@@ -2597,7 +2605,9 @@ goalArray.forEach((goalItem, index) => {
                       onChange={(e) => updateGoal(goal.id, "title", e.target.value)}
                       placeholder=""
                       className={`peer block w-full py-[15px] pl-[19px] pr-[13px] text-[14px] text-[#252525] bg-white rounded-[8px] outline-none placeholder-transparent ${
-                        gErr.title ? "border border-[#DA5747]" : "border border-[#E1E6ED]"
+                        gErr.title
+                          ? "border border-[#DA5747]"
+                          : "border border-[#E1E6ED]"
                       } focus:border-blue-600`}
                     />
                     <label className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] transition-all duration-200 ease-out top-1/2 -translate-y-1/2 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600 peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:-translate-y-4 peer-[&:not(:placeholder-shown)]:scale-75 peer-[&:not(:placeholder-shown)]:text-[#535359]">
@@ -2611,7 +2621,9 @@ goalArray.forEach((goalItem, index) => {
                           width={15}
                           height={15}
                         />
-                        <span className="text-[#DA5747] text-[10px]">{gErr.title}</span>
+                        <span className="text-[#DA5747] text-[10px]">
+                          {gErr.title}
+                        </span>
                       </div>
                     ) : null}
                   </div>
@@ -2630,7 +2642,9 @@ goalArray.forEach((goalItem, index) => {
                           min="0"
                           step="0.1"
                           value={goal.current}
-                          onChange={(e) => updateGoal(goal.id, "current", e.target.value)}
+                          onChange={(e) =>
+                            updateGoal(goal.id, "current", e.target.value)
+                          }
                           placeholder="Current Stat"
                           className="w-full max-w-[90px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#A1A1A1]"
                         />
@@ -2644,7 +2658,9 @@ goalArray.forEach((goalItem, index) => {
                           </span>
                           <IoIosArrowDown
                             className={`transition-transform ${
-                              showCurrentDropdown === goal.id ? "rotate-180" : ""
+                              showCurrentDropdown === goal.id
+                                ? "rotate-180"
+                                : ""
                             } text-[#A1A1A1]`}
                           />
                         </div>
@@ -2693,7 +2709,9 @@ goalArray.forEach((goalItem, index) => {
                           min="0"
                           step="0.1"
                           value={goal.target}
-                          onChange={(e) => updateGoal(goal.id, "target", e.target.value)}
+                          onChange={(e) =>
+                            updateGoal(goal.id, "target", e.target.value)
+                          }
                           placeholder="Target Stat"
                           className="w-full max-w-[90px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] placeholder:text-[#A1A1A1]"
                         />
@@ -2707,7 +2725,9 @@ goalArray.forEach((goalItem, index) => {
                           </span>
                           <IoIosArrowDown
                             className={`transition-transform ${
-                              showTargetDropdown === goal.id ? "rotate-180" : ""
+                              showTargetDropdown === goal.id
+                                ? "rotate-180"
+                                : ""
                             } text-[#A1A1A1]`}
                           />
                         </div>
@@ -2777,7 +2797,10 @@ goalArray.forEach((goalItem, index) => {
             placeholder="Enter approach (Ex. Low GI, High Proteins, Calories Deficit)"
             className="flex-1 outline-none text-[#252525] text-[14px] placeholder:text-[#9CA3AF]"
           />
-          <IoIosArrowDown className="text-[#A1A1A1] cursor-pointer" onClick={addTag} />
+          <IoIosArrowDown
+            className="text-[#A1A1A1] cursor-pointer"
+            onClick={addTag}
+          />
         </div>
         {errors.approach ? (
           <div className="flex gap-[5px] items-center mt-1 pl-5">
@@ -2787,7 +2810,9 @@ goalArray.forEach((goalItem, index) => {
               width={15}
               height={15}
             />
-            <span className="text-[#DA5747] text-[10px]">{errors.approach}</span>
+            <span className="text-[#DA5747] text-[10px]">
+              {errors.approach}
+            </span>
           </div>
         ) : null}
 
@@ -2797,7 +2822,9 @@ goalArray.forEach((goalItem, index) => {
               key={idx}
               className="flex items-center gap-2.5 px-5 py-2.5 rounded-[20px] border border-[#E48326] bg-[#FFF7F0]"
             >
-              <span className="text-[#E48326] text-[12px] font-semibold">{tag}</span>
+              <span className="text-[#E48326] text-[12px] font-semibold">
+                {tag}
+              </span>
               <button onClick={() => removeTag(idx)}>
                 <RxCross2 className="text-[#252525] cursor-pointer" />
               </button>
@@ -2814,7 +2841,9 @@ goalArray.forEach((goalItem, index) => {
             className="px-5 py-[15px] bg-white border border-[#D9D9D9] rounded-[10px] cursor-pointer"
             onClick={handleSaveAsDraft}
           >
-            <span className="text-[#308BF9] text-[12px] font-semibold">Save as draft</span>
+            <span className="text-[#308BF9] text-[12px] font-semibold">
+              Save as draft
+            </span>
           </div>
           <div
             className="px-5 py-[15px] bg-[#308BF9] rounded-[10px] cursor-pointer"

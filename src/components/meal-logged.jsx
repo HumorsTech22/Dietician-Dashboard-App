@@ -353,7 +353,7 @@ const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId) => {
         {/* Header */}
         <div className="flex justify-between">
           <div className="flex items-center">
-            <span className="text-[#252525] text-[15px] font-semibold tracking-[-0.3] leading-[110%]">
+            <span className="text-[#252525] text-[20px] font-semibold tracking-[-0.3] leading-[110%]">
               Meal Logged Analysis
             </span>
           </div>
