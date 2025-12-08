@@ -602,30 +602,30 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
 
 
     useEffect(() => {
-  const loadClientProfile = async () => {
-    if (!dieticianId || !profileId) return;
+        const loadClientProfile = async () => {
+            if (!dieticianId || !profileId) return;
 
-    try {
-      setLoading(true);
+            try {
+                setLoading(true);
 
-      const response = await fetchClientProfileData(dieticianId, profileId);
-      if (response.success && response.data) {
-        setClientData(response.data);
-        dispatch(setClientProfile(response.data));
-      } else {
-        dispatch(setClientProfileError("Failed to load client data"));
-      }
-    } catch (error) {
-      console.error("Error fetching client profile:", error);
-      toast.error("Error loading client data");
-      dispatch(setClientProfileError(error?.message || "Error loading client data"));
-    } finally {
-      setLoading(false);
-    }
-  };
+                const response = await fetchClientProfileData(dieticianId, profileId);
+                if (response.success && response.data) {
+                    setClientData(response.data);
+                    dispatch(setClientProfile(response.data));
+                } else {
+                    dispatch(setClientProfileError("Failed to load client data"));
+                }
+            } catch (error) {
+                console.error("Error fetching client profile:", error);
+                toast.error("Error loading client data");
+                dispatch(setClientProfileError(error?.message || "Error loading client data"));
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  loadClientProfile();
-}, [dieticianId, profileId, dispatch]);
+        loadClientProfile();
+    }, [dieticianId, profileId, dispatch]);
 
 
 
@@ -679,7 +679,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
     );
 
     // Function to handle Create Plan button click
-    const handleCreatePlanClick = () => { 
+    const handleCreatePlanClick = () => {
         // Clear localStorage when creating a new plan
         localStorage.clear();
         setIsModalOpen(true);
@@ -738,13 +738,13 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
 
                             {isPlanHistoryPage ? (
                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px] cursor-pointer'
-                                 onClick={() => window.history.back()}
+                                    onClick={() => window.history.back()}
                                 >
                                     {clientData?.profile_name || 'N/A'}
                                 </span>
                             ) : (
                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px] cursor-pointer'
-                                 onClick={() => window.history.back()}
+                                    onClick={() => window.history.back()}
                                 >Clients</span>
                             )}
                         </div>
@@ -757,7 +757,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                 </span>
                             ) : (
                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>
-                                    {clientData?.profile_name || "-" }
+                                    {clientData?.profile_name || "-"}
                                 </span>
                             )}
                         </div>
@@ -866,7 +866,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                 {planStatus === 'no_plan' ? (
                                     <div className='flex mx-2.5 bg-[#F5F7FA] rounded-[15px] whitespace-nowrap py-[13px] pl-[30px] pr-[15px] gap-[80px] items-center'>
                                         <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">No plan</span>
-                                        <button 
+                                        <button
                                             className='flex gap-[15px] px-[18px] py-[9px] bg-[#308BF9] rounded-[5px]'
                                             onClick={handleCreatePlanClick}
                                         >
@@ -879,17 +879,16 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     <div className='mx-2.5 pt-5 rounded-[15px] mt-[17px] bg-[#F5F7FA]'>
                                         {/* Plan Status Header */}
                                         <div className='flex items-center justify-between ml-[30px] mr-[17px]'>
-                                            <span className={`text-[15px] font-semibold leading-[110%] tracking-[-0.3px] ${
-                                                planStatus === 'active' ? 'text-[#3FAF58]' : 
-                                                planStatus === 'not_started' ? 'text-[#FFA500]' : 
-                                                'text-[#A1A1A1]'
-                                            }`}>
-                                                {planStatus === 'active' ? 'Active' : 
-                                                 planStatus === 'not_started' ? 'Not Started' : 
-                                                 'Completed'}
+                                            <span className={`text-[15px] font-semibold leading-[110%] tracking-[-0.3px] ${planStatus === 'active' ? 'text-[#3FAF58]' :
+                                                    planStatus === 'not_started' ? 'text-[#FFA500]' :
+                                                        'text-[#A1A1A1]'
+                                                }`}>
+                                                {planStatus === 'active' ? 'Active' :
+                                                    planStatus === 'not_started' ? 'Not Started' :
+                                                        'Completed'}
                                             </span>
                                             {/* Edit Plan Button - Commented out but kept for future use */}
-                                          <Link
+                                            <Link
                                                 href={{
                                                     pathname: '/plansummary',
                                                     query: {
@@ -905,7 +904,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                                     width={24}
                                                     className='cursor-pointer'
                                                 />
-                                            </Link> 
+                                            </Link>
                                         </div>
 
                                         {/* Divider */}
@@ -1001,9 +1000,14 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                             <span className='text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]'>
                                                 Mobile number
                                             </span>
-                                            <span className='text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px]'>
-                                                {clientData?.phone_no && clientData.phone_no !== '-' ? clientData.phone_no : '-'}
+                                            <span className="text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px]">
+                                                {clientData?.phone_no &&
+                                                    clientData.phone_no !== "-" &&
+                                                    clientData.phone_no !== "NA"
+                                                    ? clientData.phone_no
+                                                    : "-"}
                                             </span>
+
                                         </div>
 
                                         <Image
@@ -1072,18 +1076,18 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
 
                                     {/* View All Plans Link - Only show if not already on plan history page */}
                                     {pathname !== "/planhistory" && (
-                                        <Link 
-                                       href={{
-            pathname: '/planhistory',
-            query: {
-                profile_id: profileId,
-            }
-        }} 
-                                        className='flex gap-2.5'>
+                                        <Link
+                                            href={{
+                                                pathname: '/planhistory',
+                                                query: {
+                                                    profile_id: profileId,
+                                                }
+                                            }}
+                                            className='flex gap-2.5'>
                                             <span className='text-[#308BF9] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] cursor-pointer'>View all plans</span>
                                             <IoIosArrowForward className='text-[#308BF9] cursor-pointer' />
                                         </Link>
-                                    )} 
+                                    )}
                                 </div>
 
                                 <div className='my-[22px] border boder-[#E1E6ED]'></div>
@@ -1204,11 +1208,11 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     ))}
 
                                     {/* Fallback when no plans are found */}
-                                    {(!clientData?.plans_summary?.active?.length && 
-                                        !clientData?.plans_summary?.completed?.length && 
+                                    {(!clientData?.plans_summary?.active?.length &&
+                                        !clientData?.plans_summary?.completed?.length &&
                                         !clientData?.plans_summary?.not_started?.length) && (
-                                        <p className='text-[18px] text-[#252525]'>No Data found</p>
-                                    )}
+                                            <p className='text-[18px] text-[#252525]'>No Data found</p>
+                                        )}
                                 </div>
                             </div>
                         )}

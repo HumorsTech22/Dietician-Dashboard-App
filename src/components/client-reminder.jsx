@@ -84,7 +84,7 @@ export default function ClientReminder({ selectedDate }) {
       {showMissed && (
         <div className="flex flex-col gap-5 items-center pt-[56px] px-[64px] pb-[31px]">
           <p className="text-[#738298] text-[25px] font-semibold leading-[110%] tracking-[-1px]">
-            Client test has been missed
+            Client has missed the test
           </p>
         </div>
       )}
