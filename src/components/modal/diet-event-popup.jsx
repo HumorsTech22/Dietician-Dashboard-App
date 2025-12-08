@@ -821,11 +821,12 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
         focusTrapped
         closeOnOverlayClick
         showCloseIcon={false}
+        classNames={{ overlay: "flex items-center justify-center", modal: "!p-0 !rounded-[15px]", }}
       >
         {/* OUTER WRAPPER: fixed height + column => header fixed */}
-        <div className="max-h-[80vh] flex flex-col">
+        <div className="max-h-[80vh] flex flex-col rounded-[10px] px-6 pt-[25px] pb-[34px] border-t-[10px] border-[#FFA99F]">
           {/* 🔹 FIXED HEADER */}
-          <div className="rounded-[10px] px-2">
+          <div className=" px-2">
             <div className="flex justify-between">
               <div className="flex flex-col gap-2.5 px-[9px] py-[5px]">
                 <span className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
@@ -843,7 +844,7 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
                 >
                   Save
                 </button>
-                <PiDotsThreeOutlineVerticalFill />
+                
               </div>
             </div>
           </div>

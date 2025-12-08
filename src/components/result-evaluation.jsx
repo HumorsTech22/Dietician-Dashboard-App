@@ -1520,7 +1520,12 @@ useEffect(() => {
 
 {/* 🔹 When not loading, either show ClientReminder (noData) or TestEvaluation */}
 {!isInsightLoading && (
-  isNoInsightData ? <ClientReminder /> : <TestEvaluation />
+  isNoInsightData ? (
+  <ClientReminder selectedDate={selectedDate} />
+) : (
+  <TestEvaluation />
+)
+
 )}
         </div>
 
@@ -1663,7 +1668,12 @@ useEffect(() => {
 
 {/* 🔹 When not loading, either show ClientReminder (noData) or TestEvaluation */}
 {!isInsightLoading && (
-  isNoInsightData ? <ClientReminder /> : <TestEvaluation />
+isNoInsightData ? (
+  <ClientReminder selectedDate={selectedDate} />
+) : (
+  <TestEvaluation />
+)
+
 )}
       </div>
 

@@ -15,7 +15,7 @@ import { useSearchParams } from "next/navigation";
 import { 
   updateDietPlanJsonService, 
   fetchDietPlanJsonService,
-  fetchClientProfileData,         // ⬅️ NEW IMPORT
+  fetchClientProfileData,         
 } from "../services/authService"; 
 import { toast } from "sonner";
 
@@ -732,7 +732,7 @@ export default function DietPlanCreated() {
           <div className="flex flex-col gap-[15px]">
             <div className="w-full  border-b border-[#E1E6ED]"></div>
 
-            <div className="flex flex-col gap-9 bg-[#F5F7FA] rounded-[15px]">
+            <div className="flex flex-col  bg-[#F5F7FA] rounded-[15px]">
               <div className="flex items-center bg-[#E1E6ED] rounded-[15px] border-4 border-[#F5F7FA]">
 
                 <div className="flex justify-between w-[170px] py-[30px] pl-[26px]">
@@ -778,7 +778,7 @@ export default function DietPlanCreated() {
                 </div>
               </div> 
 
-              <div className="flex-1 overflow-y-auto max-h-[420px] pr-[10px] pt-4 pb-4  [scrollbar-width:none] 
+              <div className="flex-1 overflow-y-auto max-h-[320px] pr-[10px] pt-4 pb-4  [scrollbar-width:none] 
                 [&::-webkit-scrollbar]:hidden">
                 <div className="flex flex-col gap-2.5 ml-[30px]">
                   <span className="text-[#252525] text-[12px] font-normal leading-normal tracking-[-0.24px]">

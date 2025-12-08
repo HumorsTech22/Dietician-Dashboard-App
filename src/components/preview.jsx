@@ -9,6 +9,7 @@ import TestLogInfo from './testloginfo';
 import DietPlanCreated from './diet-plan-created';
 import { useSelector } from "react-redux";
 import { toast } from 'sonner';
+import DeletePopUp from './modal/delete-popup';
 
 export default function Preview() {
   const pathname = (usePathname() || '').toLowerCase();
@@ -19,32 +20,33 @@ export default function Preview() {
   const hideActions = pathname.includes('/testlog-info');
   const hideTestLogOnPlanSummary = pathname.includes('/plan-summary') || pathname.endsWith('/plansummary');
 
-const [pdfData, setPdfData] = useState({ fileName: '', blobUrl: '' });
+  const [pdfData, setPdfData] = useState({ fileName: '', blobUrl: '' });
 
   const [activePanel, setActivePanel] = useState('summary');
 
-const isExtracting = useSelector((state) => state.extraction.isExtracting);
-
+  const isExtracting = useSelector((state) => state.extraction.isExtracting);
+  const [deletePopUp, setDeletePopUp] = useState(false);
+console.log("deletePopUp29:-", deletePopUp);
 
   // NEW CODE ADDED:
-useEffect(() => {
-  const loadPdfFromLocalStorage = () => {
-    try {
-      const storedFileData = localStorage.getItem('uploadedPdfFile');
-      if (storedFileData) {
-        const parsedData = JSON.parse(storedFileData);
-        setPdfData({
-          fileName: parsedData.name || 'please_upload.pdf',
-          blobUrl: parsedData.blobUrl || ''
-        });
+  useEffect(() => {
+    const loadPdfFromLocalStorage = () => {
+      try {
+        const storedFileData = localStorage.getItem('uploadedPdfFile');
+        if (storedFileData) {
+          const parsedData = JSON.parse(storedFileData);
+          setPdfData({
+            fileName: parsedData.name || 'please_upload.pdf',
+            blobUrl: parsedData.blobUrl || ''
+          });
+        }
+      } catch (error) {
+        console.error('Error loading PDF from localStorage:', error);
       }
-    } catch (error) {
-      console.error('Error loading PDF from localStorage:', error);
-    }
-  };
+    };
 
-  loadPdfFromLocalStorage();
-}, []);
+    loadPdfFromLocalStorage();
+  }, []);
 
 
   // Cleanup blob URLs on component unmount
@@ -56,74 +58,74 @@ useEffect(() => {
     };
   }, [pdfData.blobUrl]);
 
-const handleReupload = (event) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
+  const handleReupload = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  if (file.type !== "application/pdf") {
-    toast.error("Please upload a valid PDF file");
-    return;
-  }
-
-  // File size validation (3MB max)
-  if (file.size > 3 * 1024 * 1024) {
-    toast.error("File size must be less than 3MB");
-    return;
-  }
-
-  try {
-    // Clean up previous blob URL if exists
-    if (pdfData.blobUrl) {
-      URL.revokeObjectURL(pdfData.blobUrl);
+    if (file.type !== "application/pdf") {
+      toast.error("Please upload a valid PDF file");
+      return;
     }
 
-    // Create new blob URL
-    const newBlobUrl = URL.createObjectURL(file);
-    
-    // Store file in localStorage
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      const fileData = {
-        name: file.name,
-        type: file.type,
-        size: file.size,
-        lastModified: file.lastModified,
-        data: event.target.result,
-        blobUrl: newBlobUrl
+    // File size validation (3MB max)
+    if (file.size > 3 * 1024 * 1024) {
+      toast.error("File size must be less than 3MB");
+      return;
+    }
+
+    try {
+      // Clean up previous blob URL if exists
+      if (pdfData.blobUrl) {
+        URL.revokeObjectURL(pdfData.blobUrl);
+      }
+
+      // Create new blob URL
+      const newBlobUrl = URL.createObjectURL(file);
+
+      // Store file in localStorage
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const fileData = {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          lastModified: file.lastModified,
+          data: event.target.result,
+          blobUrl: newBlobUrl
+        };
+
+        localStorage.setItem('uploadedPdfFile', JSON.stringify(fileData));
+
+        // Update local state
+        setPdfData({
+          fileName: file.name,
+          blobUrl: newBlobUrl
+        });
+
+        toast.success(`File re-uploaded: ${file.name}`);
+
+        // Reset the file input to allow re-uploading the same file
+        event.target.value = '';
       };
-      
-      localStorage.setItem('uploadedPdfFile', JSON.stringify(fileData));
-      
-      // Update local state
-      setPdfData({
-        fileName: file.name,
-        blobUrl: newBlobUrl
-      });
 
-      toast.success(`File re-uploaded: ${file.name}`);
-      
-      // Reset the file input to allow re-uploading the same file
-      event.target.value = '';
-    };
-    
-    reader.onerror = function(error) {
-      console.error("Error reading file:", error);
+      reader.onerror = function (error) {
+        console.error("Error reading file:", error);
+        toast.error("Failed to re-upload file");
+      };
+
+      reader.readAsDataURL(file);
+
+    } catch (error) {
+      console.error("Error during re-upload:", error);
       toast.error("Failed to re-upload file");
-    };
-    
-    reader.readAsDataURL(file);
-
-  } catch (error) {
-    console.error("Error during re-upload:", error);
-    toast.error("Failed to re-upload file");
-  }
-};
+    }
+  };
 
   const handleReuploadClick = () => {
     fileInputRef.current?.click();
   };
 
-    const handleSummaryConfirmNext = () => {
+  const handleSummaryConfirmNext = () => {
     setActivePanel('testlog');
   };
 
@@ -131,7 +133,13 @@ const handleReupload = (event) => {
     setActivePanel('dietplan');
   };
 
+  const handleDeletePlan = () => {
+    setDeletePopUp(false);
+
+  }
+
   return (
+    <>
     <div className='overflow-hidden w-full bg-white rounded-[15px]  p-[15px] '>
       <div className='flex justify-between'>
         <p className='text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]'>Preview</p>
@@ -139,7 +147,7 @@ const handleReupload = (event) => {
           <span className='text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>
             {pdfData?.fileName || 'please_upload.pdf'}
           </span>
-          
+
           {/* Hidden file input for re-upload */}
           <input
             type="file"
@@ -148,15 +156,15 @@ const handleReupload = (event) => {
             ref={fileInputRef}
             className="hidden"
           />
-          
+
           {/* Re-upload button - Only show when activePanel is 'summary' */}
           {activePanel === 'summary' && (
-            <div 
+            <div
               className='flex gap-1.5 px-5 py-[15px] border border-[#D9D9D9] rounded-[10px] cursor-pointer hover:bg-gray-50 transition-colors'
               onClick={handleReuploadClick}
             >
               <Image
-                src="/icons/hugeicons_rotate-01.svg"  
+                src="/icons/hugeicons_rotate-01.svg"
                 alt='hugeicons_rotate-01'
                 width={20}
                 height={20}
@@ -177,7 +185,7 @@ const handleReupload = (event) => {
           <>
             {!hideActions && (
               <div className='flex gap-5'>
-                <div className='mt-4 bg-[#F5F7FA] rounded-[15px] px-[7px] pt-[9px]'>
+                <div className='flex flex-col mt-4 bg-[#F5F7FA] rounded-[15px] px-[7px] pt-[9px] pb-[9px]'>
 
                   {/* Plan summary tile */}
                   <div
@@ -185,10 +193,10 @@ const handleReupload = (event) => {
     ${activePanel === 'summary' ? 'bg-white' : ''}
     ${isExtracting ? 'opacity-60 cursor-not-allowed pointer-events-none' : ''}
   `}
-  onClick={() => {
-    if (isExtracting) return;  // ✅ block click
-    setActivePanel('summary');
-  }}
+                    onClick={() => {
+                      if (isExtracting) return;  // ✅ block click
+                      setActivePanel('summary');
+                    }}
                   >
                     <div className='flex gap-2.5 items-center'>
                       <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] whitespace-nowrap'>Plan summary</span>
@@ -202,14 +210,14 @@ const handleReupload = (event) => {
 
                   {/* Tests log info tile */}
                   <div
-                     className={`flex justify-between py-5 pl-[23px] pr-[15px] rounded-[5px] items-center cursor-pointer
+                    className={`flex justify-between py-5 pl-[23px] pr-[15px] rounded-[5px] items-center cursor-pointer
     ${activePanel === 'testlog' ? 'bg-white' : ''}
     ${isExtracting ? 'opacity-60 cursor-not-allowed pointer-events-none' : ''}
   `}
-  onClick={() => {
-    if (isExtracting) return;
-    setActivePanel('testlog');
-  }}
+                    onClick={() => {
+                      if (isExtracting) return;
+                      setActivePanel('testlog');
+                    }}
                   >
                     <div className='flex gap-2.5 items-center'>
                       <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] whitespace-nowrap'>Tests log info</span>
@@ -227,10 +235,10 @@ const handleReupload = (event) => {
     ${activePanel === 'dietplan' ? 'bg-white' : ''}
     ${isExtracting ? 'opacity-60 cursor-not-allowed pointer-events-none' : ''}
   `}
-  onClick={() => {
-    if (isExtracting) return;
-    setActivePanel('dietplan');
-  }}
+                    onClick={() => {
+                      if (isExtracting) return;
+                      setActivePanel('dietplan');
+                    }}
                   >
                     <div className='flex gap-2.5 items-center'>
                       <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] whitespace-nowrap'>Diet plan</span>
@@ -241,11 +249,23 @@ const handleReupload = (event) => {
                     </div>
                     <IoIosArrowForward className='w-[20px] h-[20px] text-[#252525]' />
                   </div>
+
+<div className='flex gap-2.5 items-center  py-5 pl-[23px] pr-[15px] cursor-pointer mt-auto  bg-white rounded-[5px]'
+onClick={() => setDeletePopUp(true)}
+>
+  <Image
+  src="/icons/hugeicons_delete-01.svg"
+  alt='hugeicons_delete-01.svg'
+  width={24}
+  height={24}
+  />
+  <p className='text-[#DA5747] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>Delete Plan</p>
+  </div>                  
                 </div>
 
                 {/* Right side content based on activePanel */}
-                {activePanel === 'summary' && <Summary onConfirmNext={handleSummaryConfirmNext}/>}
-                {activePanel === 'testlog' && <TestLogInfo onConfirmNext={handleTestLogConfirmNext}/>}
+                {activePanel === 'summary' && <Summary onConfirmNext={handleSummaryConfirmNext} />}
+                {activePanel === 'testlog' && <TestLogInfo onConfirmNext={handleTestLogConfirmNext} />}
                 {activePanel === 'dietplan' && <DietPlanCreated />}
               </div>
             )}
@@ -298,8 +318,8 @@ const handleReupload = (event) => {
                 </div>
 
                 {/* Right side content again */}
-                {activePanel === 'summary' && <Summary onConfirmNext={handleSummaryConfirmNext}/>}
-                {activePanel === 'testlog' && <TestLogInfo onConfirmNext={handleTestLogConfirmNext}/>}
+                {activePanel === 'summary' && <Summary onConfirmNext={handleSummaryConfirmNext} />}
+                {activePanel === 'testlog' && <TestLogInfo onConfirmNext={handleTestLogConfirmNext} />}
                 {activePanel === 'dietplan' && <CreateDietPlan />}
               </div>
             )}
@@ -307,5 +327,11 @@ const handleReupload = (event) => {
         )}
       </div>
     </div>
+
+    <DeletePopUp
+    open={deletePopUp}
+    onClose={handleDeletePlan}
+    />
+    </>
   )
 }

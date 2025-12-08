@@ -1002,7 +1002,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                                 Mobile number
                                             </span>
                                             <span className='text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px]'>
-                                                {clientData?.phone_no && clientData.phone_no !== 'NA' ? clientData.phone_no : 'N/A'}
+                                                {clientData?.phone_no && clientData.phone_no !== '-' ? clientData.phone_no : '-'}
                                             </span>
                                         </div>
 
