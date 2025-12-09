@@ -131,30 +131,36 @@ export default function Graph({
           }),
           borderColor: chosenColor,
           borderWidth: 3,
-          pointRadius: 0,
-          tension: 0.45, // smooth curve
+          pointRadius: 3,                // 👈 visible points on all data
+          pointHoverRadius: 5,           // bigger on hover
+          pointHitRadius: 8,             // easier to hover
+          pointBackgroundColor: chosenColor,
+          pointBorderColor: "#FFFFFF",
+          pointBorderWidth: 1.5,
+          tension: 0.45,                 // smooth curve
           fill: true,
-        backgroundColor: (ctx) => {
-  // ❌ Remove gradient for second graph
-  if (isSecondScore) {
-    return "rgba(0,0,0,0)"; // fully transparent
-  }
 
-  const { chartArea, ctx: c } = ctx.chart;
-  if (!chartArea) return hexToRgba(chosenColor, 0.3);
+          backgroundColor: (ctx) => {
+            // ❌ Remove gradient for second graph
+            if (isSecondScore) {
+              return "rgba(0,0,0,0)"; // fully transparent
+            }
 
-  const g = c.createLinearGradient(
-    0,
-    chartArea.top,
-    0,
-    chartArea.bottom
-  );
+            const { chartArea, ctx: c } = ctx.chart;
+            if (!chartArea) return hexToRgba(chosenColor, 0.3);
 
-  g.addColorStop(0, hexToRgba(chosenColor, 0.3));
-  g.addColorStop(1, hexToRgba(chosenColor, 0));
+            const g = c.createLinearGradient(
+              0,
+              chartArea.top,
+              0,
+              chartArea.bottom
+            );
 
-  return g;
-},
+            g.addColorStop(0, hexToRgba(chosenColor, 0.3));
+            g.addColorStop(1, hexToRgba(chosenColor, 0));
+
+            return g;
+          },
 
         },
       ],

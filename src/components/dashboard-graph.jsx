@@ -37,35 +37,77 @@ export default function DashboardGraph({ testAnalyticsData }) {
       return d.toLocaleDateString("en-US", { weekday: "short" }); // Mon, Tue...
     });
 
-    const testedData = last7Days.map((day) => day.tested_clients || 0);
-    const notTestedData = last7Days.map((day) => day.not_tested_clients || 0);
+    // ✅ Use percentages so every stacked bar = 100% height
+    const testedPercentData = last7Days.map((day) => {
+      const tested = day.tested_clients || 0;
+      const notTested = day.not_tested_clients || 0;
+      const total = tested + notTested;
+      if (!total) return 0;
+      return (tested / total) * 100;
+    });
+
+    const notTestedPercentData = last7Days.map((day) => {
+      const tested = day.tested_clients || 0;
+      const notTested = day.not_tested_clients || 0;
+      const total = tested + notTested;
+      if (!total) return 0;
+      return (notTested / total) * 100;
+    });
+
+    // 🔹 GAP height between Tested and Not Tested (in percentage units)
+    const GAP_VALUE = 4;
+
+    // 🔹 Reduce "Not Tested" so Tested + Spacer + NotTested still ≈ 100
+    const adjustedNotTested = notTestedPercentData.map((v) =>
+      Math.max(v - GAP_VALUE, 0)
+    );
 
     const dateRange = getDateRange(last7Days);
 
     return {
       labels,
       datasets: [
-        // ✅ bottom part of stacked bar
+        // 🔵 Tested (top) – rounded top corners
         {
           label: "Tested Clients",
-          data: testedData,
+          data: testedPercentData,
           backgroundColor: "#0B3971",
-          borderRadius: 10,
-          borderSkipped: false,
           stack: "clients",
+          borderSkipped: false,
+          borderRadius: (ctx) => ({
+            topLeft: 10,
+            topRight: 10,
+            bottomLeft: 10,
+            bottomRight: 10,
+          }),
         },
-        // ✅ top part of stacked bar
+
+        // 🧊 Spacer in between (fake gap, transparent)
+        {
+          label: "Spacer",
+          data: testedPercentData.map(() => GAP_VALUE),
+          backgroundColor: "rgba(0,0,0,0)",
+          stack: "clients",
+          borderSkipped: false,
+        },
+
+        // ⚪ Not Tested (bottom) – rounded bottom corners
         {
           label: "Not Tested Clients",
-          data: notTestedData,
+          data: adjustedNotTested,
           backgroundColor: "#F5F7FA",
-          borderRadius: 10,
-          borderSkipped: false,
           stack: "clients",
+          borderSkipped: false,
+          borderRadius: (ctx) => ({
+            topLeft: 10,
+            topRight: 10,
+            bottomLeft: 10,
+            bottomRight: 10,
+          }),
         },
       ],
       dateRange,
-      rawDays: last7Days,
+      rawDays: last7Days, // keep raw counts for tooltip
     };
   };
 
@@ -92,6 +134,8 @@ export default function DashboardGraph({ testAnalyticsData }) {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
+      // if you had softShadow globally, disable here
+      softShadow: false,
       legend: {
         display: true,
         position: "top",
@@ -103,39 +147,59 @@ export default function DashboardGraph({ testAnalyticsData }) {
           font: {
             size: 12,
           },
+          // ❌ Hide "Spacer" from legend
+          filter: (item) => item.text !== "Spacer",
         },
       },
-      tooltip: {
-        backgroundColor: "#252525",
-        titleColor: "#fff",
-        bodyColor: "#fff",
-        callbacks: {
-          title: (context) => {
-            const index = context[0].dataIndex;
-            const dayObj = rawDays?.[index];
+    tooltip: {
+  backgroundColor: "#252525",
+  titleColor: "#fff",
+  bodyColor: "#fff",
+  callbacks: {
+    title: (context) => {
+      const index = context[0].dataIndex;
+      const dayObj = rawDays?.[index];
 
-            if (dayObj?.date) {
-              const fullDate = new Date(dayObj.date);
-              return fullDate.toLocaleDateString("en-US", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              });
-            }
+      if (dayObj?.date) {
+        const fullDate = new Date(dayObj.date);
+        return fullDate.toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+      }
 
-            return context[0].label;
-          },
-          label: (context) => {
-            const datasetLabel = context.dataset.label || "";
-            const value = context.parsed.y;
-            return `${datasetLabel}: ${value}`;
-          },
-        },
-      },
+      return context[0].label;
+    },
+
+    label: (context) => {
+      const index = context.dataIndex;
+      const datasetLabel = context.dataset.label || "";
+
+      // hide tooltip for spacer
+      if (datasetLabel === "Spacer") return "";
+
+      const dayObj = rawDays?.[index];
+      const tested = dayObj?.tested_clients || 0;
+      const notTested = dayObj?.not_tested_clients || 0;
+
+      if (datasetLabel === "Tested Clients") {
+        return `Tested Clients: ${tested}`;
+      }
+
+      if (datasetLabel === "Not Tested Clients") {
+        return `Not Tested Clients: ${notTested}`;
+      }
+
+      return "";
+    },
+  },
+},
+
     },
     scales: {
       x: {
-        stacked: true, // ✅ make bars inline per day
+        stacked: true,
         ticks: {
           color: "#535359",
         },
@@ -147,8 +211,9 @@ export default function DashboardGraph({ testAnalyticsData }) {
         },
       },
       y: {
-        stacked: true, // ✅ stack tested + not tested
+        stacked: true,
         beginAtZero: true,
+        max: 100, // ✅ always 0–100
         grid: {
           display: false,
         },

@@ -89,8 +89,12 @@ const clientRelatedPaths = ["/client", "/planhistory", "/profile"];
     <div className="flex justify-between bg-[#F5F7FA] p-4">
       <div className="flex">
         <Link href="/dashboard">
+        <div className="flex flex-col items-center">
           <img src="/icons/logorespyr.png" alt="logo" width={50} height={50} />
+          <p className="text-[#252525] text-[12px] font-normal">Beta 1.0</p>
+         </div>
         </Link>
+       
       </div>
 
       <div className="flex gap-[15px]">

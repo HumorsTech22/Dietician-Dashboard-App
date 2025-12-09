@@ -118,29 +118,37 @@ export default function FoodEvaluation() {
                         </div>
                     </div>
 
-                    <div className="flex gap-[20px]">
+                    <div className="w-full flex gap-[20px]">
                         {/* Protein */}
                         <div className="w-full bg-[#F5F7FA] rounded-[10px] py-2.5 pl-5 pr-2.5">
                             <div>
                                 <span className="text-[#535359] text-[14px] font-medium">Protein</span>
                             </div>
 
-                            <div className="flex justify-start py-[15px]">
-                                <svg viewBox="0 0 117 6" className="h-[6px]">
-                                    <path
-                                        d="M3 3H114"
-                                        stroke="#D9D9D9"
-                                        strokeWidth="5"
-                                        strokeLinecap="round"
-                                    />
-                                    <path
-                                        d={`M3 3H${(scoresInsight?.food_log_percentage?.protein || 0) * 1.17}`}
-                                        stroke="#FFC107"
-                                        strokeWidth="5"
-                                        strokeLinecap="round"
-                                    />
-                                </svg>
-                            </div>
+                           <div className="flex justify-start py-[15px]">
+    <svg viewBox="0 0 117 6" className="h-[6px]">
+        {/* Gray track */}
+        <path
+            d="M3 3H114"
+            stroke="#D9D9D9"
+            strokeWidth="5"
+            strokeLinecap="round"
+        />
+
+        {/* Show colored bar only if > 0 */}
+        {(scoresInsight?.food_log_percentage?.protein || 0) > 0 && (
+            <path
+                d={`M3 3H${
+                    (scoresInsight?.food_log_percentage?.protein || 0) * 1.17
+                }`}
+                stroke="#FFC107"
+                strokeWidth="5"
+                strokeLinecap="round"
+            />
+        )}
+    </svg>
+</div>
+
 
                             <div className="mt-3 flex flex-col gap-[5px]">
                                 <span className="text-[#252525] text-[18px] font-semibold leading-[126%] tracking-[-0.36px]">
@@ -158,22 +166,30 @@ export default function FoodEvaluation() {
                                 <span className="text-[#535359] text-[14px] font-medium">Carbs</span>
                             </div>
 
-                            <div className="flex justify-start py-[15px]">
-                                <svg viewBox="0 0 117 6" className="h-[6px]">
-                                    <path
-                                        d="M3 3H114"
-                                        stroke="#D9D9D9"
-                                        strokeWidth="5"
-                                        strokeLinecap="round"
-                                    />
-                                    <path
-                                        d={`M3 3H${(scoresInsight?.food_log_percentage?.carbs || 0) * 1.17}`}
-                                        stroke="#38A250"
-                                        strokeWidth="5"
-                                        strokeLinecap="round"
-                                    />
-                                </svg>
-                            </div>
+                          <div className="flex justify-start py-[15px]">
+    <svg viewBox="0 0 117 6" className="h-[6px]">
+        {/* Gray background track */}
+        <path
+            d="M3 3H114"
+            stroke="#D9D9D9"
+            strokeWidth="5"
+            strokeLinecap="round"
+        />
+
+        {/* Show green progress ONLY if > 0 */}
+        {(scoresInsight?.food_log_percentage?.carbs || 0) > 0 && (
+            <path
+                d={`M3 3H${
+                    (scoresInsight?.food_log_percentage?.carbs || 0) * 1.17
+                }`}
+                stroke="#38A250"
+                strokeWidth="5"
+                strokeLinecap="round"
+            />
+        )}
+    </svg>
+</div>
+
 
                             <div className="mt-3 flex flex-col gap-[5px]">
                                 <span className="text-[#252525] text-[18px] font-semibold leading-[126%] tracking-[-0.36px]">
@@ -191,22 +207,29 @@ export default function FoodEvaluation() {
                                 <span className="text-[#535359] text-[14px] font-medium">Fats</span>
                             </div>
 
-                            <div className="flex justify-start py-[15px]">
-                                <svg viewBox="0 0 117 6" className="h-[6px]">
-                                    <path
-                                        d="M3 3H114"
-                                        stroke="#D9D9D9"
-                                        strokeWidth="5"
-                                        strokeLinecap="round"
-                                    />
-                                    <path
-                                        d={`M3 3H${(scoresInsight?.food_log_percentage?.fat || 0) * 1.17}`}
-                                        stroke="#38A250"
-                                        strokeWidth="5"
-                                        strokeLinecap="round"
-                                    />
-                                </svg>
-                            </div>
+                          <div className="flex justify-start py-[15px]">
+    <svg viewBox="0 0 117 6" className="h-[6px]">
+        {/* Gray background track */}
+        <path
+            d="M3 3H114"
+            stroke="#D9D9D9"
+            strokeWidth="5"
+            strokeLinecap="round"
+        />
+
+        {/* Green bar only if fat > 0 */}
+        {(scoresInsight?.food_log_percentage?.fat || 0) > 0 && (
+            <path
+                d={`M3 3H${
+                    (scoresInsight?.food_log_percentage?.fat || 0) * 1.17
+                }`}
+                stroke="#38A250"
+                strokeWidth="5"
+                strokeLinecap="round"
+            />
+        )}
+    </svg>
+</div>
 
                             <div className="mt-3 flex flex-col gap-[5px]">
                                 <span className="text-[#252525] text-[18px] font-semibold leading-[126%] tracking-[-0.36px]">
@@ -224,22 +247,29 @@ export default function FoodEvaluation() {
                                 <span className="text-[#535359] text-[14px] font-medium">Fiber</span>
                             </div>
 
-                            <div className="flex justify-start py-[15px]">
-                                <svg viewBox="0 0 117 6" className="h-[6px]">
-                                    <path
-                                        d="M3 3H114"
-                                        stroke="#D9D9D9"
-                                        strokeWidth="5"
-                                        strokeLinecap="round"
-                                    />
-                                    <path
-                                        d={`M3 3H${(scoresInsight?.food_log_percentage?.fiber || 0) * 1.17}`}
-                                        stroke="#FFC412"
-                                        strokeWidth="5"
-                                        strokeLinecap="round"
-                                    />
-                                </svg>
-                            </div>
+                           <div className="flex justify-start py-[15px]">
+    <svg viewBox="0 0 117 6" className="h-[6px]">
+        {/* Gray background track */}
+        <path
+            d="M3 3H114"
+            stroke="#D9D9D9"
+            strokeWidth="5"
+            strokeLinecap="round"
+        />
+
+        {/* Yellow bar only if fiber > 0 */}
+        {(scoresInsight?.food_log_percentage?.fiber || 0) > 0 && (
+            <path
+                d={`M3 3H${
+                    (scoresInsight?.food_log_percentage?.fiber || 0) * 1.17
+                }`}
+                stroke="#FFC412"
+                strokeWidth="5"
+                strokeLinecap="round"
+            />
+        )}
+    </svg>
+</div>
 
                             <div className="mt-3 flex flex-col gap-[5px]">
                                 <span className="text-[#252525] text-[18px] font-semibold leading-[126%] tracking-[-0.36px]">

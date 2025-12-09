@@ -824,21 +824,21 @@ export default function Trends({ selectedDate }) {
         if (response?.noData) {
           setScoresInsightData(null);
           dispatch(setScoresInsight(null));
-          sessionStorage.setItem("scoresInsight", "null");
+          //sessionStorage.setItem("scoresInsight", "null");
         } else if (response && response.latest_test) {
           setScoresInsightData(response);
           dispatch(setScoresInsight(response));
-          sessionStorage.setItem("scoresInsight", JSON.stringify(response));
+          //sessionStorage.setItem("scoresInsight", JSON.stringify(response));
         } else {
           setScoresInsightData(null);
           dispatch(setScoresInsight(null));
-          sessionStorage.setItem("scoresInsight", "null");
+          //sessionStorage.setItem("scoresInsight", "null");
         }
       } catch (err) {
         console.error("Error fetching scores insight:", err);
         setScoresInsightData(null);
         dispatch(setScoresInsight(null));
-        sessionStorage.setItem("scoresInsight", "null");
+        //sessionStorage.setItem("scoresInsight", "null");
       } finally {
         setScoresLoading(false);
       }
@@ -1078,20 +1078,36 @@ export default function Trends({ selectedDate }) {
 
         case "Liver Heptic":
           return [
-            {
-              percentage: scores.hepatic_stress || 0,
-              colors: getZoneSegmentsForScoreType("hepatic_stress"),
-              markers: getMarkersForScoreType("hepatic_stress"),
-              status: metabolismData.hepatic_stress?.zone || "N/A",
-              statusColor: getZoneColor(metabolismData.hepatic_stress?.zone),
-              interpretation:
-                metabolismData.hepatic_stress?.interpretation ||
-                "No interpretation available",
-              intervention:
-                metabolismData.hepatic_stress?.intervention ||
-                "No intervention available",
-            },
-            {
+            // {
+            //   percentage: scores.hepatic_stress || 0,
+            //   colors: getZoneSegmentsForScoreType("hepatic_stress"),
+            //   markers: getMarkersForScoreType("hepatic_stress"),
+            //   status: metabolismData.hepatic_stress?.zone || "N/A",
+            //   statusColor: getZoneColor(metabolismData.hepatic_stress?.zone),
+            //   interpretation:
+            //     metabolismData.hepatic_stress?.interpretation ||
+            //     "No interpretation available",
+            //   intervention:
+            //     metabolismData.hepatic_stress?.intervention ||
+            //     "No intervention available",
+            // },
+            // {
+            //   percentage: scores.detoxification || 0,
+            //   colors: getZoneSegmentsForScoreType("detoxification"),
+            //   markers: getMarkersForScoreType("detoxification"),
+            //   status: metabolismData.detoxification?.zone || "N/A",
+            //   statusColor: getZoneColor(metabolismData.detoxification?.zone),
+            //   interpretation:
+            //     metabolismData.detoxification?.interpretation ||
+            //     "No interpretation available",
+            //   intervention:
+            //     metabolismData.detoxification?.intervention ||
+            //     "No intervention available",
+            // },
+
+
+
+             {
               percentage: scores.detoxification || 0,
               colors: getZoneSegmentsForScoreType("detoxification"),
               markers: getMarkersForScoreType("detoxification"),
@@ -1104,6 +1120,24 @@ export default function Trends({ selectedDate }) {
                 metabolismData.detoxification?.intervention ||
                 "No intervention available",
             },
+
+
+             {
+              percentage: scores.hepatic_stress || 0,
+              colors: getZoneSegmentsForScoreType("hepatic_stress"),
+              markers: getMarkersForScoreType("hepatic_stress"),
+              status: metabolismData.hepatic_stress?.zone || "N/A",
+              statusColor: getZoneColor(metabolismData.hepatic_stress?.zone),
+              interpretation:
+                metabolismData.hepatic_stress?.interpretation ||
+                "No interpretation available",
+              intervention:
+                metabolismData.hepatic_stress?.intervention ||
+                "No intervention available",
+            },
+           
+
+
           ];
 
         default:
@@ -1130,13 +1164,23 @@ export default function Trends({ selectedDate }) {
           firstScoreType: "fat",
           secondScoreType: "glucose",
         };
-      case "Liver Heptic":
+      // case "Liver Heptic":
+      //   return {
+      //     firstTitle: "Hepatic Stress Score",
+      //     secondTitle: "Detoxification Metabolism Score",
+      //     firstScoreType: "hepatic_stress",
+      //     secondScoreType: "detoxification",
+      //   };
+
+
+case "Liver Heptic":
         return {
-          firstTitle: "Hepatic Stress Score",
-          secondTitle: "Detoxification Metabolism Score",
-          firstScoreType: "hepatic_stress",
-          secondScoreType: "detoxification",
+          firstTitle: "Detoxification Metabolism Score",
+          secondTitle: "Hepatic Stress Score",
+          firstScoreType: "detoxification",
+          secondScoreType: "hepatic_stress",
         };
+
       default:
         return {
           firstTitle: "Absorptive Metabolism Score",
@@ -1350,11 +1394,18 @@ export default function Trends({ selectedDate }) {
         case "glucose":
           score = parseInt(item.glucose_metabolism_score) || 0;
           break;
-        case "hepatic_stress":
-          score = parseInt(item.hepatic_stress_metabolism_score) || 0;
-          break;
+        // case "hepatic_stress":
+        //   score = parseInt(item.hepatic_stress_metabolism_score) || 0;
+        //   break;
+        // case "detoxification":
+        //   score = parseInt(item.detoxification_metabolism_score) || 0;
+        //   break;
+         
         case "detoxification":
           score = parseInt(item.detoxification_metabolism_score) || 0;
+          break;
+          case "hepatic_stress":
+          score = parseInt(item.hepatic_stress_metabolism_score) || 0;
           break;
         default:
           score = 0;
@@ -1425,10 +1476,16 @@ export default function Trends({ selectedDate }) {
             return parseInt(item.fat_metabolism_score) || 0;
           case "glucose":
             return parseInt(item.glucose_metabolism_score) || 0;
-          case "hepatic_stress":
-            return parseInt(item.hepatic_stress_metabolism_score) || 0;
-          case "detoxification":
+          // case "hepatic_stress":
+          //   return parseInt(item.hepatic_stress_metabolism_score) || 0;
+          // case "detoxification":
+          //   return parseInt(item.detoxification_metabolism_score) || 0;
+
+ case "detoxification":
             return parseInt(item.detoxification_metabolism_score) || 0;
+             case "hepatic_stress":
+            return parseInt(item.hepatic_stress_metabolism_score) || 0;
+         
           default:
             return 0;
         }

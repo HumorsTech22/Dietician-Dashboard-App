@@ -51,7 +51,7 @@
 //       const queryParams = new URLSearchParams();
 //       if (urlParams.dietician_id) queryParams.append('dietician_id', urlParams.dietician_id);
 //       if (urlParams.profile_id) queryParams.append('profile_id', urlParams.profile_id);
-      
+
 //       router.push(`/plansummary?${queryParams.toString()}`);
 //       return;
 //     }
@@ -103,7 +103,7 @@
 //       const queryParams = new URLSearchParams();
 //       if (urlParams.dietician_id) queryParams.append('dietician_id', urlParams.dietician_id);
 //       if (urlParams.profile_id) queryParams.append('profile_id', urlParams.profile_id);
-      
+
 //       setShowUploadModal(false);
 //       router.push(`/plansummary?${queryParams.toString()}`);
 //     } catch (error) {
@@ -111,7 +111,7 @@
 //       toast.error("Failed to upload file");
 //     }
 //   };
-  
+
 //   return (
 //     <>
 //       {/* STEP 1 */}
@@ -285,6 +285,8 @@ export default function CreatePlanModal({ open, onClose }) {
   const [blobUrl, setBlobUrl] = useState(null);
   const [urlParams, setUrlParams] = useState({ dietician_id: null, profile_id: null });
   const [isDragging, setIsDragging] = useState(false);
+  const [fileSizeError, setFileSizeError] = useState(false);
+
 
   // Get parameters from URL safely on client side
   useEffect(() => {
@@ -319,7 +321,7 @@ export default function CreatePlanModal({ open, onClose }) {
       const queryParams = new URLSearchParams();
       if (urlParams.dietician_id) queryParams.append('dietician_id', urlParams.dietician_id);
       if (urlParams.profile_id) queryParams.append('profile_id', urlParams.profile_id);
-      
+
       router.push(`/plansummary?${queryParams.toString()}`);
       return;
     }
@@ -341,14 +343,18 @@ export default function CreatePlanModal({ open, onClose }) {
   const processFile = (file) => {
     if (!file) return;
 
+    // Reset previous error
+    setFileSizeError(false);
+
     if (file.type !== "application/pdf") {
       toast.error("Please upload a valid PDF file");
       return;
     }
 
-    // Check file size (3MB = 3 * 1024 * 1024 bytes)
+    // Check file size (3MB)
     if (file.size > 3 * 1024 * 1024) {
-      toast.error("File size must be less than 3MB");
+      setFileSizeError(true);
+      setLocalUploadedFile(null);
       return;
     }
 
@@ -359,9 +365,8 @@ export default function CreatePlanModal({ open, onClose }) {
       if (prev) URL.revokeObjectURL(prev);
       return url;
     });
-
-    //toast.success(`File selected: ${file.name}`);
   };
+
 
   // Drag and drop handlers
   const handleDragEnter = (e) => {
@@ -406,8 +411,8 @@ export default function CreatePlanModal({ open, onClose }) {
   const storeFileInLocalStorage = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
-      reader.onload = function(event) {
+
+      reader.onload = function (event) {
         try {
           const fileData = {
             name: file.name,
@@ -417,7 +422,7 @@ export default function CreatePlanModal({ open, onClose }) {
             data: event.target.result, // base64 encoded string
             blobUrl: blobUrl
           };
-          
+
           // Store in localStorage
           localStorage.setItem('uploadedPdfFile', JSON.stringify(fileData));
           resolve(true);
@@ -425,11 +430,11 @@ export default function CreatePlanModal({ open, onClose }) {
           reject(error);
         }
       };
-      
-      reader.onerror = function(error) {
+
+      reader.onerror = function (error) {
         reject(error);
       };
-      
+
       // Read file as base64 string
       reader.readAsDataURL(file);
     });
@@ -449,7 +454,7 @@ export default function CreatePlanModal({ open, onClose }) {
       const queryParams = new URLSearchParams();
       if (urlParams.dietician_id) queryParams.append('dietician_id', urlParams.dietician_id);
       if (urlParams.profile_id) queryParams.append('profile_id', urlParams.profile_id);
-      
+
       setShowUploadModal(false);
       router.push(`/plansummary?${queryParams.toString()}`);
     } catch (error) {
@@ -457,7 +462,7 @@ export default function CreatePlanModal({ open, onClose }) {
       toast.error("Failed to upload file");
     }
   };
-  
+
   return (
     <>
       {/* STEP 1 */}
@@ -487,10 +492,9 @@ export default function CreatePlanModal({ open, onClose }) {
                 <label
                   key={opt.value}
                   className={`flex gap-2.5 items-center py-[18px] pl-2.5 pr-3 rounded-[5px] cursor-pointer transition-colors
-                    ${
-                      selectedPlan === opt.value
-                        ? "border-[2px] border-[#308BF9] bg-[#F5F7FA]"
-                        : "border-[2px] border-[#E1E6ED] bg-[#F5F7FA] hover:border-[#BFD8FF]"
+                    ${selectedPlan === opt.value
+                      ? "border-[2px] border-[#308BF9] bg-[#F5F7FA]"
+                      : "border-[2px] border-[#E1E6ED] bg-[#F5F7FA] hover:border-[#BFD8FF]"
                     }`}
                 >
                   <input
@@ -514,10 +518,9 @@ export default function CreatePlanModal({ open, onClose }) {
               onClick={handleNext}
               disabled={!selectedPlan}
               className={`w-[146px] px-4 py-2 rounded-[10px] text-white text-[12px] font-semibold tracking-[-0.24px] cursor-pointer
-                ${
-                  selectedPlan
-                    ? "bg-[#308BF9]"
-                    : "bg-gray-400 cursor-not-allowed"
+                ${selectedPlan
+                  ? "bg-[#308BF9]"
+                  : "bg-gray-400 cursor-not-allowed"
                 }`}
             >
               Next
@@ -548,11 +551,13 @@ export default function CreatePlanModal({ open, onClose }) {
             <p className="text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.3px]">File size max. 3MB</p>
           </div>
 
-          <div 
+          <div
             className={`flex-1 border-2 border-dashed rounded-[10px] p-8 text-center cursor-pointer transition-colors
-              ${isDragging 
-                ? "border-[#308BF9] bg-[#F0F7FF]" 
-                : "border-[#E1E6ED] hover:bg-[#F5F7FA]"
+    ${fileSizeError
+                ? "border-[#DA5747] bg-[#FFF5F5]"
+                : isDragging
+                  ? "border-[#308BF9] bg-[#F0F7FF]"
+                  : "border-[#E1E6ED] hover:bg-[#F5F7FA]"
               }`}
             onClick={handleDropZoneClick}
             onDragEnter={handleDragEnter}
@@ -567,6 +572,7 @@ export default function CreatePlanModal({ open, onClose }) {
                 width={48}
                 height={48}
               />
+
               <input
                 ref={fileInputRef}
                 id="file-upload"
@@ -575,27 +581,48 @@ export default function CreatePlanModal({ open, onClose }) {
                 onChange={handleFileChange}
                 className="hidden"
               />
-              <p className="text-[#252525] text-[15px]">
-                {uploadedFile
-                  ? `Selected: ${uploadedFile.name}`
-                  : "Drag or browse from My Computer"}
-              </p>
-              {isDragging && (
+
+              {/* Normal message OR selected file */}
+              {!fileSizeError && (
+                <p className="text-[#252525] text-[15px]">
+                  {uploadedFile
+                    ? `Selected: ${uploadedFile.name}`
+                    : "Drag or browse from My Computer"}
+                </p>
+              )}
+
+              {/* ERROR MESSAGE */}
+              {fileSizeError && (
+                <p className="text-[#DA5747] text-[14px] font-medium">
+                  File size must be less than 3MB
+                </p>
+              )}
+
+              {/* Drag message */}
+              {isDragging && !fileSizeError && (
                 <p className="text-[#308BF9] text-sm font-medium">
                   Drop your PDF file here...
                 </p>
               )}
             </div>
           </div>
+
         </div>
 
         <div className="flex justify-end gap-3 px-8 pb-8">
           <button
             onClick={handleUploadAndRoute}
-            className="w-[146px] px-4 py-2 rounded-[10px] bg-[#308BF9] text-white text-[12px] font-semibold"
+            disabled={fileSizeError || !uploadedFile}
+            className={`w-[146px] px-4 py-2 rounded-[10px] text-white text-[12px] font-semibold
+    ${fileSizeError || !uploadedFile
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-[#308BF9] cursor-pointer"
+              }
+  `}
           >
             Next
           </button>
+
         </div>
       </Modal>
     </>

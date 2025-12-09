@@ -36,58 +36,52 @@ export default function NoPlans() {
         </div>
 
         {/* Plan History - Always show header, conditionally show content */}
-        <div className="max-w-[332px] mt-[30px] bg-white rounded-[15px] px-[22px] py-10">
-          <div className="">
-            <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">
-              Plan History({clientData?.plans_count?.total || 0})
-            </span>
-          </div>
+   {clientData?.plans_count?.total > 0 && (
+    <div className="max-w-[332px] mt-[30px] bg-white rounded-[15px] px-[22px] py-10">
+      <div>
+        <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">
+          Plan History ({clientData?.plans_count?.total})
+        </span>
+      </div>
 
-          <div className="my-[22px] border border-[#E1E6ED]" />
+      <div className="my-[22px] border border-[#E1E6ED]" />
 
-          {clientData?.plans_count?.total > 0 ? (
-            <div className="flex flex-col gap-[30px]">
-              {/* Render Completed Plans if available */}
-              {clientData?.plans_summary?.completed?.length > 0 && clientData?.plans_summary?.completed.map((plan) => (
-                <div key={plan.id} className="flex flex-col">
-                  <div className="flex gap-[25px] justify-between cursor-pointer">
-                    <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">
-                      {plan.plan_title}
-                    </span>
-                    <span className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
-                      {`${plan.plan_start_date} - ${plan.plan_end_date}`}
-                    </span>
-                  </div>
+      <div className="flex flex-col gap-[30px]">
+        {clientData?.plans_summary?.completed?.length > 0 &&
+          clientData.plans_summary.completed.map((plan) => (
+            <div key={plan.id} className="flex flex-col">
+              <div className="flex gap-[25px] justify-between cursor-pointer">
+                <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">
+                  {plan.plan_title}
+                </span>
+                <span className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
+                  {`${plan.plan_start_date} - ${plan.plan_end_date}`}
+                </span>
+              </div>
 
-                  <div className="flex justify-between">
-                    <div>
-                      <span className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize">
-                        Updated {plan.updated_at}
-                      </span>
-                    </div>
-                    <div className="flex gap-[3px] items-center">
-                      <Image
-                        src="/icons/verified.svg"
-                        alt="verified"
-                        width={12}
-                        height={12}
-                      />
-                      <span className="text-[#3FAF58] text-[12px] font-normal leading-normal tracking-[-0.24px]">
-                        Finished
-                      </span>
-                    </div>
-                  </div>
+              <div className="flex justify-between">
+                <span className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize">
+                  Updated {plan.updated_at}
+                </span>
+
+                <div className="flex gap-[3px] items-center">
+                  <Image
+                    src="/icons/verified.svg"
+                    alt="verified"
+                    width={12}
+                    height={12}
+                  />
+                  <span className="text-[#3FAF58] text-[12px]">
+                    Finished
+                  </span>
                 </div>
-              ))}
+              </div>
             </div>
-          ) : (
-            <div className="flex justify-center items-center py-8">
-              <span className="text-[#738298] text-[16px] font-semibold">
-                No data found
-              </span>
-            </div>
-          )}
-        </div>
+          ))}
+      </div>
+    </div>
+)}
+
       </div>
 
       <CreatePlanModal
