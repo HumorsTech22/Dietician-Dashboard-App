@@ -637,6 +637,7 @@ export default function TestLogInfo({ onConfirmNext }) {
   const [isLoading, setIsLoading] = useState(false);
   const isExtracting = useSelector((state) => state.extraction.isExtracting);
   const [apiResponse, setApiResponse] = useState(null);
+const [isSavingDraft, setIsSavingDraft] = useState(false);
 
   const [progress, setProgress] = useState(0);
   const rafRef = useRef(null);
@@ -835,7 +836,25 @@ export default function TestLogInfo({ onConfirmNext }) {
     }
   };
 
-  const handleSaveAsDraft = () => saveToLocalStorage(true);
+  // const handleSaveAsDraft = () => saveToLocalStorage(true);
+
+const handleSaveAsDraft = () => {
+  setIsSavingDraft(true);
+
+  try {
+    saveToLocalStorage(true);
+    toast.success("Draft saved");
+  } catch (error) {
+    console.error("Error saving draft:", error);
+    toast.error("Failed to save draft");
+  } finally {
+    // small delay so user can see the state change
+    setTimeout(() => {
+      setIsSavingDraft(false);
+    }, 400);
+  }
+};
+
 
   // ========= 7) Extract Diet PDF =========
   const extractDietPdf = async ({ dieticianId, clientId, dietplanId }) => {
@@ -1155,14 +1174,56 @@ export default function TestLogInfo({ onConfirmNext }) {
 
           <div className="py-[23px]">
             <div className="flex gap-5 justify-end">
-              <div
+              {/* <div
                 className="px-5 py-[15px] bg-white border border-[#D9D9D9] rounded-[10px] cursor-pointer"
                 onClick={handleSaveAsDraft}
               >
                 <span className="text-[#308BF9] text-[12px] font-semibold">
                   Save as draft
                 </span>
-              </div>
+              </div> */}
+
+
+              <div
+  className={`px-5 py-[15px] border rounded-[10px] flex items-center justify-center
+    ${
+      isSavingDraft
+        ? "bg-gray-100 border-gray-300 opacity-60 cursor-not-allowed"
+        : "bg-white border-[#D9D9D9] cursor-pointer"
+    }`}
+  onClick={!isSavingDraft ? handleSaveAsDraft : undefined}
+>
+  {isSavingDraft ? (
+    <span className="text-[#308BF9] text-[12px] font-semibold flex items-center gap-2">
+      <svg
+        className="animate-spin h-4 w-4 text-[#308BF9]"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        ></circle>
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+        ></path>
+      </svg>
+      Saving…
+    </span>
+  ) : (
+    <span className="text-[#308BF9] text-[12px] font-semibold">
+      Save as draft
+    </span>
+  )}
+</div>
+
 
               <button
                 type="button"

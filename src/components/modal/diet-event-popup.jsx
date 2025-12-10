@@ -603,6 +603,9 @@ import { Modal } from "react-responsive-modal";
 import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 import Image from "next/image";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
+import { IoClose } from "react-icons/io5";
+
 
 // Split "1.0 bowl" → { quantityValue: "1.0", quantityUnit: "bowl" }
 const parseQuantityDetail = (detail) => {
@@ -651,8 +654,10 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
   const [eventTitle, setEventTitle] = useState("Event1");
   const [planName, setPlanName] = useState("");
   const [foodItems, setFoodItems] = useState([emptyFoodItem]);
+  console.log("foodItems654:-", foodItems);
   const [updatedExtractedData, setUpdatedExtractedData] = useState(null);
   const UNIT_OPTIONS = ["Bowl", "Cup", "Plate", "Glass"];
+
 
 
   // When selectedMeal changes, rebuild foodItems from selectedMeal.meals
@@ -738,25 +743,122 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
   };
 
   // Build RAW STRUCTURED DATA like extractedData
+  // const handleSave = () => {
+  //   if (!dayName) {
+  //     console.error("Day name is missing, cannot save data.");
+  //     return;
+  //   }
+
+  //   // 1️⃣ Build items array in RAW format
+  //   const items = foodItems.map((item) => {
+  //     const portionStr = `${item.quantityValue} ${item.quantityUnit}`.trim();
+
+  //     return {
+  //       name: item.name || "",
+  //       portion: portionStr, // "1.0 bowl"
+  //       calories_kcal: parseFloat(item.caloriesValue) || 0,
+  //       protein: parseFloat(item.proteinValue) || 0,
+  //       carbs: parseFloat(item.carbsValue) || 0,
+  //       fat: parseFloat(item.fatValue) || 0,
+  //     };
+  //   });
+
+  //   // 2️⃣ Build meal time label like: "Lunch at 02:00 PM"
+  //   const mealLabel =
+  //     selectedMeal?.time && selectedMeal?.timeRange
+  //       ? `${selectedMeal.time} at ${selectedMeal.timeRange}`
+  //       : selectedMeal?.time || "";
+
+  //   // 3️⃣ Calculate totals for this meal
+  //   const totals = items.reduce(
+  //     (acc, cur) => {
+  //       acc.calories_kcal += cur.calories_kcal || 0;
+  //       acc.protein += cur.protein || 0;
+  //       acc.carbs += cur.carbs || 0;
+  //       acc.fat += cur.fat || 0;
+  //       return acc;
+  //     },
+  //     { calories_kcal: 0, protein: 0, carbs: 0, fat: 0 }
+  //   );
+
+  //   // 4️⃣ Build RAW day block
+  //   const dayBlock = {
+  //     meals: [
+  //       {
+  //         time: mealLabel, // e.g. "Lunch at 02:00 PM"
+  //         items,
+  //         totals, // meal totals
+  //       },
+  //     ],
+  //     totals,
+  //   };
+
+  //   // 5️⃣ Final RAW payload with .result (for parent to merge)
+  //   const rawPayload = {
+  //     _notes: {
+  //       illegible: [],
+  //       omissions: [],
+  //       warnings: [],
+  //     },
+  //     result: {
+  //       [dayName]: dayBlock,
+  //     },
+  //   };
+
+  //   setUpdatedExtractedData(rawPayload);
+
+  //   try {
+  //     if (onSave) {
+  //       onSave(rawPayload);
+  //     }
+  //     onClose();
+  //   } catch (error) {
+  //     console.error("Failed to save data:", error);
+  //   }
+  // };
+
+
+  // ... (inside DietEvent component)
+
+  // Build RAW STRUCTURED DATA like extractedData
   const handleSave = () => {
     if (!dayName) {
       console.error("Day name is missing, cannot save data.");
       return;
     }
 
-    // 1️⃣ Build items array in RAW format
-    const items = foodItems.map((item) => {
-      const portionStr = `${item.quantityValue} ${item.quantityUnit}`.trim();
+    // 1️⃣ Build items array in RAW format with validation/filtering
+    const items = foodItems
+      .map((item) => {
+        // **A. Filter out invalid/empty items**
+        // An item is considered "filled" if it has a name OR a quantity value.
+        const hasName = item.name.trim().length > 0;
+        const hasQuantity = item.quantityValue.trim().length > 0;
 
-      return {
-        name: item.name || "",
-        portion: portionStr, // "1.0 bowl"
-        calories_kcal: parseFloat(item.caloriesValue) || 0,
-        protein: parseFloat(item.proteinValue) || 0,
-        carbs: parseFloat(item.carbsValue) || 0,
-        fat: parseFloat(item.fatValue) || 0,
-      };
-    });
+        if (!hasName && !hasQuantity) {
+          return null; // Mark for removal
+        }
+
+        // **B. Transform valid item into the required payload format**
+        const portionStr = `${item.quantityValue} ${item.quantityUnit}`.trim();
+
+        return {
+          name: item.name || "",
+          portion: portionStr, // "1.0 bowl"
+          // Ensure values are numbers, default to 0 if parsing fails
+          calories_kcal: parseFloat(item.caloriesValue) || 0,
+          protein: parseFloat(item.proteinValue) || 0,
+          carbs: parseFloat(item.carbsValue) || 0,
+          fat: parseFloat(item.fatValue) || 0,
+        };
+      })
+      .filter(item => item !== null); // **C. Remove the marked null items**
+
+    // Optional: If ALL items were blank and filtered out, you might want to prevent saving entirely
+    // if (items.length === 0) {
+    //   console.log("No food items filled out. Save aborted.");
+    //   return;
+    // }
 
     // 2️⃣ Build meal time label like: "Lunch at 02:00 PM"
     const mealLabel =
@@ -812,8 +914,33 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
     }
   };
 
+
+  const handleRemoveItem = (indexToRemove) => {
+    setFoodItems((prev) => {
+      if (prev.length === 1) {
+        // keep at least one item
+        return [{ ...emptyFoodItem }];
+      }
+      return prev.filter((_, idx) => idx !== indexToRemove);
+    });
+  };
+
+
+  // const handleRemoveItem = (indexToRemove) => {
+  //  setFoodItems((prev) => {
+  //   if (prev.length === 1) {
+  //  // If it's the last item, close the modal
+  //  onClose(); 
+  //  return []; // Clear state, modal will close anyway
+  //  }
+  //  return prev.filter((_, idx) => idx !== indexToRemove);
+  // });
+  // };
+
+
   return (
     <>
+
       <Modal
         open={open}
         onClose={onClose}
@@ -823,6 +950,8 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
         showCloseIcon={false}
         classNames={{ overlay: "flex items-center justify-center", modal: "!p-0 !rounded-[15px]", }}
       >
+
+
         {/* OUTER WRAPPER: fixed height + column => header fixed */}
         <div className="max-h-[80vh] flex flex-col rounded-[10px] px-6 pt-[25px] pb-[34px] border-t-[10px] border-[#FFA99F]">
           {/* 🔹 FIXED HEADER */}
@@ -844,7 +973,7 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
                 >
                   Save
                 </button>
-                
+
               </div>
             </div>
           </div>
@@ -886,9 +1015,22 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
                   key={index}
                   className="pl-5 h-full border-l border-[#E1E6ED] mt-4"
                 >
-                  <span className="text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]">
-                    Item {index + 1}
-                  </span>
+                  <div className="flex items-center justify-between pr-2 pb-2.5">
+                    <span className="text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]">
+                      Item {index + 1}
+                    </span>
+
+                    {foodItems.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveItem(index)}
+                        className="flex items-center gap-1 text-[#252525] text-[12px] cursor-pointer"
+                      >
+
+                        <MdDelete size={16} />
+                      </button>
+                    )}
+                  </div>
                   <div className="pl-[13px] h-full border-l border-[#E1E6ED]">
                     <div className="flex flex-col gap-[20px]">
                       {/* Goal Title */}
@@ -938,48 +1080,48 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
                         </div>
 
                         {/* Quantity Unit */}
-                  <div className="relative w-[120px]">
-  <select
-    id={`quantity-unit-${index}`}
-    className="appearance-none peer block w-full py-[15px] pl-[19px] pr-[40px] text-[14px] text-[#252525] bg-white border border-[#E1E6ED] rounded-[8px] outline-none focus:border-blue-600"
-    value={item.quantityUnit || ""}
-    onChange={(e) =>
-      updateFoodItem(
-        index,
-        "quantityUnit",
-        sanitizeUnitInput(e.target.value)
-      )
-    }
-  >
-    <option value="" disabled>
-      Select
-    </option>
+                        <div className="relative w-[120px]">
+                          <select
+                            id={`quantity-unit-${index}`}
+                            className="appearance-none peer block w-full py-[15px] pl-[19px] pr-[40px] text-[14px] text-[#252525] bg-white border border-[#E1E6ED] rounded-[8px] outline-none focus:border-blue-600"
+                            value={item.quantityUnit || ""}
+                            onChange={(e) =>
+                              updateFoodItem(
+                                index,
+                                "quantityUnit",
+                                sanitizeUnitInput(e.target.value)
+                              )
+                            }
+                          >
+                            <option value="" disabled>
+                              Select
+                            </option>
 
-    {item.quantityUnit &&
-      !UNIT_OPTIONS.map((u) => u.toLowerCase()).includes(
-        item.quantityUnit.toLowerCase()
-      ) && (
-        <option value={item.quantityUnit}>{item.quantityUnit}</option>
-      )}
+                            {item.quantityUnit &&
+                              !UNIT_OPTIONS.map((u) => u.toLowerCase()).includes(
+                                item.quantityUnit.toLowerCase()
+                              ) && (
+                                <option value={item.quantityUnit}>{item.quantityUnit}</option>
+                              )}
 
-    <option value="Bowl">Bowl</option>
-    <option value="Cup">Cup</option>
-    <option value="Plate">Plate</option>
-    <option value="Glass">Glass</option>
-  </select>
+                            <option value="Bowl">Bowl</option>
+                            <option value="Cup">Cup</option>
+                            <option value="Plate">Plate</option>
+                            <option value="Glass">Glass</option>
+                          </select>
 
-  {/* CUSTOM DROPDOWN ICON */}
-  <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-    <MdOutlineKeyboardArrowDown size={20} color="#252525" />
-  </span>
+                          {/* CUSTOM DROPDOWN ICON */}
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                            <MdOutlineKeyboardArrowDown size={20} color="#252525" />
+                          </span>
 
-  <label
-    htmlFor={`quantity-unit-${index}`}
-    className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] top-[-9px] leading-none"
-  >
-    Unit
-  </label>
-</div>
+                          <label
+                            htmlFor={`quantity-unit-${index}`}
+                            className="pointer-events-none absolute left-[19px] bg-white px-2 text-[14px] text-[#9CA3AF] top-[-9px] leading-none"
+                          >
+                            Unit
+                          </label>
+                        </div>
 
                       </div>
 
@@ -1012,7 +1154,7 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
 
                           <div className="relative w-[90px]">
                             <input
-                            readOnly
+                              readOnly
                               type="text"
                               placeholder=" "
                               className="peer block w-full py-[15px] pl-[19px] pr-[15px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] bg-white border border-[#E1E6ED] rounded-[8px] placeholder-transparent focus:border-blue-600"
@@ -1056,7 +1198,7 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
                               </div>
                               <div className="relative max-w-[70px]">
                                 <input
-                                readOnly
+                                  readOnly
                                   type="text"
                                   placeholder=" "
                                   className="peer block w-full py-[15px] pl-[19px] pr-[15px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] bg-white border  rounded-[8px] placeholder-transparent"
@@ -1099,7 +1241,7 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
                               </div>
                               <div className="relative max-w-[70px]">
                                 <input
-                                readOnly
+                                  readOnly
                                   type="text"
                                   placeholder=" "
                                   className="peer block w-full py-[15px] pl-[19px] pr-[15px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] bg-white border  rounded-[8px] placeholder-transparent"
@@ -1142,7 +1284,7 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
                               </div>
                               <div className="relative max-w-[70px]">
                                 <input
-                                readOnly
+                                  readOnly
                                   type="text"
                                   placeholder=" "
                                   className="peer block w-full py-[15px] pl-[19px] pr-[15px] outline-none text-[#252525] text-[14px] font-normal leading-normal tracking-[-0.2px] bg-white border  rounded-[8px] placeholder-transparent"
@@ -1168,19 +1310,28 @@ export default function DietEvent({ open, onClose, selectedMeal, onSave }) {
                 </div>
               ))}
 
-              <button
-                type="button"
-                onClick={handleAddItem}
-                className="mt-2.5 py-[15px] px-[7px] text-[#308BF9] font-semibold 
-               leading-normal tracking-[-0.24px] text-[12px] cursor-pointer
-               bg-transparent border-none outline-none"
-              >
-                Add Alternative Item
-              </button>
+
             </div>
           </div>
+
+          <div className="flex justify-start">
+            <button
+              type="button"
+              onClick={handleAddItem}
+              className="mt-2.5 py-[15px] px-[7px] text-[#308BF9] font-semibold 
+               leading-normal tracking-[-0.24px] text-[12px] cursor-pointer
+               bg-transparent border-none outline-none"
+            >
+              Add Alternative Item
+            </button>
+          </div>
         </div>
+
+
       </Modal>
+
+
+
     </>
   );
 }

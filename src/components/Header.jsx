@@ -29,10 +29,10 @@ const MonoIcon = ({ src, size = 20, color = "#A1A1A1", alt = "" }) => (
 
 export default function Header() {
   const pathname = usePathname();
-   const router = useRouter();
+  const router = useRouter();
   const [active, setActive] = useState(pathname);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Update active state when route changes
   useEffect(() => {
@@ -46,37 +46,39 @@ export default function Header() {
     { name: "Settings", icon: "/icons/hugeicons_settings-03.svg", path: "/settings" },
   ];
 
-const clientRelatedPaths = ["/client", "/planhistory", "/profile"];
+  const clientRelatedPaths = ["/client", "/planhistory", "/profile"];
 
 
-    const handleLogout = () => {
+  const handleLogout = () => {
     try {
       cookieManager.clearAuth();
       localStorage.clear()
       setIsDropdownOpen(false);
-      
+
       // Redirect to login page
       router.push('/');
-     
+
     } catch (error) {
       console.error("Error during logout:", error);
     }
-   };
+  };
 
 
-   const handleMenuClick = (menuItem, e) => {
-  if (menuItem.name === "Messages" || menuItem.name === "Settings") {
-    e.preventDefault();
-    toast.info("Coming Soon");
-    return false;
-  }
+  const handleMenuClick = (menuItem, e) => {
+    if (menuItem.name === "Messages" 
+      // || menuItem.name === "Settings"
+    ) {
+      e.preventDefault();
+      toast.info("Coming Soon");
+      return false;
+    }
 
-  setActive(menuItem.path);
-  return true;
-};
+    setActive(menuItem.path);
+    return true;
+  };
 
 
- const handleNotificationClick = () => {
+  const handleNotificationClick = () => {
     toast.info("Coming Soon");
   };
 
@@ -86,54 +88,54 @@ const clientRelatedPaths = ["/client", "/planhistory", "/profile"];
 
   return (
     <>
-    <div className="flex justify-between bg-[#F5F7FA] p-4">
-      <div className="flex">
-        <Link href="/dashboard">
-        <div className="flex flex-col items-center">
-          <img src="/icons/logorespyr.png" alt="logo" width={50} height={50} />
-          <p className="text-[#252525] text-[12px] font-normal">Beta 1.0</p>
-         </div>
-        </Link>
-       
-      </div>
+      <div className="flex justify-between bg-[#F5F7FA] p-4">
+        <div className="flex">
+          <Link href="/dashboard">
+            <div className="flex flex-col items-center">
+              <img src="/icons/logorespyr.png" alt="logo" width={50} height={50} />
+              <p className="text-[#252525] text-[12px] font-normal">Beta 1.0</p>
+            </div>
+          </Link>
 
-      <div className="flex gap-[15px]">
-        {menu.map((m) => {
-        const isActive =
-  m.name === "Client"
-    ? clientRelatedPaths.includes(pathname)
-    : active === m.path;
-
-          const color = isActive ? "#308BF9" : "#A1A1A1";
-          return (
-            <Link href={m.path} key={m.name} onClick={() => setActive(m.path)}>
-              <button
-                className="flex items-center gap-1.5 cursor-pointer rounded-[15px] px-[20px] py-[15px] bg-white"
-                onClick={(e) => handleMenuClick(m, e)}
-              >
-                <MonoIcon src={m.icon} color={color} alt={m.name} />
-                <span
-                  className={`font-semibold text-[12px]`}
-                  style={{ color }}
-                >
-                  {m.name}
-                </span>
-              </button>
-            </Link>
-          );
-        })}
-      </div>
-
-      <div className="flex items-center gap-5">
-        <div 
-          className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white"
-        onClick={handleNotificationClick}
-            //onClick={openModal}
-        >
-          <MonoIcon src="/icons/hugeicons_notification-01.svg" color="#A1A1A1" alt="notification" />
         </div>
 
-        {/* <Link
+        <div className="flex gap-[15px]">
+          {menu.map((m) => {
+            const isActive =
+              m.name === "Client"
+                ? clientRelatedPaths.includes(pathname)
+                : active === m.path;
+
+            const color = isActive ? "#308BF9" : "#A1A1A1";
+            return (
+              <Link href={m.path} key={m.name} onClick={() => setActive(m.path)}>
+                <button
+                  className="flex items-center gap-1.5 cursor-pointer rounded-[15px] px-[20px] py-[15px] bg-white"
+                  onClick={(e) => handleMenuClick(m, e)}
+                >
+                  <MonoIcon src={m.icon} color={color} alt={m.name} />
+                  <span
+                    className={`font-semibold text-[12px]`}
+                    style={{ color }}
+                  >
+                    {m.name}
+                  </span>
+                </button>
+              </Link>
+            );
+          })}
+        </div>
+
+        <div className="flex items-center gap-5">
+          <div
+            className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white"
+            onClick={handleNotificationClick}
+          //onClick={openModal}
+          >
+            <MonoIcon src="/icons/hugeicons_notification-01.svg" color="#A1A1A1" alt="notification" />
+          </div>
+
+          {/* <Link
           href="/loginuser"
           className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white"
           aria-label="User"
@@ -141,23 +143,23 @@ const clientRelatedPaths = ["/client", "/planhistory", "/profile"];
           <MonoIcon src="/icons/hugeicons_user.svg" color="#A1A1A1" size={20} alt="user" />
         </Link> */}
 
-        <div className="flex items-center gap-5">
-       
+          <div className="flex items-center gap-5">
 
-        {/* User Dropdown */}
-        <div 
-          className="relative"
-          onMouseEnter={() => setIsDropdownOpen(true)}
-          onMouseLeave={() => setIsDropdownOpen(false)}
-        >
-          <div className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white">
-            <MonoIcon src="/icons/hugeicons_user.svg" color="#A1A1A1" size={20} alt="user" />
-          </div>
 
-          {/* Dropdown Menu */}
-          {isDropdownOpen && (
-            <div className="absolute right-0 top-full  w-48 bg-white rounded-[15px] shadow-lg p-1.5 z-50">
-              {/* <Link 
+            {/* User Dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={() => setIsDropdownOpen(true)}
+              onMouseLeave={() => setIsDropdownOpen(false)}
+            >
+              <div className="flex items-center cursor-pointer rounded-[15px] p-[13px] bg-white">
+                <MonoIcon src="/icons/hugeicons_user.svg" color="#A1A1A1" size={20} alt="user" />
+              </div>
+
+              {/* Dropdown Menu */}
+              {isDropdownOpen && (
+                <div className="absolute right-0 top-full  w-48 bg-white rounded-[15px] shadow-lg p-1.5 z-50">
+                  {/* <Link 
                 href="/profile" 
                 className="flex items-center px-4 py-3 text-sm text-[#A1A1A1] hover:bg-gray-100 transition-colors"
                 onClick={() => setIsDropdownOpen(false)}
@@ -165,26 +167,26 @@ const clientRelatedPaths = ["/client", "/planhistory", "/profile"];
                 
                 <span className="ml-3 cursor-pointer">Profile</span>
               </Link> */}
-              
-              <button
-                onClick={handleLogout}
-                  className="flex items-center cursor-pointer w-full px-4  py-3 text-sm text-[#A1A1A1] hover:bg-gray-100 transition-colors"
-              >
-                
-                <span className="ml-3 cursor-pointer">Logout</span>
-              </button>
+
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center cursor-pointer w-full px-4  py-3 text-sm text-[#A1A1A1] hover:bg-gray-100 transition-colors"
+                  >
+
+                    <span className="ml-3 cursor-pointer">Logout</span>
+                  </button>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </div>
         </div>
       </div>
-    </div>
 
       {/* <NotificationModal
     open={isModalOpen}
     onClose={closeModal}
           /> */}
-          </>
+    </>
   );
 }
 

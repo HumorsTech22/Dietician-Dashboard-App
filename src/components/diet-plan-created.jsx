@@ -76,7 +76,7 @@ export default function DietPlanCreated() {
   });
 
 
-  const VISIBLE_COUNT = 7;
+  const VISIBLE_COUNT = 6;
 
   // ---------- SYNC REDUX → LOCAL STORAGE (only when no local edits) ----------
   useEffect(() => {
@@ -118,6 +118,7 @@ export default function DietPlanCreated() {
     if (!activePlans || activePlans.length === 0) return;
 
     const diet_plan_id = activePlans[0]?.id;
+    console.log("diet_plan_id121:-", diet_plan_id);
     if (!diet_plan_id) return;
 
     const loadDietPlan = async () => {
@@ -128,7 +129,7 @@ export default function DietPlanCreated() {
           profile_id,
           diet_plan_id
         );
-
+console.log("response132:-", response);
 
         // ---------- CASE 1: API SUCCESS ----------
         if (response?.success && response?.data?.record?.diet_json) {
@@ -618,75 +619,163 @@ export default function DietPlanCreated() {
     }
   };
 
-  const handleFinishClick = async () => {
-    try {
-      setIsSubmitting(true);
 
-      const login_id = getDieticianIdFromCookies();
-      if (!login_id) {
-        toast.error("Please log in again. Dietician ID not found.");
-        return;
-      }
 
-      if (!profile_id) {
-        toast.error("Profile ID not found.");
-        return;
-      }
+// const handleFinishClick = async () => {
+//   try {
+//     setIsSubmitting(true); // Disable the button and show 'Saving...'
 
-      // ✅ PRIMARY SOURCE: planSummary (might come from refreshed client profile)
-      let diet_plan_id = planSummary?.diet_plan_id;
+//     const login_id = getDieticianIdFromCookies();
+//     console.log("login_id698:-", login_id);
+//     const profile_id =
+//       searchParams.get("profile_id") || effectiveClientProfile?.profile_id;
+//       console.log("profile_id701:-", profile_id);
 
-      // ✅ BACKUP: only if planSummary fails → use effectiveClientProfile
-      if (!diet_plan_id && effectiveClientProfile?.plans_summary?.active?.length > 0) {
-        diet_plan_id = effectiveClientProfile.plans_summary.active[0]?.id;
-      }
+//     // 1. Get Authentication and Plan IDs
+//     if (!login_id) {
+//       toast.error("Please log in again. Dietician ID not found.");
+//       return;
+//     }
 
-      if (!diet_plan_id) {
-        toast.error("No active diet plan found.");
-        return;
-      }
+//     if (!profile_id) {
+//       toast.error("Profile ID not found.");
+//       return;
+//     }
 
-      // ---- Prepare diet JSON ----
-      let diet_json = {};
-      try {
-        const storedData = localStorage.getItem("updatedExtractedData");
-        diet_json = storedData ? JSON.parse(storedData) : extractedData || {};
-      } catch (error) {
-        console.error("Error reading diet JSON:", error);
-        diet_json = extractedData || {};
-      }
+//     let diet_plan_id = planSummary?.diet_plan_id;
+//     console.log("diet_plan_id716:-", diet_plan_id);
+//     if (
+//       !diet_plan_id &&
+//       effectiveClientProfile?.plans_summary?.active?.length > 0
+//     ) {
+//       diet_plan_id = effectiveClientProfile.plans_summary.active[0]?.id;
+//     }
 
-      const toastId = toast.loading("Saving diet plan...");
+//     if (!diet_plan_id) {
+//       toast.error("No active diet plan found.");
+//       return;
+//     }
 
-      // ---- Save to server ----
-      const response = await updateDietPlanJsonService(
-        login_id,
-        profile_id,
-        diet_plan_id,
-        diet_json.result
-      );
+//     // 2. Prepare Data (read from localStorage or fallback)
+//     let diet_json = {};
+//     try {
+//       const storedData = localStorage.getItem("updatedExtractedData");
+//       // This is the complete object, including the 'result' key
+//       diet_json = storedData ? JSON.parse(storedData) : extractedData || {};
+//     } catch (error) {
+//       console.error("Error reading diet JSON:", error);
+//       diet_json = extractedData || {};
+//     }
 
-      if (response.success) {
-        toast.success("Diet plan saved successfully!", {
-          id: toastId,
-          duration: 3000,
-        });
-      } else {
-        toast.error(
-          `Failed to save diet plan: ${response.message || "Unknown error"}`,
-          {
-            id: toastId,
-            duration: 5000,
-          }
-        );
-      }
-    } catch (error) {
-      console.error("Save error:", error);
-      toast.error(`Error saving diet plan: ${error.message}`);
-    } finally {
-      setIsSubmitting(false);
+//     const toastId = toast.loading("Saving diet plan..."); // Show loading toast
+
+//     // 3. Call the API to save the plan
+//     const response = await updateDietPlanJsonService(
+//       login_id,
+//       profile_id,
+//       diet_plan_id,
+//       diet_json.result // Only send the 'result' object (the actual diet data)
+//     );
+//     console.log("response747:-", response);
+
+//     // 4. Handle Response
+//     if (response.success) {
+//       toast.success("Diet plan saved successfully!", {
+//         id: toastId,
+//         duration: 3000,
+//       });
+//     } else {
+//       toast.error(
+//         `Failed to save diet plan: ${response.message || "Unknown error"}`,
+//         {
+//           id: toastId,
+//           duration: 5000,
+//         }
+//       );
+//     }
+//   } catch (error) {
+//     console.error("Save error:", error);
+//     toast.error(`Error saving diet plan: ${error.message}`);
+//   } finally {
+//     setIsSubmitting(false); // Re-enable the button
+//   }
+// };
+
+
+
+const handleFinishClick = async () => {
+  try {
+    setIsSubmitting(true);
+
+    const login_id = getDieticianIdFromCookies();
+    const profile_id =
+      searchParams.get("profile_id") || effectiveClientProfile?.profile_id;
+
+    if (!login_id) {
+      toast.error("Please log in again. Dietician ID not found.");
+      return;
     }
-  };
+
+    if (!profile_id) {
+      toast.error("Profile ID not found.");
+      return;
+    }
+
+    // ✅ ALWAYS take active plan from effectiveClientProfile first
+    const activePlans = effectiveClientProfile?.plans_summary?.active;
+    let diet_plan_id =
+      activePlans?.length > 0
+        ? activePlans[0].id
+        : planSummary?.diet_plan_id; // fallback only if no activePlans
+
+    console.log("diet_plan_id716:-", diet_plan_id);
+
+    if (!diet_plan_id) {
+      toast.error("No active diet plan found.");
+      return;
+    }
+
+    // rest of your code stays same...
+    let diet_json = {};
+    try {
+      const storedData = localStorage.getItem("updatedExtractedData");
+      diet_json = storedData ? JSON.parse(storedData) : extractedData || {};
+    } catch (error) {
+      console.error("Error reading diet JSON:", error);
+      diet_json = extractedData || {};
+    }
+
+    const toastId = toast.loading("Saving diet plan...");
+
+    const response = await updateDietPlanJsonService(
+      login_id,
+      profile_id,
+      diet_plan_id,
+      diet_json.result
+    );
+
+    if (response.success) {
+      toast.success("Diet plan saved successfully!", {
+        id: toastId,
+        duration: 3000,
+      });
+    } else {
+      toast.error(
+        `Failed to save diet plan: ${response.message || "Unknown error"}`,
+        {
+          id: toastId,
+          duration: 5000,
+        }
+      );
+    }
+  } catch (error) {
+    console.error("Save error:", error);
+    toast.error(`Error saving diet plan: ${error.message}`);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   const getActiveDayMealsFromDietPlan = () => {
     if (!allDays[activeDay]?.fullDate) {
@@ -748,7 +837,7 @@ export default function DietPlanCreated() {
                     <div key={day.id} className="flex items-center">
                       <div
                         className={`flex flex-col w-[140px] gap-2.5 pt-[15px] pb-2.5 pr-2.5 pl-[15px] rounded-[8px] cursor-pointer ${
-                          activeDay === day.id ? 'bg-[#308BF9]' : 'bg-white'
+                          activeDay === day.id ? 'bg-[#308BF9]' : ''
                         }`}
                         onClick={() => {
                           setActiveDay(day.id);
@@ -877,7 +966,7 @@ export default function DietPlanCreated() {
                 )}
               </div>
             </div>
-
+ 
             <div className="mt-[30px]">
               <div className="w-full border-b border-[#E1E6ED]"></div>
               <div className="flex justify-end my-[23px] mr-5">
@@ -888,7 +977,7 @@ export default function DietPlanCreated() {
                     isSubmitting ? 'bg-gray-400' : 'bg-[#308BF9]'
                   }`}
                 >
-                  {isSubmitting ? 'Saving...' : 'Finish'}
+                  {isSubmitting ? 'Saving...' : 'Update'}
                 </button>
               </div>
             </div>
