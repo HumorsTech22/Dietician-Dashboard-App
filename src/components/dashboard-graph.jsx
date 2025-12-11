@@ -32,10 +32,23 @@ export default function DashboardGraph({ testAnalyticsData }) {
     // last 7 days
     const last7Days = sortedDays.slice(-7);
 
+    // const labels = last7Days.map((day) => {
+    //   const d = new Date(day.date);
+    //   return d.toLocaleDateString("en-US", { weekday: "short" }); // Mon, Tue...
+    // });
+
+
     const labels = last7Days.map((day) => {
-      const d = new Date(day.date);
-      return d.toLocaleDateString("en-US", { weekday: "short" }); // Mon, Tue...
-    });
+  const d = new Date(day.date);
+
+  const weekday = d.toLocaleDateString("en-US", { weekday: "short" }); // Mon
+  const dayNum = d.getDate();                                          // 9
+  const month = d.toLocaleDateString("en-US", { month: "short" });     // Dec
+
+  return `${weekday} ${dayNum} ${month}`; // Mon 9 Dec
+});
+
+
 
     // ✅ Use percentages so every stacked bar = 100% height
     const testedPercentData = last7Days.map((day) => {

@@ -541,6 +541,7 @@ import CreatePlanModal from './modal/create-plan';
 import { fetchClientProfileData } from '../services/authService';
 import { useDispatch, useSelector } from 'react-redux';
 import { setClientProfile, clearClientProfile, setClientProfileLoading, setClientProfileError } from '@/store/clientProfileSlice';
+import CreatePlanPopUp from './pop-folder/create-plan-popup';
 
 export const ClientProfile = ({ showPlanDetails = true, showOverview = true, showPlanSelection = true, showPlanHistoryMargin = true }) => {
     const pathname = usePathname();
@@ -1255,7 +1256,11 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
             </div>
 
             {/* Create Plan Modal */}
-            <CreatePlanModal
+            {/* <CreatePlanModal
+                open={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            /> */}
+            <CreatePlanPopUp
                 open={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
             />

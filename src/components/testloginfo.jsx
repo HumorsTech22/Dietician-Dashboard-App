@@ -1184,7 +1184,7 @@ const handleSaveAsDraft = () => {
               </div> */}
 
 
-              <div
+              {/* <div
   className={`px-5 py-[15px] border rounded-[10px] flex items-center justify-center
     ${
       isSavingDraft
@@ -1222,7 +1222,7 @@ const handleSaveAsDraft = () => {
       Save as draft
     </span>
   )}
-</div>
+</div> */}
 
 
               <button

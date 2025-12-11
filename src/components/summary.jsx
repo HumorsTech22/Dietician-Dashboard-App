@@ -2655,7 +2655,7 @@ export default function Summary({ onConfirmNext }) {
                           gErr.current || gErr.currentUnit
                             ? "border border-[#DA5747]"
                             : "border border-[#E1E6ED]"
-                        }`}
+                        } focus:border-blue-600`}
                       >
                         <input
                           type="number"
@@ -2722,7 +2722,7 @@ export default function Summary({ onConfirmNext }) {
                           gErr.target || gErr.targetUnit
                             ? "border border-[#DA5747]"
                             : "border border-[#E1E6ED]"
-                        }`}
+                        } focus:border-blue-600`}
                       >
                         <input
                           type="number"
@@ -2867,7 +2867,7 @@ export default function Summary({ onConfirmNext }) {
             </span>
           </div> */}
 
-<div
+{/* <div
   className={`px-5 py-[15px] border rounded-[10px] cursor-pointer flex items-center justify-center
     ${isSavingDraft ? "bg-gray-100 border-gray-300 opacity-60 cursor-not-allowed" : "bg-white border-[#D9D9D9]"}`}
   onClick={!isSavingDraft ? handleSaveAsDraft : undefined}
@@ -2885,7 +2885,7 @@ export default function Summary({ onConfirmNext }) {
       Save as draft
     </span>
   )}
-</div>
+</div> */}
 
 
           <div
