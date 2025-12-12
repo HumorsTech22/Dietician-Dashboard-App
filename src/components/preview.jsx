@@ -10,22 +10,34 @@ import DietPlanCreated from './diet-plan-created';
 import { useSelector } from "react-redux";
 import { toast } from 'sonner';
 import DeletePopUp from './modal/delete-popup';
+import { cookieManager } from "../lib/cookies";
+import { fetchClientProfileData } from "../services/authService";
+import { useSearchParams } from "next/navigation";
+
 
 export default function Preview() {
+
   const pathname = (usePathname() || '').toLowerCase();
 
   const fileInputRef = useRef(null);
+  const searchParams = useSearchParams();
 
   const isDietPlan = pathname.includes('/dietplan') || pathname.endsWith('/diet-plan');
   const hideActions = pathname.includes('/testlog-info');
   const hideTestLogOnPlanSummary = pathname.includes('/plan-summary') || pathname.endsWith('/plansummary');
 
   const [pdfData, setPdfData] = useState({ fileName: '', blobUrl: '' });
-const [hasUploadedPdf, setHasUploadedPdf] = useState(false);
+  const [hasUploadedPdf, setHasUploadedPdf] = useState(false);
   const [activePanel, setActivePanel] = useState('summary');
 
   const isExtracting = useSelector((state) => state.extraction.isExtracting);
   const [deletePopUp, setDeletePopUp] = useState(false);
+  const [clientProfile, setClientProfile] = useState(null);
+  const [clientProfileLoading, setClientProfileLoading] = useState(false);
+
+    const [dietPlanId, setDietPlanId] = useState(null);
+    console.log("dietPlanId39:-", dietPlanId);
+  
 
   // NEW CODE ADDED:
   // useEffect(() => {
@@ -49,7 +61,47 @@ const [hasUploadedPdf, setHasUploadedPdf] = useState(false);
   // }, []);
 
 
+  useEffect(() => {
+  const loadClientProfile = async () => {
+    try {
+      const dietician = cookieManager.getJSON("dietician"); // ✅
+      const dieticianId = dietician?.dietician_id || dietician?.dietitian_id || dietician?.login_id;
+
+      const profileId = searchParams.get("profile_id"); // ✅ app router safe
+
+      if (!dieticianId || !profileId) return;
+
+      setClientProfileLoading(true);
+      const res = await fetchClientProfileData(dieticianId, profileId);
+
+      setClientProfile(res?.data ?? res); // ✅ depends on your API response shape
+    } catch (err) {
+      console.error("fetchClientProfileData error:", err);
+      toast.error("Failed to load client profile");
+    } finally {
+      setClientProfileLoading(false);
+    }
+  };
+
+  loadClientProfile();
+}, [searchParams]);
+
+
+
 useEffect(() => {
+    const id =
+      clientProfile?.plans_summary?.active?.[0]?.id ??
+      clientProfile?.plans_summary?.not_started?.[0]?.id ??
+      clientProfile?.plans_summary?.completed?.[0]?.id ??
+      null;
+
+    setDietPlanId(id);
+  }, [clientProfile]);
+
+
+
+
+  useEffect(() => {
     try {
       const storedFileData = localStorage.getItem('uploadedPdfFile');
       setHasUploadedPdf(!!storedFileData); // check exists
@@ -163,38 +215,38 @@ useEffect(() => {
         <div className='flex justify-between'>
           <p className='text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]'>Preview</p>
 
-           {hasUploadedPdf && (
-          <div className='flex gap-[25px] items-center pb-2.5'>
-            <span className='text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>
-              {pdfData?.fileName || 'please_upload.pdf'}
-            </span>
+          {hasUploadedPdf && (
+            <div className='flex gap-[25px] items-center pb-2.5'>
+              <span className='text-[#308BF9] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>
+                {pdfData?.fileName || 'please_upload.pdf'}
+              </span>
 
-            {/* Hidden file input for re-upload */}
-            <input
-              type="file"
-              accept=".pdf,application/pdf"
-              onChange={handleReupload}
-              ref={fileInputRef}
-              className="hidden"
-            />
+              {/* Hidden file input for re-upload */}
+              <input
+                type="file"
+                accept=".pdf,application/pdf"
+                onChange={handleReupload}
+                ref={fileInputRef}
+                className="hidden"
+              />
 
-            {/* Re-upload button - Only show when activePanel is 'summary' */}
-            {activePanel === 'summary' && (
-              <div
-                className='flex gap-1.5 px-5 py-[15px] border border-[#D9D9D9] rounded-[10px] cursor-pointer hover:bg-gray-50 transition-colors'
-                onClick={handleReuploadClick}
-              >
-                <Image
-                  src="/icons/hugeicons_rotate-01.svg"
-                  alt='hugeicons_rotate-01'
-                  width={20}
-                  height={20}
-                />
-                <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Re-upload</span>
-              </div>
-            )}
-          </div>
-           )}
+              {/* Re-upload button - Only show when activePanel is 'summary' */}
+              {activePanel === 'summary' && (
+                <div
+                  className='flex gap-1.5 px-5 py-[15px] border border-[#D9D9D9] rounded-[10px] cursor-pointer hover:bg-gray-50 transition-colors'
+                  onClick={handleReuploadClick}
+                >
+                  <Image
+                    src="/icons/hugeicons_rotate-01.svg"
+                    alt='hugeicons_rotate-01'
+                    width={20}
+                    height={20}
+                  />
+                  <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>Re-upload</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="w-full border-b border-[#E1E6ED]"></div>
@@ -353,6 +405,7 @@ useEffect(() => {
       <DeletePopUp
         open={deletePopUp}
         onClose={handleDeletePlan}
+        dietPlanId={dietPlanId}
       />
     </>
   )

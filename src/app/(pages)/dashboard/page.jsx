@@ -60,7 +60,9 @@ const Dashboard = () => {
 
  <ProtectedRoute>
       <UserProfile /> 
- {/* <Notification/>  */}
+      {/* <div className='pb-[42px]'>
+ <Notification/> 
+ </div> */}
 
       <div className='flex gap-5'>
         {/* <DashboardSidebar/> */}

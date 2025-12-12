@@ -1686,7 +1686,6 @@ export default function Summary({ onConfirmNext }) {
     const fetchProfile = async () => {
       try {
         const res = await fetchClientProfileData(dieticianId, profileIdLocal);
-
         if (!res?.success) {
           console.warn("fetchClientProfileData failed:", res);
           return;

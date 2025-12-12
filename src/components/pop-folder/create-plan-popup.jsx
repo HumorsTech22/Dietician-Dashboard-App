@@ -945,7 +945,7 @@ export default function CreatePlanPopUp({ open, onClose }) {
             <button
               onClick={handleNext}
               disabled={!selectedPlan}
-              className={`w-[146px] px-4 py-2 rounded-[10px] text-white text-[12px]
+              className={`w-[146px] px-4 py-2 rounded-[10px] text-white text-[12px] cursor-pointer
                 ${
                   selectedPlan
                     ? "bg-[#308BF9]"
@@ -975,7 +975,7 @@ export default function CreatePlanPopUp({ open, onClose }) {
 
           {/* UPLOAD BOX */}
           <div
-            className={`w-full border-2 border-dashed rounded-[10px] p-8 text-center
+            className={`w-full border-2 border-dashed rounded-[10px] p-8 text-center cursor-pointer
               ${
                 fileSizeError
                   ? "border-[#DA5747] bg-[#FFF5F5]"
@@ -1022,7 +1022,7 @@ export default function CreatePlanPopUp({ open, onClose }) {
           <button
             onClick={handleUploadAndRoute}
             disabled={!uploadedFile || fileSizeError}
-            className={`w-[146px] px-4 py-2 rounded-[10px] text-white text-[12px]
+            className={`w-[146px] px-4 py-2 rounded-[10px] text-white text-[12px] cursor-pointer
               ${
                 !uploadedFile || fileSizeError
                   ? "bg-gray-400 cursor-not-allowed"

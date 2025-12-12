@@ -243,7 +243,8 @@ export default function HistoryPlan() {
               <div className="flex gap-5 justify-between items-center">
                 {/* Plan Duration */}
                 <span className="text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]">
-                  {getPlanDuration()}
+                  {/* {getPlanDuration()} */}
+                  {currentPlan?.plan_title || "-"}
                 </span>
                 {/* Date Range */}
                 <span className="items-end text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24]">

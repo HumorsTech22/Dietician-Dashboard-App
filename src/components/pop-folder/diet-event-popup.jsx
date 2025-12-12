@@ -63,73 +63,55 @@ const DietEventPopUp = forwardRef(function Popup({ open, onClose, selectedMeal, 
   const [hasUserTouched, setHasUserTouched] = useState(false);
 
    const scrollContainerRef = useRef(null);   
+   const originalFoodItemsRef = useRef(null);
+
   const [shouldScrollToEnd, setShouldScrollToEnd] = useState(false); 
 
 
 
   // When selectedMeal changes, rebuild foodItems from selectedMeal.meals
-  useEffect(() => {
-    if (!selectedMeal) {
-      setFoodItems([emptyFoodItem]);
-      setEventTitle("Event1");
-      setPlanName("");
-      return;
-    }
+useEffect(() => {
+  if (!selectedMeal) return;
 
-    const mealsArray = selectedMeal.meals || [];
-    if (!mealsArray.length) {
-      setFoodItems([emptyFoodItem]);
-      setEventTitle(selectedMeal.time || "Event1");
-      setPlanName(selectedMeal.time ? `${selectedMeal.time} Plan` : "");
-      return;
-    }
+  const mealsArray = selectedMeal.meals || [];
+  const items = [];
 
-    const items = [];
+  mealsArray.forEach((meal) => {
+    (meal.foodItems || []).forEach((foodItem) => {
+      const { quantityValue, quantityUnit } = parseQuantityDetail(foodItem.details?.[0]);
+      const { value: caloriesValue, unit: caloriesUnit } = parseValueUnit(foodItem.details?.[1]);
+      const { value: proteinValue } = parseValueUnit(foodItem.details?.[2]?.split(":")[1] || "");
+      const { value: carbsValue } = parseValueUnit(foodItem.details?.[3]?.split(":")[1] || "");
+      const { value: fatValue } = parseValueUnit(foodItem.details?.[4]?.split(":")[1] || "");
 
-    mealsArray.forEach((meal) => {
-      (meal.foodItems || []).forEach((foodItem) => {
-        const { quantityValue, quantityUnit } = parseQuantityDetail(
-          foodItem.details?.[0]
-        );
-
-        const { value: caloriesValue, unit: caloriesUnit } = parseValueUnit(
-          foodItem.details?.[1]
-        );
-
-        const proteinStr =
-          foodItem.details?.[2]?.split(":")[1]?.trim() || ""; // "20g"
-        const { value: proteinValue, unit: proteinUnit } =
-          parseValueUnit(proteinStr);
-
-        const carbsStr =
-          foodItem.details?.[3]?.split(":")[1]?.trim() || ""; // "50g"
-        const { value: carbsValue, unit: carbsUnit } =
-          parseValueUnit(carbsStr);
-
-        const fatStr =
-          foodItem.details?.[4]?.split(":")[1]?.trim() || ""; // "15g"
-        const { value: fatValue, unit: fatUnit } = parseValueUnit(fatStr);
-
-        items.push({
-          name: foodItem.name || "",
-          quantityValue,
-          quantityUnit,
-          caloriesValue,
-          caloriesUnit,
-          proteinValue,
-          proteinUnit,
-          carbsValue,
-          carbsUnit,
-          fatValue,
-          fatUnit,
-        });
+      items.push({
+        name: foodItem.name || "",
+        quantityValue,
+        quantityUnit,
+        caloriesValue,
+        caloriesUnit,
+        proteinValue,
+        proteinUnit: "g",
+        carbsValue,
+        carbsUnit: "g",
+        fatValue,
+        fatUnit: "g",
       });
     });
+  });
 
-    setFoodItems(items.length ? items : [emptyFoodItem]);
-    setEventTitle(selectedMeal.time || "Event1");
-    setPlanName(selectedMeal.time ? `${selectedMeal.time} Plan` : "");
-  }, [selectedMeal]);
+  const finalItems = items.length ? items : [emptyFoodItem];
+
+  setFoodItems(finalItems);
+
+  // ✅ STORE ORIGINAL SNAPSHOT (ONLY ON OPEN)
+originalFoodItemsRef.current = JSON.stringify(
+  normalizeItemsForCompare(finalItems)
+);
+
+  setHasUserTouched(false);
+}, [selectedMeal]);
+
 
 const handleAddItem = () => {
   setFoodItems((prev) => [...prev, { ...emptyFoodItem }]);
@@ -359,11 +341,17 @@ const handleRemoveItem = (indexToRemove) => {
 
 useEffect(() => {
   if (!onEditing) return;
-  if (!hasUserTouched) return; // don’t mark as edited just for initial load
+  if (!originalFoodItemsRef.current) return;
 
-  const hasContent = hasAnyFilledValue(foodItems);
-  onEditing(true);   // 🔔 tell parent: true/false
-}, [foodItems, hasUserTouched, onEditing]);
+  const original = originalFoodItemsRef.current;
+  const current = JSON.stringify(normalizeItemsForCompare(foodItems));
+
+  const isChanged = current !== original;
+
+  onEditing(isChanged);
+}, [foodItems, onEditing]);
+
+
 
 useEffect(() => {
   if (shouldScrollToEnd && scrollContainerRef.current) {
@@ -374,6 +362,38 @@ useEffect(() => {
     setShouldScrollToEnd(false);
   }
 }, [foodItems.length, shouldScrollToEnd]);
+
+
+
+
+const normalizeItemsForCompare = (items) => {
+  const cleaned = (items || [])
+    .map((it) => ({
+      name: (it.name || "").trim(),
+      quantityValue: (it.quantityValue || "").trim(),
+      quantityUnit: (it.quantityUnit || "").trim(),
+      caloriesValue: (it.caloriesValue || "").trim(),
+      proteinValue: (it.proteinValue || "").trim(),
+      carbsValue: (it.carbsValue || "").trim(),
+      fatValue: (it.fatValue || "").trim(),
+      // units are constant/readOnly in your UI, no need in compare
+    }))
+    // IMPORTANT: remove fully empty rows (same rule as your save filter intent)
+    .filter((it) => {
+      const hasName = it.name.length > 0;
+      const hasQty = it.quantityValue.length > 0;
+      const hasMacros =
+        it.caloriesValue.length > 0 ||
+        it.proteinValue.length > 0 ||
+        it.carbsValue.length > 0 ||
+        it.fatValue.length > 0;
+
+      return hasName || hasQty || hasMacros;
+    });
+
+  return cleaned;
+};
+
 
 
 
@@ -988,7 +1008,7 @@ useEffect(() => {
             </div>
           </div>
 
-          <button className="bg-white text-black px-3 py-1 rounded-md cursor-pointer"
+          <button className="bg-white text-[#252525] px-3 py-1 rounded-md cursor-pointer"
             onClick={onClose}
           >x</button>
         </div>

@@ -236,3 +236,20 @@ export const fetchDietPlanJsonService = async (login_id, profile_id, diet_plan_i
     }),
   });
 };
+
+
+
+
+export const deleteDietPlanService = async (dietPlanId, clientId, dietitianId) => {
+  return apiFetcher(API_ENDPOINTS.PLAN.DELETEDIETPLAN, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      diet_plan_id: String(dietPlanId),
+      client_id: String(clientId),
+      dietitian_id: String(dietitianId),
+    }),
+  });
+};

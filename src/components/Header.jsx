@@ -182,10 +182,10 @@ export default function Header() {
         </div>
       </div>
 
-      {/* <NotificationModal
+     {/* <NotificationModal
     open={isModalOpen}
     onClose={closeModal}
-          /> */}
+          />   */}
     </>
   );
 }
