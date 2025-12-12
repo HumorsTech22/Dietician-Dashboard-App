@@ -16,7 +16,7 @@ function pad2(n) {
 const TEST_START_HOUR = 6;  // 6 AM – timer visible from here
 const TEST_END_HOUR = 11;   // 11 AM – deadline
 
-export default function ClientReminder({ selectedDate }) {
+export default function ClientReminder({ selectedDate, isInsightLoading = false }) {
   const [now, setNow] = useState(new Date());
 
   // ⏱ Update current time every second
@@ -80,6 +80,13 @@ export default function ClientReminder({ selectedDate }) {
 
   return (
     <div className="bg-[#F5F7FA] pt-[29px] px-[229px] pb-[41px] rounded-[15px]">
+
+{isInsightLoading && (
+        <div className="w-full py-6 text-center">
+          <p className="text-[#535359] text-[16px]">Loading test data...</p>
+        </div>
+      )}
+
       {/* 👉 MISSED STATE (past date OR today after 11 AM) */}
       {showMissed && (
         <div className="flex flex-col gap-5 items-center pt-[56px] px-[64px] pb-[31px]">
