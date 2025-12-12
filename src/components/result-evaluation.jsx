@@ -1031,17 +1031,17 @@
 //       </div>
 
 //       {/* Additional evaluation components */}
-     
+
 //       <div className="flex flex-col gap-[50px]">
- 
+
 //       <Trends selectedDate={selectedDate} />
 //       {/* <WeightTracker/>  */}
 //       <FoodEvaluation />
-      
-   
+
+
 //     {/* <ClientReminder /> */}
 //     <MealLogged />
-  
+
 // </div>
 //     </div>
 //   );
@@ -1221,52 +1221,52 @@ export const ResultEvaluation = () => {
   console.log("scoresInsightResponse1216:-", scoresInsightResponse);
 
   const [isInsightLoading, setIsInsightLoading] = useState(false); // ⬅️ NEW
-console.log("scoresInsightResponse1216:-", scoresInsightResponse);
+  console.log("scoresInsightResponse1216:-", scoresInsightResponse);
 
   const isNoInsightData =
-  scoresInsightResponse && scoresInsightResponse.noData === true;
+    scoresInsightResponse && scoresInsightResponse.noData === true;
 
 
-useEffect(() => {
-  // 🔹 Get dietician_id from cookie "dietician"
-  const dieticianCookie = Cookies.get("dietician");
-  let dieticianId = null;
+  useEffect(() => {
+    // 🔹 Get dietician_id from cookie "dietician"
+    const dieticianCookie = Cookies.get("dietician");
+    let dieticianId = null;
 
-  if (dieticianCookie) {
-    try {
-      const parsed = JSON.parse(dieticianCookie);
-      dieticianId = parsed.dietician_id; // e.g. "RespyrD01"
-    } catch (e) {
-      console.error("Invalid dietician cookie:", e);
+    if (dieticianCookie) {
+      try {
+        const parsed = JSON.parse(dieticianCookie);
+        dieticianId = parsed.dietician_id; // e.g. "RespyrD01"
+      } catch (e) {
+        console.error("Invalid dietician cookie:", e);
+      }
     }
-  }
 
-  const profileId = profileIdFromUrl;
+    const profileId = profileIdFromUrl;
 
-  // If anything missing, don't call API
-  if (!dieticianId || !profileId || !selectedDate) {
-    setScoresInsightResponse(null);
-    setIsInsightLoading(false);
-    return;
-  }
-
-  const apiDate = formatDateForApi(selectedDate);
-
-  setIsInsightLoading(true); // ⬅️ start loading
-
-  fetchScoresInsight(dieticianId, profileId, apiDate)
-    .then((res) => {
-      setScoresInsightResponse(res);
-      console.log("fetchScoresInsight response:", res);
-    })
-    .catch((err) => {
-      console.error("Error in fetchScoresInsight:", err);
+    // If anything missing, don't call API
+    if (!dieticianId || !profileId || !selectedDate) {
       setScoresInsightResponse(null);
-    })
-    .finally(() => {
-      setIsInsightLoading(false); // ⬅️ stop loading
-    });
-}, [profileIdFromUrl, selectedDate]);
+      setIsInsightLoading(false);
+      return;
+    }
+
+    const apiDate = formatDateForApi(selectedDate);
+
+    setIsInsightLoading(true); // ⬅️ start loading
+
+    fetchScoresInsight(dieticianId, profileId, apiDate)
+      .then((res) => {
+        setScoresInsightResponse(res);
+        console.log("fetchScoresInsight response:", res);
+      })
+      .catch((err) => {
+        console.error("Error in fetchScoresInsight:", err);
+        setScoresInsightResponse(null);
+      })
+      .finally(() => {
+        setIsInsightLoading(false); // ⬅️ stop loading
+      });
+  }, [profileIdFromUrl, selectedDate]);
 
 
 
@@ -1512,37 +1512,37 @@ useEffect(() => {
 
           <div className="my-[20px] border border-[#E1E6ED]"></div>
           {/* Test evaluation component */}
-{isInsightLoading && (
-  <div className="w-full py-6 text-center">
-    <p className="text-[#535359] text-[16px]">Loading test data...</p>
-  </div>
-)}
+          {/* {isInsightLoading && (
+            <div className="w-full py-6 text-center">
+              <p className="text-[#535359] text-[16px]">Loading test data...</p>
+            </div>
+          )} */}
 
-{/* 🔹 When not loading, either show ClientReminder (noData) or TestEvaluation */}
-{!isInsightLoading && (
-  isNoInsightData ? (
-  <ClientReminder selectedDate={selectedDate} />
-) : (
-  <TestEvaluation />
-)
+          {/* 🔹 When not loading, either show ClientReminder (noData) or TestEvaluation */}
+          {!isInsightLoading && (
+            isNoInsightData ? (
+              <ClientReminder selectedDate={selectedDate} isInsightLoading={isInsightLoading}/>
+            ) : (
+              <TestEvaluation />
+            )
 
-)}
+          )}
         </div>
 
         {/* Additional evaluation components for historical data */}
 
-      <div className="flex flex-col gap-[50px]">
-  {/* 🔹 Show Trends + FoodEvaluation only when we have data and not loading */}
-  {!isInsightLoading && !isNoInsightData && (
-    <>
-      <Trends selectedDate={selectedDate} />
-      <FoodEvaluation />
-    </>
-  )}
+        <div className="flex flex-col gap-[50px]">
+          {/* 🔹 Show Trends + FoodEvaluation only when we have data and not loading */}
+          {!isInsightLoading && !isNoInsightData && (
+            <>
+              <Trends selectedDate={selectedDate} />
+              <FoodEvaluation />
+            </>
+          )}
 
-  {/* MealLogged can always be visible */}
-  <MealLogged />
-</div>
+          {/* MealLogged can always be visible */}
+          <MealLogged />
+        </div>
 
 
       </div>
@@ -1660,45 +1660,45 @@ useEffect(() => {
         <div className="my-[20px] border border-[#E1E6ED]"></div>
 
         {/* If insight present → show TestEvaluation, else show ClientReminder */}
-     {isInsightLoading && (
-  <div className="w-full py-6 text-center">
-    <p className="text-[#535359] text-[16px]">Loading test data...</p>
-  </div>
-)}
+        {isInsightLoading && (
+          <div className="w-full py-6 text-center">
+            <p className="text-[#535359] text-[16px]">Loading test data...</p>
+          </div>
+        )}
 
-{/* 🔹 When not loading, either show ClientReminder (noData) or TestEvaluation */}
-{!isInsightLoading && (
-isNoInsightData ? (
-  <ClientReminder selectedDate={selectedDate} />
-) : (
-  <TestEvaluation />
-)
+        {/* 🔹 When not loading, either show ClientReminder (noData) or TestEvaluation */}
+        {!isInsightLoading && (
+          isNoInsightData ? (
+            <ClientReminder selectedDate={selectedDate} isInsightLoading={isInsightLoading}/>
+          ) : (
+            <TestEvaluation />
+          )
 
-)}
+        )}
       </div>
 
       {/* Additional evaluation components */}
 
-     
+
 
       <div className="flex flex-col gap-[50px]">
-  {/* Show Trends + FoodEvaluation only when we have data */}
- 
+        {/* Show Trends + FoodEvaluation only when we have data */}
 
 
-  <div className="flex flex-col gap-[50px]">
-  {!isInsightLoading && !isNoInsightData && (
-    <>
-      <Trends selectedDate={selectedDate} />
-      {/* <WeightTracker/>  */}
-      <FoodEvaluation />
-    </>
-  )}
-  <MealLogged />
-</div>
+
+        <div className="flex flex-col gap-[50px]">
+          {!isInsightLoading && !isNoInsightData && (
+            <>
+              <Trends selectedDate={selectedDate} />
+              {/* <WeightTracker/>  */}
+              <FoodEvaluation />
+            </>
+          )}
+          <MealLogged />
+        </div>
 
 
-</div>
+      </div>
 
     </div>
   );
