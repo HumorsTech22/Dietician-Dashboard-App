@@ -1524,6 +1524,9 @@ export default function Summary({ onConfirmNext }) {
   // to keep all plans from API (active + completed + not_started)
   const [allPlans, setAllPlans] = useState([]);
 
+
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+
   // ---------- Helpers for date format ----------
   const ymdToDmy = (v) => {
     if (!v) return "";
@@ -1683,7 +1686,6 @@ export default function Summary({ onConfirmNext }) {
     const fetchProfile = async () => {
       try {
         const res = await fetchClientProfileData(dieticianId, profileIdLocal);
-
         if (!res?.success) {
           console.warn("fetchClientProfileData failed:", res);
           return;
@@ -2063,13 +2065,26 @@ export default function Summary({ onConfirmNext }) {
     }
   };
 
-  const handleSaveAsDraft = () => saveToLocalStorage(true);
+  // const handleSaveAsDraft = () => saveToLocalStorage(true);
+  const handleSaveAsDraft = () => {
+  setIsSavingDraft(true);
+
+  setTimeout(() => {
+    saveToLocalStorage(true);
+    setIsSavingDraft(false);
+    toast.success("Draft saved"); 
+  }, 600); 
+};
+
+
   const handleConfirmNext = () => saveToLocalStorage(false);
 
   const onChangeAndClear = (setter, key) => (e) => {
     setter(e.target.value);
     setErrors((prev) => ({ ...prev, [key]: "" }));
   };
+
+  
 
   return (
     <div className="w-full">
@@ -2082,7 +2097,11 @@ export default function Summary({ onConfirmNext }) {
 
         <div className="w-full border-b border-[#E1E6ED]"></div>
 
-        <div className="mt-[15px]">
+        
+      </div>
+
+
+      <div className="mt-[15px]">
           <div className="flex gap-5 items-end">
             <div className="relative flex-1">
               <input
@@ -2635,7 +2654,7 @@ export default function Summary({ onConfirmNext }) {
                           gErr.current || gErr.currentUnit
                             ? "border border-[#DA5747]"
                             : "border border-[#E1E6ED]"
-                        }`}
+                        } focus:border-blue-600`}
                       >
                         <input
                           type="number"
@@ -2702,7 +2721,7 @@ export default function Summary({ onConfirmNext }) {
                           gErr.target || gErr.targetUnit
                             ? "border border-[#DA5747]"
                             : "border border-[#E1E6ED]"
-                        }`}
+                        } focus:border-blue-600`}
                       >
                         <input
                           type="number"
@@ -2768,7 +2787,6 @@ export default function Summary({ onConfirmNext }) {
             );
           })}
         </div>
-      </div>
 
       <div className="px-5 py-[15px]">
         <span
@@ -2833,18 +2851,42 @@ export default function Summary({ onConfirmNext }) {
         </div>
       </div>
 
+    
+
       <div className="w-full border-b border-[#E1E6ED] mt-[30px]"></div>
 
       <div className="py-[23px]">
         <div className="flex gap-5 justify-end">
-          <div
+          {/* <div
             className="px-5 py-[15px] bg-white border border-[#D9D9D9] rounded-[10px] cursor-pointer"
             onClick={handleSaveAsDraft}
           >
             <span className="text-[#308BF9] text-[12px] font-semibold">
               Save as draft
             </span>
-          </div>
+          </div> */}
+
+{/* <div
+  className={`px-5 py-[15px] border rounded-[10px] cursor-pointer flex items-center justify-center
+    ${isSavingDraft ? "bg-gray-100 border-gray-300 opacity-60 cursor-not-allowed" : "bg-white border-[#D9D9D9]"}`}
+  onClick={!isSavingDraft ? handleSaveAsDraft : undefined}
+>
+  {isSavingDraft ? (
+    <span className="text-[#308BF9] text-[12px] font-semibold flex items-center gap-2">
+      <svg className="animate-spin h-4 w-4 text-[#308BF9]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+      Saving…
+    </span>
+  ) : (
+    <span className="text-[#308BF9] text-[12px] font-semibold">
+      Save as draft
+    </span>
+  )}
+</div> */}
+
+
           <div
             className="px-5 py-[15px] bg-[#308BF9] rounded-[10px] cursor-pointer"
             onClick={handleConfirmNext}

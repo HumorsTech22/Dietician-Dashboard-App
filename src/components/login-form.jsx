@@ -170,20 +170,20 @@ export function LoginForm({
       });
       router.push("/dashboard");
 
-    }  catch (error) {
-  let errorMessage = "Invalid credentials";
+    } catch (error) {
+      let errorMessage = "Invalid credentials";
 
-  if (error.isApiError) {
-    errorMessage = error.message || error.data?.error || "Invalid credentials";
-  }
+      if (error.isApiError) {
+        errorMessage = error.message || error.data?.error || "Invalid credentials";
+      }
 
-  // set input error for fields
-  setInputError(errorMessage);
+      // set input error for fields
+      setInputError(errorMessage);
 
-  toast.error(errorMessage);
-} finally {
-  setLoading(false);
-}
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
 
   };
 
@@ -207,9 +207,9 @@ export function LoginForm({
               value={email}
               autoComplete="false"
               onChange={(e) => {
-      setEmail(e.target.value);
-      setInputError("");
-    }}
+                setEmail(e.target.value);
+                setInputError("");
+              }}
               required
               className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-1 
     focus:ring-[#E1E6ED] peer 
@@ -234,10 +234,10 @@ export function LoginForm({
               placeholder=" "
               value={password}
               autoComplete="false"
-             onChange={(e) => {
-      setPassword(e.target.value);
-      setInputError("");
-    }}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setInputError("");
+              }}
               required
               className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-1 
     focus:ring-[#E1E6ED] peer pr-10
@@ -255,7 +255,7 @@ export function LoginForm({
             </label>
 
             {/* Password visibility toggle */}
-            <div 
+            <div
               className="absolute right-3 top-4 cursor-pointer"
               onClick={togglePasswordVisibility}
             >
@@ -275,18 +275,34 @@ export function LoginForm({
               Forgot password?
             </Link>
 
-             {inputError && (
-    <p className="text-[#DA5747] text-[12px] mt-1 absolute -bottom-6">
-      {inputError}
-    </p>
-  )}
+            {inputError && (
+              <p className="text-[#DA5747] text-[12px] mt-1 absolute -bottom-6">
+                {inputError}
+              </p>
+            )}
           </div>
 
-          <p className="text-[#A1A1A1] text-[12px] font-normal leading-[110%] tracking-[-0.24px] whitespace-nowrap">By continuing, you agree to our
-            <span className="underline cursor-pointer"> Terms </span>
-            and
-            <span className="underline cursor-pointer"> Privacy Policy</span> .
-          </p>
+        <p className="text-[#A1A1A1] text-[12px] font-normal leading-[110%] tracking-[-0.24px] whitespace-nowrap">
+  By continuing, you agree to our{" "}
+  <a
+    href="https://respyr.in/terms-conditions/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="underline"
+  >
+    Terms
+  </a>{" "}
+  and{" "}
+  <a
+    href="https://respyr.in/privacy_policy/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="underline"
+  >
+    Privacy Policy
+  </a>.
+</p>
+
 
           <button
             type="submit"

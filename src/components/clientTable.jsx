@@ -233,6 +233,8 @@ export default function ClientTable({
     return sortedClients.filter(c => c.name.toLowerCase().includes(q));
   }, [search, sortedClients]);
 
+  console.log("filteredClients236:-", filteredClients);
+
 
   return (
     <>
@@ -336,9 +338,13 @@ export default function ClientTable({
                         <span className={`text-[12px] font-semibold leading-[126%] tracking-[-0.24px] ${
                           client.planStatus === 'Active' ? 'text-[#3FAF58]' : 'text-[#A1A1A1]'
                         }`}>
-                          {client.planStatus}
+                         {client.planStatus}
+                         
                         </span>
-                        <span className="text-[#535359] text-[10px] font-normal leading-normal tracking-[-0.2px]">{client.planType}</span>
+                        <span className="text-[#535359] text-[10px] font-normal leading-normal tracking-[-0.2px]">
+                          {/* {client.planType} */}
+                       {getMostRelevantPlan(client.originalData)?.plan_title || "No Plan"} 
+                          </span>
                         <div className="flex gap-[5px]">
                           <p className="text-[#308BF9] cursor-pointer font-semibold text-[10px] leading-[110%] tracking-[-0.2px]">
                             View Plan
