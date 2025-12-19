@@ -472,7 +472,7 @@ export default function TestMonitor() {
 
   return (
     <>
-      <div className="border border-[#E1E6ED] rounded-[10px] px-[15px] pt-[30px]">
+      <div className="border border-[#E1E6ED] rounded-[10px] px-[15px] pt-[30px] pb-2">
         <div className="flex justify-between pb-[23px] border-b border-[#E1E6ED]">
           <span className="text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]">
             Test Analytics
@@ -555,13 +555,13 @@ export default function TestMonitor() {
           <DashboardGraph testAnalyticsData={filteredGraphData} />
         </div>
 
-        <div className="flex flex-col gap-[26px]">
+        {/* <div className="flex flex-col gap-[26px]">
           <span className="mt-10 ml-3.5 text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">
             Tests Results
           </span>
           <ClientRisk hideDietGoal={true} />
          
-        </div>
+        </div> */}
       </div>
     </>
   );

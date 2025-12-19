@@ -16,8 +16,16 @@ export const UserProfile = ({
   onSortChange = () => { },
 }) => {
   const pathname = usePathname();
-  const isClientPage =
-    pathname?.startsWith("/client") || pathname?.startsWith("/clients");
+  // const isClientPage =
+  //   pathname?.startsWith("/client") || pathname?.startsWith("/clients");
+
+const isClientPage =
+  pathname?.startsWith("/client") ||
+  pathname?.startsWith("/clients") ||
+  pathname?.startsWith("/partners/client") ||
+  pathname?.startsWith("/partners/clients");
+
+
   const isMessagesPage = pathname?.startsWith("/messages");
 
   const [dieticianName, setDieticianName] = useState('Dietician');
@@ -26,6 +34,9 @@ export const UserProfile = ({
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState('Recently Added');
   const [pendingRequest, setPendingRequest] = useState(false);
+
+  const [dieticianId, setDieticianId] = useState(null);
+
 
   const options = [
     'Recently Added',
@@ -39,6 +50,23 @@ export const UserProfile = ({
     setIsOpen(false);
     onSortChange(option);
   };
+
+
+  useEffect(() => {
+  const dieticianData = cookieManager.getJSON('dietician');
+
+  setDieticianName(dieticianData?.name || 'Dietician');
+  setDieticianId(dieticianData?.dietician_id || null); // ✅ ADD THIS
+
+  const date = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long'
+  });
+  setCurrentDate(date);
+}, []);
+
+
 
   useEffect(() => {
 

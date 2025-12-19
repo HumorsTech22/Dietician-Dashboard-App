@@ -727,7 +727,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                     {/* Navigation Breadcrumb */}
                     <div className='w-[333px] flex gap-2.5 pl-[15px]  py-[14px] bg-white rounded-[15px]'>
                         <div className='flex gap-[15px] items-center'>
-                            {/* Back Button */}
+                           
                             <Image
                                 src="/icons/Frame 383.svg"
                                 alt='Frame 383'
@@ -742,6 +742,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     onClick={() => window.history.back()}
                                 >
                                     {clientData?.profile_name || 'N/A'}
+                                    
                                 </span>
                             ) : (
                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px] cursor-pointer'
@@ -750,7 +751,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                             )}
                         </div>
 
-                        <div className='flex gap-[5px] items-center'>
+                       <div className='flex gap-[5px] items-center'>
                             <IoChevronBackSharp className='w-[15px] h-[15px] cursor-pointer' />
                             {isPlanHistoryPage ? (
                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>
@@ -761,7 +762,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     {clientData?.profile_name || "-"}
                                 </span>
                             )}
-                        </div>
+                        </div> 
                     </div>
 
                     {/* Plan Selection Section - Commented out but kept for future use */}
@@ -862,140 +863,162 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     </div>
                                 </div>
 
+
+                                <div className='px-2.5 pt-5 pb-0.5'>
+<div className='flex flex-col gap-5 pl-5 pr-[42px] pb-5 border-b border-[#E1E6ED]'>
+    <p className='text-[#252525] text-[12px] font-semibold leading-[130%] tracking-[-0.24px]'>BMI</p>
+    <div className='flex flex-col gap-2.5'>
+        <p className='text-[#252525] text-[20px] font-semibold leading-[110%] traking-[-0.4px]'>19 kg/m2</p>
+        <p className='text-[#3FAF58] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>Underweight</p>
+    </div>
+</div>
+
+<div className='flex flex-col gap-5 pl-5 pr-[42px] pt-5'>
+<p className='text-[#252525] text-[12px] font-semibold leading-[130%] tracking-[-0.24px]'>RECOMMENDED SCORE RANGE</p>
+<div className='flex flex-col gap-2.5'>
+    <p className='text-[#252525] text-[20px] font-semibold leading-[110%] tracking-[-0.4px]'> {">71%"}</p>
+    <p className='text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px]'>This score range is based on the <br></br>client’s BMI.</p>
+</div>
+</div>
+                                </div>
+
                                 {/* Plan Details Section */}
                                 {/* Show "No Plan" button only when there are truly no plans */}
                                 {planStatus === 'no_plan' ? (
-                                    <div className='flex mx-2.5 bg-[#F5F7FA] rounded-[15px] whitespace-nowrap py-[13px] pl-[30px] pr-[15px] gap-[80px] items-center'>
-                                        <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">No plan</span>
-                                        <button
-                                            className='flex gap-[15px] px-[18px] py-[9px] bg-[#308BF9] rounded-[5px]'
-                                            onClick={handleCreatePlanClick}
-                                        >
-                                            <GoPlus className='text-white w-[15px] h-[15px] cursor-pointer' />
-                                            <span className='text-white text-[12px] font-semibold leading-[110%] tracking-[-0.24px] cursor-pointer'>Create Plan</span>
-                                        </button>
-                                    </div>
+                                    // <div className='flex mx-2.5 bg-[#F5F7FA] rounded-[15px] whitespace-nowrap py-[13px] pl-[30px] pr-[15px] gap-[80px] items-center'>
+                                    //     <span className="text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]">No plan</span>
+                                    //     <button
+                                    //         className='flex gap-[15px] px-[18px] py-[9px] bg-[#308BF9] rounded-[5px] cursor-pointer'
+                                    //         onClick={handleCreatePlanClick}
+                                    //     >
+                                    //         <GoPlus className='text-white w-[15px] h-[15px] ' />
+                                    //         <span className='text-white text-[12px] font-semibold leading-[110%] tracking-[-0.24px] '>Create Plan</span>
+                                    //     </button>
+                                    // </div>
+                                    ""
                                 ) : (
                                     /* Show Plan Details for active, not_started, or completed plans */
-                                    <div className='mx-2.5 pt-5 rounded-[15px] mt-[17px] bg-[#F5F7FA]'>
-                                        {/* Plan Status Header */}
-                                        <div className='flex items-center justify-between ml-[30px] mr-[17px]'>
-                                            <span className={`text-[15px] font-semibold leading-[110%] tracking-[-0.3px] ${planStatus === 'active' ? 'text-[#3FAF58]' :
-                                                    planStatus === 'not_started' ? 'text-[#FFA500]' :
-                                                        'text-[#A1A1A1]'
-                                                }`}>
-                                                {planStatus === 'active' ? 'Active' :
-                                                    planStatus === 'not_started' ? 'Not Started' :
-                                                        'Completed'}
-                                            </span>
-                                            {/* Edit Plan Button - Commented out but kept for future use */}
-                                            <Link
-                                                href={{
-                                                    pathname: '/plansummary',
-                                                    query: {
-                                                        //dietician_id: cookieManager.getJSON('dietician')?.dietician_id || '',
-                                                        profile_id: profileId || ''
-                                                    }
-                                                }}
-                                            >
-                                                <Image
-                                                    src="/icons/hugeicons_pencil-edit-02.svg"
-                                                    alt='hugeicons_pencil'
-                                                    height={24}
-                                                    width={24}
-                                                    className='cursor-pointer'
-                                                />
-                                            </Link>
-                                        </div>
+                                    // <div className='mx-2.5 pt-5 rounded-[15px] mt-[17px] bg-[#F5F7FA]'>
+                                      
+                                    //     <div className='flex items-center justify-between ml-[30px] mr-[17px]'>
+                                    //         <span className={`text-[15px] font-semibold leading-[110%] tracking-[-0.3px] ${planStatus === 'active' ? 'text-[#3FAF58]' :
+                                    //                 planStatus === 'not_started' ? 'text-[#FFA500]' :
+                                    //                     'text-[#A1A1A1]'
+                                    //             }`}>
+                                    //             {planStatus === 'active' ? 'Active' :
+                                    //                 planStatus === 'not_started' ? 'Not Started' :
+                                    //                     'Completed'}
+                                    //         </span>
+                                         
+                                    //         <Link
+                                    //             href={{
+                                    //                 pathname: '/plansummary',
+                                    //                 query: {
+                                    //                     //dietician_id: cookieManager.getJSON('dietician')?.dietician_id || '',
+                                    //                     profile_id: profileId || ''
+                                    //                 }
+                                    //             }}
+                                    //         >
+                                    //             <Image
+                                    //                 src="/icons/hugeicons_pencil-edit-02.svg"
+                                    //                 alt='hugeicons_pencil'
+                                    //                 height={24}
+                                    //                 width={24}
+                                    //                 className='cursor-pointer'
+                                    //             />
+                                    //         </Link>
+                                    //     </div>
 
-                                        {/* Divider */}
-                                        <div className='my-5 mx-[5px] border border-[#E1E6ED]'></div>
+                                      
+                                    //     <div className='my-5 mx-[5px] border border-[#E1E6ED]'></div>
 
-                                        {/* Plan Title and Dates */}
-                                        <div className='flex justify-between mx-6 my-5'>
-                                            <div className='flex flex-col gap-2.5 cursor-pointer'>
-                                                <p className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>{activePlan.plan_title}</p>
-                                                <p className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]'>
-                                                    Updated {new Date(activePlan.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, {new Date(activePlan.updated_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}
-                                                </p>
-                                            </div>
+                                        
+                                    //     <div className='flex justify-between mx-6 my-5'>
+                                    //         <div className='flex flex-col gap-2.5 cursor-pointer'>
+                                    //             <p className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>{activePlan.plan_title}</p>
+                                    //             <p className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]'>
+                                    //                 Updated {new Date(activePlan.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, {new Date(activePlan.updated_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                                    //             </p>
+                                    //         </div>
 
-                                            <div className='flex items-start'>
-                                                <p className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]'>
-                                                    {new Date(activePlan.plan_start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}-{new Date(activePlan.plan_end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                                                </p>
-                                            </div>
-                                        </div>
+                                    //         <div className='flex items-start'>
+                                    //             <p className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]'>
+                                    //                 {new Date(activePlan.plan_start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}-{new Date(activePlan.plan_end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                                    //             </p>
+                                    //         </div>
+                                    //     </div>
 
-                                        {/* Divider */}
-                                        <div className='my-5 mx-[5px] border border-[#E1E6ED]'></div>
+                                      
+                                    //     <div className='my-5 mx-[5px] border border-[#E1E6ED]'></div>
 
-                                        {/* Goals Section Header */}
-                                        <div className='flex items-center gap-[5px] mt-5 mb-[25px] ml-[10px]'>
-                                            <div className='p-0.5'>
-                                                <Image
-                                                    src="/icons/hugeicons_award-01.svg"
-                                                    alt='hugeicons_award'
-                                                    width={15}
-                                                    height={15}
-                                                />
-                                            </div>
-                                            <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>Goal</span>
-                                        </div>
+                                      
+                                    //     <div className='flex items-center gap-[5px] mt-5 mb-[25px] ml-[10px]'>
+                                    //         <div className='p-0.5'>
+                                    //             <Image
+                                    //                 src="/icons/hugeicons_award-01.svg"
+                                    //                 alt='hugeicons_award'
+                                    //                 width={15}
+                                    //                 height={15}
+                                    //             />
+                                    //         </div>
+                                    //         <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>Goal</span>
+                                    //     </div>
 
-                                        {/* Goals List */}
-                                        <div className='flex flex-col gap-5 mx-5'>
-                                            {goals.map((goal, index) => (
-                                                <div key={index}>
-                                                    <span className='text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] capitalize'>{goal.name}</span>
-                                                    <div className='flex gap-5 mt-2'>
-                                                        <div className='flex flex-col items-start gap-2.5'>
-                                                            <span className='text-[#252525] text-[15px] font-semibold leading-[126%] tracking-[-0.3px]'>{goal.current_stat}</span>
-                                                            <span className='text-[#252525] text-center text-[10px] font-normal leading-normal tracking-[-0.2px] whitespace-nowrap'>Current stat</span>
-                                                        </div>
-                                                        {/* Divider between current and target stats */}
-                                                        <div className="mt-[7px] w-[122px] h-px border border-[#A1A1A1]"></div>
-                                                        <div className='flex flex-col items-start gap-2.5'>
-                                                            <span className='text-[#252525] text-[15px] font-semibold leading-[126%] tracking-[-0.3px]'>{goal.target_stat}</span>
-                                                            <span className='text-[#252525] text-center text-[10px] font-normal leading-normal tracking-[-0.2px] whitespace-nowrap'>Target stat</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
+                                      
+                                    //     <div className='flex flex-col gap-5 mx-5'>
+                                    //         {goals.map((goal, index) => (
+                                    //             <div key={index}>
+                                    //                 <span className='text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] capitalize'>{goal.name}</span>
+                                    //                 <div className='flex gap-5 mt-2'>
+                                    //                     <div className='flex flex-col items-start gap-2.5'>
+                                    //                         <span className='text-[#252525] text-[15px] font-semibold leading-[126%] tracking-[-0.3px]'>{goal.current_stat}</span>
+                                    //                         <span className='text-[#252525] text-center text-[10px] font-normal leading-normal tracking-[-0.2px] whitespace-nowrap'>Current stat</span>
+                                    //                     </div>
+                                                     
+                                    //                     <div className="mt-[7px] w-[122px] h-px border border-[#A1A1A1]"></div>
+                                    //                     <div className='flex flex-col items-start gap-2.5'>
+                                    //                         <span className='text-[#252525] text-[15px] font-semibold leading-[126%] tracking-[-0.3px]'>{goal.target_stat}</span>
+                                    //                         <span className='text-[#252525] text-center text-[10px] font-normal leading-normal tracking-[-0.2px] whitespace-nowrap'>Target stat</span>
+                                    //                     </div>
+                                    //                 </div>
+                                    //             </div>
+                                    //         ))}
+                                    //     </div>
 
-                                        {/* Approach Section */}
-                                        {activePlan.approach && (
-                                            <div className='flex flex-col gap-5 mt-10'>
-                                                <div className='flex items-center gap-[5px] ml-[10px]'>
-                                                    <div className='p-0.5'>
-                                                        <Image
-                                                            src="/icons/hugeicons_sparkles.svg"
-                                                            alt='hugeicons_sparkles'
-                                                            width={15}
-                                                            height={15}
-                                                        />
-                                                    </div>
-                                                    <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>Approach</span>
-                                                </div>
+                                       
+                                    //     {activePlan.approach && (
+                                    //         <div className='flex flex-col gap-5 mt-10'>
+                                    //             <div className='flex items-center gap-[5px] ml-[10px]'>
+                                    //                 <div className='p-0.5'>
+                                    //                     <Image
+                                    //                         src="/icons/hugeicons_sparkles.svg"
+                                    //                         alt='hugeicons_sparkles'
+                                    //                         width={15}
+                                    //                         height={15}
+                                    //                     />
+                                    //                 </div>
+                                    //                 <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>Approach</span>
+                                    //             </div>
 
-                                                <div className='flex flex-col gap-[5px] mx-5 mb-[30px]'>
-                                                    <div className='flex gap-[5px]'>
-                                                        {activePlan.approach.split(',').map((approach, index) => (
-                                                            <div key={index} className='bg-[#FFFFFF] px-[20px] p-[5px] rounded-[20px]'>
-                                                                <span className='text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]'>{approach.trim()}</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
+                                    //             <div className='flex flex-col gap-[5px] mx-5 mb-[30px]'>
+                                    //                 <div className='flex gap-[5px]'>
+                                    //                     {activePlan.approach.split(',').map((approach, index) => (
+                                    //                         <div key={index} className='bg-[#FFFFFF] px-[20px] p-[5px] rounded-[20px]'>
+                                    //                             <span className='text-[#535359] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]'>{approach.trim()}</span>
+                                    //                         </div>
+                                    //                     ))}
+                                    //                 </div>
+                                    //             </div>
+                                    //         </div>
+                                    //     )}
+                                    // </div>
+
+                                    ""
                                 )}
 
                                 {/* Contact Information Section */}
-                                <div className='flex flex-col gap-10 mt-[30px]'>
-                                    {/* Mobile Number */}
+                                <div className='flex flex-col gap-10 mt-[30px] bg-[#F5F7FA] mx-2.5 mb-[13px] py-[30px] rounded-[15px]'>
+                                  
                                     <div className='flex mx-8  justify-between  items-center'>
                                         <div className='flex flex-col gap-2.5'>
                                             <span className='text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]'>
@@ -1068,154 +1091,155 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
 
                         {/* Plan History Section */}
                         {showPlanDetails && hasAnyPlans && (
-                            <div className={`bg-white rounded-[15px] px-[22px] py-10 whitespace-nowrap ${showOverview ? "" : (showPlanHistoryMargin ? "mt-[30px]" : "")
-                                }`}>
-                                <div className='flex justify-between items-center'>
-                                    <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>
-                                        Plan History({clientData?.plans_count?.total || 2})
-                                    </span>
+                            // <div className={`bg-white rounded-[15px] px-[22px] py-10 whitespace-nowrap ${showOverview ? "" : (showPlanHistoryMargin ? "mt-[30px]" : "")
+                            //     }`}>
+                            //     <div className='flex justify-between items-center'>
+                            //         <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>
+                            //             Plan History({clientData?.plans_count?.total || 2})
+                            //         </span>
 
-                                    {/* View All Plans Link - Only show if not already on plan history page */}
-                                    {pathname !== "/planhistory" && (
-                                        <Link
-                                            href={{
-                                                pathname: '/planhistory',
-                                                query: {
-                                                    profile_id: profileId,
-                                                }
-                                            }}
-                                            className='flex gap-2.5'>
-                                            <span className='text-[#308BF9] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] cursor-pointer'>View all plans</span>
-                                            <IoIosArrowForward className='text-[#308BF9] cursor-pointer' />
-                                        </Link>
-                                    )}
-                                </div>
+                                 
+                            //         {pathname !== "/planhistory" && (
+                            //             <Link
+                            //                 href={{
+                            //                     pathname: '/planhistory',
+                            //                     query: {
+                            //                         profile_id: profileId,
+                            //                     }
+                            //                 }}
+                            //                 className='flex gap-2.5'>
+                            //                 <span className='text-[#308BF9] text-[12px] font-semibold leading-[110%] tracking-[-0.24px] cursor-pointer'>View all plans</span>
+                            //                 <IoIosArrowForward className='text-[#308BF9] cursor-pointer' />
+                            //             </Link>
+                            //         )}
+                            //     </div>
 
-                                <div className='my-[22px] border boder-[#E1E6ED]'></div>
+                            //     <div className='my-[22px] border boder-[#E1E6ED]'></div>
 
-                                <div className='flex flex-col gap-[30px]'>
-                                    {/* Active Plans */}
-                                    {clientData?.plans_summary?.active?.map((plan, index) => (
-                                        <Link
-                                            key={`active-${index}`}
-                                            href={{
-                                                pathname: '/planhistory',
-                                                query: {
-                                                    profile_id: profileId,
-                                                }
-                                            }}
-                                            className='flex flex-col'
-                                        >
-                                            <div className='flex gap-[25px] justify-between '>
-                                                <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] cursor-pointer'>{plan.plan_title}</span>
-                                                <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px] cursor-pointer'>
-                                                    {new Date(plan.plan_start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}-{new Date(plan.plan_end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                                                </span>
-                                            </div>
+                            //     <div className='flex flex-col gap-[30px]'>
+                                   
+                            //         {clientData?.plans_summary?.active?.map((plan, index) => (
+                            //             <Link
+                            //                 key={`active-${index}`}
+                            //                 href={{
+                            //                     pathname: '/planhistory',
+                            //                     query: {
+                            //                         profile_id: profileId,
+                            //                     }
+                            //                 }}
+                            //                 className='flex flex-col'
+                            //             >
+                            //                 <div className='flex gap-[25px] justify-between '>
+                            //                     <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] cursor-pointer'>{plan.plan_title}</span>
+                            //                     <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px] cursor-pointer'>
+                            //                         {new Date(plan.plan_start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}-{new Date(plan.plan_end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                            //                     </span>
+                            //                 </div>
 
-                                            <div className='flex justify-between'>
-                                                <div>
-                                                    <span className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize'>
-                                                        Updated {new Date(plan.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, {new Date(plan.updated_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}
-                                                    </span>
-                                                </div>
-                                                <div className='flex gap-[3px] items-center'>
-                                                    <Image
-                                                        src="/icons/verified.svg"
-                                                        alt='verified'
-                                                        width={12}
-                                                        height={12}
-                                                    />
-                                                    <span className='text-[#3FAF58] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Active</span>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    ))}
+                            //                 <div className='flex justify-between'>
+                            //                     <div>
+                            //                         <span className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize'>
+                            //                             Updated {new Date(plan.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, {new Date(plan.updated_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                            //                         </span>
+                            //                     </div>
+                            //                     <div className='flex gap-[3px] items-center'>
+                            //                         <Image
+                            //                             src="/icons/verified.svg"
+                            //                             alt='verified'
+                            //                             width={12}
+                            //                             height={12}
+                            //                         />
+                            //                         <span className='text-[#3FAF58] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Active</span>
+                            //                     </div>
+                            //                 </div>
+                            //             </Link>
+                            //         ))}
 
-                                    {/* Completed Plans */}
-                                    {clientData?.plans_summary?.completed?.map((plan, index) => (
-                                        <Link
-                                            key={`completed-${index}`}
-                                            href={{
-                                                pathname: '/planhistory',
-                                                query: {
-                                                    profile_id: profileId,
-                                                }
-                                            }}
-                                            className='flex flex-col'
-                                        >
-                                            <div className='flex gap-[25px] justify-between'>
-                                                <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>{plan.plan_title}</span>
-                                                <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>
-                                                    {new Date(plan.plan_start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}-{new Date(plan.plan_end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                                                </span>
-                                            </div>
+                                 
+                            //         {clientData?.plans_summary?.completed?.map((plan, index) => (
+                            //             <Link
+                            //                 key={`completed-${index}`}
+                            //                 href={{
+                            //                     pathname: '/planhistory',
+                            //                     query: {
+                            //                         profile_id: profileId,
+                            //                     }
+                            //                 }}
+                            //                 className='flex flex-col'
+                            //             >
+                            //                 <div className='flex gap-[25px] justify-between'>
+                            //                     <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>{plan.plan_title}</span>
+                            //                     <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>
+                            //                         {new Date(plan.plan_start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}-{new Date(plan.plan_end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                            //                     </span>
+                            //                 </div>
 
-                                            <div className='flex justify-between'>
-                                                <div>
-                                                    <span className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize'>
-                                                        Updated {new Date(plan.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, {new Date(plan.updated_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}
-                                                    </span>
-                                                </div>
-                                                <div className='flex gap-[3px] items-center'>
-                                                    <Image
-                                                        src="/icons/verified.svg"
-                                                        alt='verified'
-                                                        width={12}
-                                                        height={12}
-                                                    />
-                                                    <span className='text-[#3FAF58] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Finished</span>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    ))}
+                            //                 <div className='flex justify-between'>
+                            //                     <div>
+                            //                         <span className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize'>
+                            //                             Updated {new Date(plan.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, {new Date(plan.updated_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                            //                         </span>
+                            //                     </div>
+                            //                     <div className='flex gap-[3px] items-center'>
+                            //                         <Image
+                            //                             src="/icons/verified.svg"
+                            //                             alt='verified'
+                            //                             width={12}
+                            //                             height={12}
+                            //                         />
+                            //                         <span className='text-[#3FAF58] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Finished</span>
+                            //                     </div>
+                            //                 </div>
+                            //             </Link>
+                            //         ))}
 
-                                    {/* Not Started Plans */}
-                                    {clientData?.plans_summary?.not_started?.map((plan, index) => (
-                                        <Link
-                                            key={`not-started-${index}`}
-                                            href={{
-                                                pathname: '/planhistory',
-                                                query: {
-                                                    profile_id: profileId,
-                                                }
-                                            }}
-                                            className='flex flex-col'
-                                        >
-                                            <div className='flex gap-[25px] justify-between'>
-                                                <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>{plan.plan_title}</span>
-                                                <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>
-                                                    {new Date(plan.plan_start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}-{new Date(plan.plan_end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                                                </span>
-                                            </div>
+                                  
+                            //         {clientData?.plans_summary?.not_started?.map((plan, index) => (
+                            //             <Link
+                            //                 key={`not-started-${index}`}
+                            //                 href={{
+                            //                     pathname: '/planhistory',
+                            //                     query: {
+                            //                         profile_id: profileId,
+                            //                     }
+                            //                 }}
+                            //                 className='flex flex-col'
+                            //             >
+                            //                 <div className='flex gap-[25px] justify-between'>
+                            //                     <span className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>{plan.plan_title}</span>
+                            //                     <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>
+                            //                         {new Date(plan.plan_start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}-{new Date(plan.plan_end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                            //                     </span>
+                            //                 </div>
 
-                                            <div className='flex justify-between'>
-                                                <div>
-                                                    <span className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize'>
-                                                        Updated {new Date(plan.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, {new Date(plan.updated_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}
-                                                    </span>
-                                                </div>
-                                                <div className='flex gap-[3px] items-center'>
-                                                    <Image
-                                                        src="/icons/clock.svg"
-                                                        alt='not started'
-                                                        width={12}
-                                                        height={12}
-                                                    />
-                                                    <span className='text-[#FFA500] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Not Started</span>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    ))}
+                            //                 <div className='flex justify-between'>
+                            //                     <div>
+                            //                         <span className='text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px] capitalize'>
+                            //                             Updated {new Date(plan.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, {new Date(plan.updated_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                            //                         </span>
+                            //                     </div>
+                            //                     <div className='flex gap-[3px] items-center'>
+                            //                         <Image
+                            //                             src="/icons/clock.svg"
+                            //                             alt='not started'
+                            //                             width={12}
+                            //                             height={12}
+                            //                         />
+                            //                         <span className='text-[#FFA500] text-[12px] font-normal leading-normal tracking-[-0.24px]'>Not Started</span>
+                            //                     </div>
+                            //                 </div>
+                            //             </Link>
+                            //         ))}
 
-                                    {/* Fallback when no plans are found */}
-                                    {(!clientData?.plans_summary?.active?.length &&
-                                        !clientData?.plans_summary?.completed?.length &&
-                                        !clientData?.plans_summary?.not_started?.length) && (
-                                            <p className='text-[18px] text-[#252525]'>No Data found</p>
-                                        )}
-                                </div>
-                            </div>
+                                 
+                            //         {(!clientData?.plans_summary?.active?.length &&
+                            //             !clientData?.plans_summary?.completed?.length &&
+                            //             !clientData?.plans_summary?.not_started?.length) && (
+                            //                 <p className='text-[18px] text-[#252525]'>No Data found</p>
+                            //             )}
+                            //     </div>
+                            // </div>
+                            ""
                         )}
                     </div>
                 )}

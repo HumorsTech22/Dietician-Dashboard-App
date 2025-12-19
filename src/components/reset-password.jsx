@@ -431,7 +431,6 @@
 
 
 
-
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -454,9 +453,19 @@ export default function ResetPassword() {
   const [resendTimer, setResendTimer] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [otpError, setOtpError] = useState("");  
+  console.log("otpError458:-", otpError);
 
   const inputRefs = useRef([]);
   const router = useRouter();
+
+  // Strong password validation helper
+  const isStrongPassword = (value) => {
+    // min 8, 1 upper, 1 lower, 1 digit, 1 special
+    const strongRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    return strongRegex.test(value);
+  };
 
   // Timer effect
   useEffect(() => {
@@ -469,10 +478,21 @@ export default function ResetPassword() {
     return () => clearInterval(interval);
   }, [resendTimer]);
 
-  // Validate passwords match
+  // Validate passwords match and strength
   useEffect(() => {
+    // if user started typing password
+    if (password) {
+      if (!isStrongPassword(password)) {
+        setPasswordError(
+          "Password must be 8+ chars with uppercase, lowercase, number & special character."
+        );
+        return;
+      }
+    }
+
+    // matching check
     if (password && confirmPassword && password !== confirmPassword) {
-      setPasswordError("Passwords do not match");
+      setPasswordError("Password not matching");
     } else {
       setPasswordError("");
     }
@@ -539,8 +559,10 @@ export default function ResetPassword() {
     if (enteredOtp === serverOtp) {
       toast.success("OTP verified successfully!");
       setStep("forgot");
+      setOtpError(""); 
     } else {
       toast.error("Invalid OTP. Please enter the correct code.");
+      setOtpError("Invalid OTP. Please enter the correct code.");
     }
   };
 
@@ -588,8 +610,16 @@ export default function ResetPassword() {
   const handlePasswordReset = async (e) => {
     e.preventDefault();
     
+    if (!isStrongPassword(password)) {
+      toast.error("Please enter a strong password.");
+      setPasswordError(
+        "Password must be 8+ chars with uppercase, lowercase, number & special character."
+      );
+      return;
+    }
+
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error("Password not matching");
       return;
     }
     
@@ -599,10 +629,10 @@ export default function ResetPassword() {
       const res = await resetPasswordService(email, password);
       toast.success(res.message || "Password updated successfully.");
       setTimeout(() => {
-        router.push("/login");
+        router.push("/");
       }, 1000);
     } catch (error) {
-        toast.error(error.data?.message || "Something went wrong. Try again.");
+      toast.error(error.data?.message || "Something went wrong. Try again.");
     } finally {
       setLoading(false);
     }
@@ -619,15 +649,12 @@ export default function ResetPassword() {
   return (
     <div className="flex items-center justify-start min-h-screen">
       <div className="w-full max-w-md bg-white shadow-lg px-[62px] pt-[60px] pb-[54px]">
-        
+    
         {step === "reset" && (
           <>
             <h2 className="text-[34px] font-normal leading-normal tracking-[-2.04] text-[#252525] text-center whitespace-nowrap">
-              Reset Password
+              Forgot Password
             </h2>
-            <p className="text-[#A1A1A1] text-[14px] font-normal leading-[110%] tracking-[-0.24px] text-center mt-4">
-              Enter your email to receive an OTP.
-            </p>
 
             <form onSubmit={handleResetSubmit} className="mt-[73px] space-y-4">
               <div className="relative">
@@ -651,7 +678,7 @@ export default function ResetPassword() {
                    peer-not-placeholder-shown:top-[-10px] peer-not-placeholder-shown:text-sm
                    bg-white px-1"
                 >
-                  Enter your email
+                  Enter Registered Email Address
                 </label>
                 {emailError && (
                   <p className="text-red-500 text-[12px] mt-1">{emailError}</p>
@@ -660,7 +687,7 @@ export default function ResetPassword() {
 
               <button
                 type="submit"
-                className="w-full mt-5 cursor-pointer bg-[#308BF9] text-white py-[15px] px-[93px] rounded-lg font-semibold border border-transparent hover:bg-white hover:text-[#252525] hover:border-[#308BF9] transition disabled:opacity-60"
+                className="w-full cursor-pointer bg-[#308BF9] text-white font-semibold py-[15px] px-[93px] rounded-[10px] text-[12px] border border-transparent hover:bg-white hover:text-[#252525] hover:border-[#308BF9] transition disabled:opacity-60"
               >
                 Send OTP
               </button>
@@ -702,6 +729,12 @@ export default function ResetPassword() {
                   />
                 ))}
               </div>
+
+              {otpError && (
+                <p className="text-red-500 text-[12px] mt-2 text-center">
+                  {otpError}
+                </p>
+              )}
 
               <button
                 type="submit"
@@ -833,7 +866,7 @@ export default function ResetPassword() {
 
               <button
                 type="submit"
-                disabled={loading || password !== confirmPassword || !password || !confirmPassword}
+                disabled={loading || password !== confirmPassword || !password || !confirmPassword || !isStrongPassword(password)}
                 className="w-full mt-5 cursor-pointer bg-[#308BF9] text-white py-[15px] px-[93px] rounded-lg font-semibold border border-transparent hover:bg-white hover:text-[#252525] hover:border-[#308BF9] transition disabled:opacity-60"
               >
                 {loading ? "Resetting..." : "Reset password"}

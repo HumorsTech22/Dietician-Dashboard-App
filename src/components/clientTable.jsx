@@ -233,7 +233,6 @@ export default function ClientTable({
     return sortedClients.filter(c => c.name.toLowerCase().includes(q));
   }, [search, sortedClients]);
 
-  console.log("filteredClients236:-", filteredClients);
 
 
   return (
@@ -264,15 +263,22 @@ export default function ClientTable({
                     Date Created {sortOption === 'Recently Added' && '↓'}
                   </p>
                 </th>
-                <th className="px-[15px] pt-5 pb-[5px] text-left">
+                {/* <th className="px-[15px] pt-5 pb-[5px] text-left">
                   <p className="text-[#535359] font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins']">
                     Current Plan
                   </p>
-                </th>
-                {showDailyStatusHeader && (
+                </th> */}
+                {/* {showDailyStatusHeader && (
                   <th className="px-[15px] pt-5 pb-[5px] text-left">
                     <p className="text-[#535359] text-center font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins']">
                       Plans completed
+                    </p>
+                  </th>
+                )} */}
+                 {showDailyStatusHeader && (
+                  <th className="px-[15px] pt-5 pb-[5px] text-left">
+                    <p className="text-[#535359] text-center font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins']">
+                     Test Taken
                     </p>
                   </th>
                 )}
@@ -333,7 +339,7 @@ export default function ClientTable({
                     </td>
 
                     {/* Current Plan */}
-                    <td className="px-[15px] py-5">
+                    {/* <td className="px-[15px] py-5">
                       <div className="flex flex-col gap-1">
                         <span className={`text-[12px] font-semibold leading-[126%] tracking-[-0.24px] ${
                           client.planStatus === 'Active' ? 'text-[#3FAF58]' : 'text-[#A1A1A1]'
@@ -342,7 +348,7 @@ export default function ClientTable({
                          
                         </span>
                         <span className="text-[#535359] text-[10px] font-normal leading-normal tracking-[-0.2px]">
-                          {/* {client.planType} */}
+                         {client.planType}
                        {getMostRelevantPlan(client.originalData)?.plan_title || "No Plan"} 
                           </span>
                         <div className="flex gap-[5px]">
@@ -352,9 +358,18 @@ export default function ClientTable({
                           <Image src="/icons/right button.svg" width={10} height={10} alt="right button" className="cursor-pointer" />
                         </div>
                       </div>
-                    </td>
+                    </td> */}
 
                     {/* Plans completed */}
+                    {/* {showDailyStatusHeader && (
+                      <td className="text-center px-[15px] py-5">
+                        <span className="text-[#252525] text-center text-[12px] font-semibold leading-[1.26px]">
+                          {client.plansCompleted}
+                        </span>
+                      </td>
+                    )} */}
+
+{/* Test Count */}
                     {showDailyStatusHeader && (
                       <td className="text-center px-[15px] py-5">
                         <span className="text-[#252525] text-center text-[12px] font-semibold leading-[1.26px]">
