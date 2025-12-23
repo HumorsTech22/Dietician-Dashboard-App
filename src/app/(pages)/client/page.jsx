@@ -193,8 +193,8 @@ useEffect(() => {
    const tabs = useMemo(
     () => [
       { id: "all", label: `All Clients (${count ?? 0})` },
-      { id: "active", label: `Active Plan (${activeCount ?? 0})` },
-      { id: "needs", label: `Needs Plan (${needsCount ?? 0})` },
+      // { id: "active", label: `Active Plan (${activeCount ?? 0})` },
+      // { id: "needs", label: `Needs Plan (${needsCount ?? 0})` },
     ],
     [count, activeCount, needsCount]
   );

@@ -12,7 +12,7 @@ import DashboardCard from "./dashboard-card";
 export default function GoalTracker() {
   const [activeTab, setActiveTab] = useState("Client Monitor");
   const menuItems = ["Client Monitor", "Test Monitor",
-     "Diet Plan Monitor"
+    //  "Diet Plan Monitor"
     ];
   const [isMounted, setIsMounted] = useState(false);
 
@@ -34,7 +34,7 @@ export default function GoalTracker() {
       <div className="flex gap-5 bg-white rounded-[15px] pt-[15px] pb-[18px] pr-5">
         {/* Left menu */}
         <div className="flex flex-col gap-[18px] bg-white rounded-[15px] py-[15px] px-[18px]">
-          <div className="px-2 pt-2 pb-[81px]">
+          <div className="w-[325px] px-2 pt-2 pb-[81px]">
             {menuItems.map((item, index) => (
               <div
                 key={index}
@@ -58,7 +58,7 @@ export default function GoalTracker() {
           </div>
 
           {/* Left gradient cards (unchanged) */}
-          <div className="pb-2.5 rounded-[15px] bg-gradient-to-b from-[#FBD881] to-[#E7AA37]">
+          {/* <div className="pb-2.5 rounded-[15px] bg-gradient-to-b from-[#FBD881] to-[#E7AA37]">
             <div className="ml-1.5 mr-2.5 pt-[30px] pb-[23px] pl-[34px] pr-[138px]">
               <span className="text-[#252525] font-semibold leading-[110%] tracking-[-0.3px]">
                 Plan Goal Tracker
@@ -105,7 +105,7 @@ export default function GoalTracker() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Right side: header cards + active monitor */}
@@ -114,7 +114,7 @@ export default function GoalTracker() {
 
           {activeTab === "Client Monitor" && <ClientMonitor />}
           {activeTab === "Test Monitor" && <TestMonitor />}
-          {activeTab === "Diet Plan Monitor" && <DietPlanMonitor />}
+          {/* {activeTab === "Diet Plan Monitor" && <DietPlanMonitor />} */}
         </div>
       </div>
     </>

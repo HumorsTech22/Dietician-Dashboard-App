@@ -214,7 +214,7 @@ export default function DashboardCard({ activeTab }) {
 
   if (activeTab === "Client Monitor") {
     return (
-      <div className="flex gap-5">
+      <div className="flex gap-5 hidden">
         {/* Total Client Card */}
         <div className="w-full flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8">
           <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
@@ -236,7 +236,7 @@ export default function DashboardCard({ activeTab }) {
         </div>
 
         {/* Needs Plan Card */}
-        <div className="w-full flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-5">
+        <div className="w-full flex flex-col gap-10 bg-[#F5F7FA] border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 pr-5 ">
           <div className="flex gap-[119px] items-center">
             <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
               Needs Plan
@@ -258,7 +258,7 @@ export default function DashboardCard({ activeTab }) {
 
   if (activeTab === "Test Monitor") {
     return (
-      <div className="flex gap-5">
+      <div className="flex gap-5 hidden">
         <div className="flex flex-col gap-10 bg-white border border-[#E1E6ED] rounded-[10px] pt-5 pl-5 pb-8 w-full">
           <span className="text-[#252525] text-[12px] font-semibold leading-[126%] tracking-[-0.24px] whitespace-nowrap">
             Total Tests purchased

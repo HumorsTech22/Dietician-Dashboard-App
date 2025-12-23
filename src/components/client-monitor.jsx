@@ -73,7 +73,7 @@ export default function ClientMonitor() {
               <IoIosArrowForward className="text-[#308BF9] w-[15px] h-[15px]" />
             </div>
           </div>
-          <ClientTable showUserProfile={false} showDailyStatusHeader={false} clients={clients}/>
+          <ClientTable showUserProfile={false} showDailyStatusHeader={false} clients={clients} />
         </div>
       </div>
     </>
