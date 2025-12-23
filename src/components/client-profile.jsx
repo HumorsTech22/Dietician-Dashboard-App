@@ -542,6 +542,7 @@ import { fetchClientProfileData } from '../services/authService';
 import { useDispatch, useSelector } from 'react-redux';
 import { setClientProfile, clearClientProfile, setClientProfileLoading, setClientProfileError } from '@/store/clientProfileSlice';
 import CreatePlanPopUp from './pop-folder/create-plan-popup';
+import { getClientsForDietician, selectClients } from "../store/clientSlice";
 
 export const ClientProfile = ({ showPlanDetails = true, showOverview = true, showPlanSelection = true, showPlanHistoryMargin = true }) => {
     const pathname = usePathname();
@@ -550,8 +551,9 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
     const dispatch = useDispatch();
     const clientProfileFromRedux = useSelector((state) => state.clientProfile.data);
 
+       const clientsFromRedux = useSelector(selectClients);
+
     const [clientData, setClientData] = useState(null);
-    console.log("clientData554:-", clientData);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPlan, setSelectedPlan] = useState("");
@@ -574,30 +576,55 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
         { value: "copy", label: "Copy previous plan" },
     ];
 
+const selectedClientFromRedux = Array.isArray(clientsFromRedux)
+  ? clientsFromRedux.find(
+      (c) => String(c?.profile_id) === String(profileId)
+    )
+  : null;
 
-// ✅ BMI Helpers
-  const calculateBMI = (weightKg, heightCm) => {
-    if (!weightKg || !heightCm) return null;
-    const w = Number(weightKg);
-    const hCm = Number(heightCm);
-    if (!Number.isFinite(w) || !Number.isFinite(hCm) || w <= 0 || hCm <= 0)
-      return null;
 
-    const heightM = hCm / 100;
-    const bmi = w / (heightM * heightM);
-    return bmi.toFixed(1);
-  };
 
-  const getBMICategory = (bmi) => {
-    const v = bmi ? Number(bmi) : null;
-    if (!v || !Number.isFinite(v)) return { label: "-", color: "#535359" };
 
-    if (v < 18.5) return { label: "Underweight", color: "#FFA500" };
-    if (v >= 18.5 && v < 25) return { label: "Normal", color: "#3FAF58" };
-    if (v >= 25 && v < 30) return { label: "Overweight", color: "#FFA500" };
-    return { label: "Obese", color: "#DA5747" };
-  };
+    // ✅ BMI Helpers
+    const calculateBMI = (weightKg, heightCm) => {
+        if (!weightKg || !heightCm) return null;
+        const w = Number(weightKg);
+        const hCm = Number(heightCm);
+        if (!Number.isFinite(w) || !Number.isFinite(hCm) || w <= 0 || hCm <= 0)
+            return null;
 
+        const heightM = hCm / 100;
+        const bmi = w / (heightM * heightM);
+        return bmi.toFixed(1);
+    };
+
+    const getBMICategory = (bmi) => {
+        const v = bmi ? Number(bmi) : null;
+        if (!v || !Number.isFinite(v)) return { label: "-", color: "#535359" };
+
+        if (v < 18.5) return { label: "Underweight", color: "#FFA500" };
+        if (v >= 18.5 && v < 25) return { label: "Normal", color: "#3FAF58" };
+        if (v >= 25 && v < 30) return { label: "Overweight", color: "#FFA500" };
+        return { label: "Obese", color: "#DA5747" };
+    };
+
+
+
+const getRoundedFatMetabolism = (client) => {
+  const range =
+    client?.metabolism_target?.target_metabolism_scores?.["Fat Metabolism %"];
+
+  if (!range) return null;
+
+  // Extract first percentage number safely (works for "11.90% to 19.90%" etc.)
+  const match = String(range).match(/([\d.]+)\s*%/);
+  if (!match?.[1]) return null;
+
+  const number = Number(match[1]);
+  if (!Number.isFinite(number)) return null;
+
+  return Math.round(number);
+};
 
 
 
@@ -724,11 +751,14 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
     // Check if current page is plan history page
     const isPlanHistoryPage = pathname?.toLowerCase().includes('planhistory');
 
-      // ✅ BMI values from clientData
-  const bmiValue = calculateBMI(clientData?.weight, clientData?.height);
-  const bmiCategory = getBMICategory(bmiValue);
+    // ✅ BMI values from clientData
+    const bmiValue = calculateBMI(clientData?.weight, clientData?.height);
+    const bmiCategory = getBMICategory(bmiValue);
+   const fatMetabolismPercent =
+  getRoundedFatMetabolism(selectedClientFromRedux) ??
+  getRoundedFatMetabolism(clientData);
 
-  
+
 
     // Loading state
     if (loading && !hideClientBits) {
@@ -901,24 +931,27 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                 <div className='px-2.5 pt-5 pb-0.5'>
                                     <div className='flex flex-col gap-5 pl-5 pr-[42px] pb-5 border-b border-[#E1E6ED]'>
                                         <p className='text-[#252525] text-[12px] font-semibold leading-[130%] tracking-[-0.24px]'>BMI</p>
-                                       <div className='flex flex-col gap-2.5'>
-        <p className='text-[#252525] text-[20px] font-semibold leading-[110%] tracking-[-0.4px]'>
-            {bmiValue ? `${bmiValue} kg/m²` : "-"}
-        </p>
+                                        <div className='flex flex-col gap-2.5'>
+                                            <p className='text-[#252525] text-[20px] font-semibold leading-[110%] tracking-[-0.4px]'>
+                                                {bmiValue ? `${bmiValue} kg/m²` : "-"}
+                                            </p>
 
-        <p
-            className='text-[12px] font-normal leading-[110%] tracking-[-0.24px]'
-            style={{ color: bmiCategory.color }}
-        >
-            {bmiCategory.label}
-        </p>
-    </div>
+                                            <p
+                                                className='text-[12px] font-normal leading-[110%] tracking-[-0.24px]'
+                                                style={{ color: bmiCategory.color }}
+                                            >
+                                                {bmiCategory.label}
+                                            </p>
+                                        </div>
                                     </div>
 
                                     <div className='flex flex-col gap-5 pl-5 pr-[42px] pt-5'>
                                         <p className='text-[#252525] text-[12px] font-semibold leading-[130%] tracking-[-0.24px]'>RECOMMENDED SCORE RANGE</p>
                                         <div className='flex flex-col gap-2.5'>
-                                            <p className='text-[#252525] text-[20px] font-semibold leading-[110%] tracking-[-0.4px]'> {">71%"}</p>
+                                        <p className='text-[#252525] text-[20px] font-semibold leading-[110%] tracking-[-0.4px]'>
+  {fatMetabolismPercent !== null ? `>${fatMetabolismPercent}%` : "-"}
+</p>
+
                                             <p className='text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px]'>This score range is based on the <br></br>client’s BMI.</p>
                                         </div>
                                     </div>
