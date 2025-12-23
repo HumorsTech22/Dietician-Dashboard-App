@@ -551,6 +551,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
     const clientProfileFromRedux = useSelector((state) => state.clientProfile.data);
 
     const [clientData, setClientData] = useState(null);
+    console.log("clientData554:-", clientData);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPlan, setSelectedPlan] = useState("");
@@ -572,6 +573,33 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
         { value: "manual", label: "Manual fill" },
         { value: "copy", label: "Copy previous plan" },
     ];
+
+
+// ✅ BMI Helpers
+  const calculateBMI = (weightKg, heightCm) => {
+    if (!weightKg || !heightCm) return null;
+    const w = Number(weightKg);
+    const hCm = Number(heightCm);
+    if (!Number.isFinite(w) || !Number.isFinite(hCm) || w <= 0 || hCm <= 0)
+      return null;
+
+    const heightM = hCm / 100;
+    const bmi = w / (heightM * heightM);
+    return bmi.toFixed(1);
+  };
+
+  const getBMICategory = (bmi) => {
+    const v = bmi ? Number(bmi) : null;
+    if (!v || !Number.isFinite(v)) return { label: "-", color: "#535359" };
+
+    if (v < 18.5) return { label: "Underweight", color: "#FFA500" };
+    if (v >= 18.5 && v < 25) return { label: "Normal", color: "#3FAF58" };
+    if (v >= 25 && v < 30) return { label: "Overweight", color: "#FFA500" };
+    return { label: "Obese", color: "#DA5747" };
+  };
+
+
+
 
     // Fetch client profile data
     // useEffect(() => {
@@ -696,6 +724,12 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
     // Check if current page is plan history page
     const isPlanHistoryPage = pathname?.toLowerCase().includes('planhistory');
 
+      // ✅ BMI values from clientData
+  const bmiValue = calculateBMI(clientData?.weight, clientData?.height);
+  const bmiCategory = getBMICategory(bmiValue);
+
+  
+
     // Loading state
     if (loading && !hideClientBits) {
         return (
@@ -727,7 +761,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                     {/* Navigation Breadcrumb */}
                     <div className='w-[333px] flex gap-2.5 pl-[15px]  py-[14px] bg-white rounded-[15px]'>
                         <div className='flex gap-[15px] items-center'>
-                           
+
                             <Image
                                 src="/icons/Frame 383.svg"
                                 alt='Frame 383'
@@ -742,7 +776,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     onClick={() => window.history.back()}
                                 >
                                     {clientData?.profile_name || 'N/A'}
-                                    
+
                                 </span>
                             ) : (
                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px] cursor-pointer'
@@ -751,7 +785,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                             )}
                         </div>
 
-                       <div className='flex gap-[5px] items-center'>
+                        <div className='flex gap-[5px] items-center'>
                             <IoChevronBackSharp className='w-[15px] h-[15px] cursor-pointer' />
                             {isPlanHistoryPage ? (
                                 <span className='text-[#252525] text-[12px] font-semibold leading-normal tracking-[-0.24px]'>
@@ -762,7 +796,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     {clientData?.profile_name || "-"}
                                 </span>
                             )}
-                        </div> 
+                        </div>
                     </div>
 
                     {/* Plan Selection Section - Commented out but kept for future use */}
@@ -865,21 +899,29 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
 
 
                                 <div className='px-2.5 pt-5 pb-0.5'>
-<div className='flex flex-col gap-5 pl-5 pr-[42px] pb-5 border-b border-[#E1E6ED]'>
-    <p className='text-[#252525] text-[12px] font-semibold leading-[130%] tracking-[-0.24px]'>BMI</p>
-    <div className='flex flex-col gap-2.5'>
-        <p className='text-[#252525] text-[20px] font-semibold leading-[110%] traking-[-0.4px]'>19 kg/m2</p>
-        <p className='text-[#3FAF58] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>Underweight</p>
-    </div>
-</div>
+                                    <div className='flex flex-col gap-5 pl-5 pr-[42px] pb-5 border-b border-[#E1E6ED]'>
+                                        <p className='text-[#252525] text-[12px] font-semibold leading-[130%] tracking-[-0.24px]'>BMI</p>
+                                       <div className='flex flex-col gap-2.5'>
+        <p className='text-[#252525] text-[20px] font-semibold leading-[110%] tracking-[-0.4px]'>
+            {bmiValue ? `${bmiValue} kg/m²` : "-"}
+        </p>
 
-<div className='flex flex-col gap-5 pl-5 pr-[42px] pt-5'>
-<p className='text-[#252525] text-[12px] font-semibold leading-[130%] tracking-[-0.24px]'>RECOMMENDED SCORE RANGE</p>
-<div className='flex flex-col gap-2.5'>
-    <p className='text-[#252525] text-[20px] font-semibold leading-[110%] tracking-[-0.4px]'> {">71%"}</p>
-    <p className='text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px]'>This score range is based on the <br></br>client’s BMI.</p>
-</div>
-</div>
+        <p
+            className='text-[12px] font-normal leading-[110%] tracking-[-0.24px]'
+            style={{ color: bmiCategory.color }}
+        >
+            {bmiCategory.label}
+        </p>
+    </div>
+                                    </div>
+
+                                    <div className='flex flex-col gap-5 pl-5 pr-[42px] pt-5'>
+                                        <p className='text-[#252525] text-[12px] font-semibold leading-[130%] tracking-[-0.24px]'>RECOMMENDED SCORE RANGE</p>
+                                        <div className='flex flex-col gap-2.5'>
+                                            <p className='text-[#252525] text-[20px] font-semibold leading-[110%] tracking-[-0.4px]'> {">71%"}</p>
+                                            <p className='text-[#535359] text-[12px] font-normal leading-normal tracking-[-0.24px]'>This score range is based on the <br></br>client’s BMI.</p>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Plan Details Section */}
@@ -899,7 +941,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                 ) : (
                                     /* Show Plan Details for active, not_started, or completed plans */
                                     // <div className='mx-2.5 pt-5 rounded-[15px] mt-[17px] bg-[#F5F7FA]'>
-                                      
+
                                     //     <div className='flex items-center justify-between ml-[30px] mr-[17px]'>
                                     //         <span className={`text-[15px] font-semibold leading-[110%] tracking-[-0.3px] ${planStatus === 'active' ? 'text-[#3FAF58]' :
                                     //                 planStatus === 'not_started' ? 'text-[#FFA500]' :
@@ -909,7 +951,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     //                 planStatus === 'not_started' ? 'Not Started' :
                                     //                     'Completed'}
                                     //         </span>
-                                         
+
                                     //         <Link
                                     //             href={{
                                     //                 pathname: '/plansummary',
@@ -929,10 +971,10 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     //         </Link>
                                     //     </div>
 
-                                      
+
                                     //     <div className='my-5 mx-[5px] border border-[#E1E6ED]'></div>
 
-                                        
+
                                     //     <div className='flex justify-between mx-6 my-5'>
                                     //         <div className='flex flex-col gap-2.5 cursor-pointer'>
                                     //             <p className='text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px]'>{activePlan.plan_title}</p>
@@ -948,10 +990,10 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     //         </div>
                                     //     </div>
 
-                                      
+
                                     //     <div className='my-5 mx-[5px] border border-[#E1E6ED]'></div>
 
-                                      
+
                                     //     <div className='flex items-center gap-[5px] mt-5 mb-[25px] ml-[10px]'>
                                     //         <div className='p-0.5'>
                                     //             <Image
@@ -964,7 +1006,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     //         <span className='text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]'>Goal</span>
                                     //     </div>
 
-                                      
+
                                     //     <div className='flex flex-col gap-5 mx-5'>
                                     //         {goals.map((goal, index) => (
                                     //             <div key={index}>
@@ -974,7 +1016,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     //                         <span className='text-[#252525] text-[15px] font-semibold leading-[126%] tracking-[-0.3px]'>{goal.current_stat}</span>
                                     //                         <span className='text-[#252525] text-center text-[10px] font-normal leading-normal tracking-[-0.2px] whitespace-nowrap'>Current stat</span>
                                     //                     </div>
-                                                     
+
                                     //                     <div className="mt-[7px] w-[122px] h-px border border-[#A1A1A1]"></div>
                                     //                     <div className='flex flex-col items-start gap-2.5'>
                                     //                         <span className='text-[#252525] text-[15px] font-semibold leading-[126%] tracking-[-0.3px]'>{goal.target_stat}</span>
@@ -985,7 +1027,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                                     //         ))}
                                     //     </div>
 
-                                       
+
                                     //     {activePlan.approach && (
                                     //         <div className='flex flex-col gap-5 mt-10'>
                                     //             <div className='flex items-center gap-[5px] ml-[10px]'>
@@ -1018,7 +1060,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
 
                                 {/* Contact Information Section */}
                                 <div className='flex flex-col gap-10 mt-[30px] bg-[#F5F7FA] mx-2.5 mb-[13px] py-[30px] rounded-[15px]'>
-                                  
+
                                     <div className='flex mx-8  justify-between  items-center'>
                                         <div className='flex flex-col gap-2.5'>
                                             <span className='text-[#252525] text-[12px] font-semibold leading-[110%] tracking-[-0.24px]'>
@@ -1098,7 +1140,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                             //             Plan History({clientData?.plans_count?.total || 2})
                             //         </span>
 
-                                 
+
                             //         {pathname !== "/planhistory" && (
                             //             <Link
                             //                 href={{
@@ -1117,7 +1159,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                             //     <div className='my-[22px] border boder-[#E1E6ED]'></div>
 
                             //     <div className='flex flex-col gap-[30px]'>
-                                   
+
                             //         {clientData?.plans_summary?.active?.map((plan, index) => (
                             //             <Link
                             //                 key={`active-${index}`}
@@ -1155,7 +1197,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                             //             </Link>
                             //         ))}
 
-                                 
+
                             //         {clientData?.plans_summary?.completed?.map((plan, index) => (
                             //             <Link
                             //                 key={`completed-${index}`}
@@ -1193,7 +1235,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                             //             </Link>
                             //         ))}
 
-                                  
+
                             //         {clientData?.plans_summary?.not_started?.map((plan, index) => (
                             //             <Link
                             //                 key={`not-started-${index}`}
@@ -1231,7 +1273,7 @@ export const ClientProfile = ({ showPlanDetails = true, showOverview = true, sho
                             //             </Link>
                             //         ))}
 
-                                 
+
                             //         {(!clientData?.plans_summary?.active?.length &&
                             //             !clientData?.plans_summary?.completed?.length &&
                             //             !clientData?.plans_summary?.not_started?.length) && (

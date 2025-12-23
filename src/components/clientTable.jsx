@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 export default function ClientTable({ 
   showUserProfile = true, 
   showDailyStatusHeader = true, 
-  testAssigned = true,
+  testAssigned = false,
   clients: clientsList,
   activeTab = "all"
 }) {
@@ -275,19 +275,19 @@ export default function ClientTable({
                     </p>
                   </th>
                 )} */}
-                 {showDailyStatusHeader && (
+         
                   <th className="px-[15px] pt-5 pb-[5px] text-left">
                     <p className="text-[#535359] text-center font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins']">
                      Test Taken
                     </p>
                   </th>
-                )}
+             
                 {testAssigned && (
                   <th className="px-[15px] pt-5 pb-[5px] text-left">
                     <p className="text-[#535359] text-center font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins']">Test Assigned</p>
                   </th>
                 )}
-                <th className="px-[15px] pt-5 pb-[5px] text-left">
+                <th className="px-[15px] pt-5 pb-[5px] text-left hidden">
                   <p className="text-[#535359] font-normal text-xs leading-[1.1] tracking-[-0.24px] font-['Poppins']">Actions</p>
                 </th>
               </tr>
@@ -370,14 +370,13 @@ export default function ClientTable({
                     )} */}
 
 {/* Test Count */}
-                    {showDailyStatusHeader && (
+                   
                       <td className="text-center px-[15px] py-5">
                         <span className="text-[#252525] text-center text-[12px] font-semibold leading-[1.26px]">
                           {client.plansCompleted}
                         </span>
                       </td>
-                    )}
-
+                
                     {testAssigned && (
                       <td className="text-center px-[15px] py-5">
                         <span className="text-[#252525] text-center text-[12px] font-semibold leading-[1.26px]">
@@ -387,7 +386,7 @@ export default function ClientTable({
                     )}
 
                     {/* Actions */}
-                    <td className="px-[15px] py-5">
+                    <td className="px-[15px] py-5 hidden">
                       <div className="py-2.5 flex gap-5">
                         <Image src="/icons/hugeicons_message-02.svg" alt="message" width={20} height={20} className="cursor-pointer" />
                         <Image src="/icons/hugeicons_view.svg" alt="view" width={20} height={20} className="cursor-pointer" />

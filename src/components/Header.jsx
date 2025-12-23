@@ -272,6 +272,17 @@ function readDieticianFromCookie() {
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
+
+const hideHeaderPaths = [
+    "/updatepassword",
+    "/partners/updatepassword",
+  ];
+
+  if (hideHeaderPaths.includes(pathname)) {
+    return null;
+  }
+
+
   const [active, setActive] = useState(pathname);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -346,6 +357,8 @@ export default function Header() {
   const handleNotificationClick = () => {
     toast.info("Coming Soon");
   };
+
+
 
   return (
     <>

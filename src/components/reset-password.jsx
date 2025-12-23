@@ -430,22 +430,35 @@
 
 
 
-
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 import { sendOtpService, resetPasswordService } from "@/services/authService";
 import { toast } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
 
+/** ✅ ADDED (no changes to your existing logic) */
+function PasswordRule({ label, active }) {
+  return (
+    <li
+      className={`flex items-center gap-2 ${
+        active ? "text-green-600" : "text-[#6B7280]"
+      }`}
+    >
+      <span className="text-sm">{active ? "✔" : "✖"}</span>
+      <span className="text-sm">{label}</span>
+    </li>
+  );
+}
+
 export default function ResetPassword() {
-  const [step, setStep] = useState("reset"); 
+  const [step, setStep] = useState("reset");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", ""]);
-  const [serverOtp, setServerOtp] = useState(""); 
-  const [emailError, setEmailError] = useState(""); 
+  const [serverOtp, setServerOtp] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -453,8 +466,7 @@ export default function ResetPassword() {
   const [resendTimer, setResendTimer] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [otpError, setOtpError] = useState("");  
-  console.log("otpError458:-", otpError);
+  const [otpError, setOtpError] = useState("");
 
   const inputRefs = useRef([]);
   const router = useRouter();
@@ -466,6 +478,39 @@ export default function ResetPassword() {
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
     return strongRegex.test(value);
   };
+
+  /** ✅ ADDED (only for UI hints) */
+  const passwordRules = {
+    minLength: (pwd) => pwd.length >= 8,
+    lowercase: (pwd) => /[a-z]/.test(pwd),
+    uppercase: (pwd) => /[A-Z]/.test(pwd),
+    numbers: (pwd) => /\d/.test(pwd),
+    special: (pwd) => /[^A-Za-z0-9]/.test(pwd),
+  };
+
+  /** ✅ ADDED (only for UI hints) */
+  const getStrengthScore = (pwd) => {
+    if (!pwd) return 0;
+    let score = 0;
+    Object.values(passwordRules).forEach((rule) => {
+      if (rule(pwd)) score++;
+    });
+    return score; // 0..5
+  };
+
+  /** ✅ ADDED (only for UI hints) */
+  const strengthLabels = [
+    "Empty",
+    "Weak",
+    "Medium",
+    "Strong",
+    "Very Strong",
+    "Super Strong",
+  ];
+
+  /** ✅ ADDED (only for UI hints) */
+  const strengthScore = getStrengthScore(password);
+  const strengthLabel = strengthLabels[strengthScore];
 
   // Timer effect
   useEffect(() => {
@@ -484,7 +529,7 @@ export default function ResetPassword() {
     if (password) {
       if (!isStrongPassword(password)) {
         setPasswordError(
-          "Password must be 8+ chars with uppercase, lowercase, number & special character."
+          "Password must be Strong"
         );
         return;
       }
@@ -500,7 +545,7 @@ export default function ResetPassword() {
 
   const handleResetSubmit = async (e) => {
     e.preventDefault();
-    setEmailError(""); 
+    setEmailError("");
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setEmailError("Please enter a valid email address.");
@@ -516,29 +561,29 @@ export default function ResetPassword() {
         setStep("otp");
         setResendTimer(60);
       } else {
-        setEmailError(response.message || "Failed to send OTP."); 
+        setEmailError(response.message || "Failed to send OTP.");
       }
     } catch (error) {
       if (error.isApiError) {
         if (error.status === 404) {
-          setEmailError(error.data?.message || "Email not found."); 
+          setEmailError(error.data?.message || "Email not found.");
         } else {
-          setEmailError(error.data?.message || "Something went wrong."); 
+          setEmailError(error.data?.message || "Something went wrong.");
         }
         return;
       }
       console.error("Unexpected error:", error);
-      setEmailError("Unexpected error occurred. Please try again."); 
+      setEmailError("Unexpected error occurred. Please try again.");
     }
   };
 
   // Handle OTP resend
   const handleResendOtp = async () => {
     if (resendTimer > 0) return;
-    
+
     try {
       const response = await sendOtpService(email);
-      
+
       if (response.success) {
         toast.success("OTP resent successfully!");
         setResendTimer(60);
@@ -559,7 +604,7 @@ export default function ResetPassword() {
     if (enteredOtp === serverOtp) {
       toast.success("OTP verified successfully!");
       setStep("forgot");
-      setOtpError(""); 
+      setOtpError("");
     } else {
       toast.error("Invalid OTP. Please enter the correct code.");
       setOtpError("Invalid OTP. Please enter the correct code.");
@@ -609,7 +654,7 @@ export default function ResetPassword() {
 
   const handlePasswordReset = async (e) => {
     e.preventDefault();
-    
+
     if (!isStrongPassword(password)) {
       toast.error("Please enter a strong password.");
       setPasswordError(
@@ -622,9 +667,9 @@ export default function ResetPassword() {
       toast.error("Password not matching");
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       const res = await resetPasswordService(email, password);
       toast.success(res.message || "Password updated successfully.");
@@ -649,7 +694,6 @@ export default function ResetPassword() {
   return (
     <div className="flex items-center justify-start min-h-screen">
       <div className="w-full max-w-md bg-white shadow-lg px-[62px] pt-[60px] pb-[54px]">
-    
         {step === "reset" && (
           <>
             <h2 className="text-[34px] font-normal leading-normal tracking-[-2.04] text-[#252525] text-center whitespace-nowrap">
@@ -748,7 +792,10 @@ export default function ResetPassword() {
               {resendTimer > 0 ? (
                 <>
                   Resend OTP in{" "}
-                  <span className="text-red-500 font-semibold">{resendTimer}</span> seconds
+                  <span className="text-red-500 font-semibold">
+                    {resendTimer}
+                  </span>{" "}
+                  seconds
                 </>
               ) : (
                 <>
@@ -785,7 +832,10 @@ export default function ResetPassword() {
               Enter your new password for {email}
             </p>
 
-            <form onSubmit={handlePasswordReset} className="mt-[73px] space-y-4">
+            <form
+              onSubmit={handlePasswordReset}
+              className="mt-[73px] space-y-4"
+            >
               <div className="relative">
                 <input
                   id="password"
@@ -809,7 +859,7 @@ export default function ResetPassword() {
                 </label>
 
                 {/* Password visibility toggle */}
-                <div 
+                <div
                   className="absolute right-3 top-4 cursor-pointer"
                   onClick={togglePasswordVisibility}
                 >
@@ -846,7 +896,7 @@ export default function ResetPassword() {
                 </label>
 
                 {/* Confirm Password visibility toggle */}
-                <div 
+                <div
                   className="absolute right-3 top-4 cursor-pointer"
                   onClick={toggleConfirmPasswordVisibility}
                 >
@@ -864,9 +914,42 @@ export default function ResetPassword() {
                 <p className="text-red-500 text-[12px] mt-1">{passwordError}</p>
               )}
 
+
+                <div className="mt-3 text-sm">
+                  
+                    <ul className="space-y-1">
+                      <PasswordRule
+                        label="Minimum number of characters is 8."
+                        active={passwordRules.minLength(password)}
+                      />
+                      <PasswordRule
+                        label="Should contain lowercase."
+                        active={passwordRules.lowercase(password)}
+                      />
+                      <PasswordRule
+                        label="Should contain uppercase."
+                        active={passwordRules.uppercase(password)}
+                      />
+                      <PasswordRule
+                        label="Should contain numbers."
+                        active={passwordRules.numbers(password)}
+                      />
+                      <PasswordRule
+                        label="Should contain special characters."
+                        active={passwordRules.special(password)}
+                      />
+                    </ul>
+                  </div>
+
               <button
                 type="submit"
-                disabled={loading || password !== confirmPassword || !password || !confirmPassword || !isStrongPassword(password)}
+                disabled={
+                  loading ||
+                  password !== confirmPassword ||
+                  !password ||
+                  !confirmPassword ||
+                  !isStrongPassword(password)
+                }
                 className="w-full mt-5 cursor-pointer bg-[#308BF9] text-white py-[15px] px-[93px] rounded-lg font-semibold border border-transparent hover:bg-white hover:text-[#252525] hover:border-[#308BF9] transition disabled:opacity-60"
               >
                 {loading ? "Resetting..." : "Reset password"}

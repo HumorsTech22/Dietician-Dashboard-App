@@ -473,7 +473,7 @@ export default function TestMonitor() {
   return (
     <>
       <div className="border border-[#E1E6ED] rounded-[10px] px-[15px] pt-[30px] pb-2">
-        <div className="flex justify-between pb-[23px] border-b border-[#E1E6ED]">
+        <div className="flex justify-between pb-[23px] ">
           <span className="text-[#252525] text-[25px] font-semibold leading-normal tracking-[-1px]">
             Test Analytics
           </span>
@@ -506,7 +506,7 @@ export default function TestMonitor() {
         </div>
 
         <div className="flex flex-col gap-[18px]">
-          <span className="pl-3.5 text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] mt-[30px]">
+          <span className="pl-3.5 text-[#252525] text-[15px] font-semibold leading-[110%] tracking-[-0.3px] mt-[30px] hidden">
             Tests Tracking
           </span>
 

@@ -201,7 +201,6 @@
 
 
 
-
 "use client";
 
 import Link from "next/link";
@@ -244,20 +243,20 @@ export function LoginForm({ className, ...props }) {
 
       const dieticianId = res?.dietician?.dietician_id || "";
 
-      if (dieticianId === "Qua") {
-        router.push("/partners");
-      } else if (B2B2C.includes(dieticianId)) {
-        router.push("/dashboard");
-         router.push("/partners/dashboard");
-
+      // ✅ Routing logic:
+      // RespyrD01 and Qua -> /partners/dashboard
+      // everyone else -> /dashboard
+      if (B2B2C.includes(dieticianId)) {
+        router.push("/partners/dashboard");
       } else {
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (error) {
       let errorMessage = "Invalid credentials";
 
       if (error?.isApiError) {
-        errorMessage = error.message || error.data?.error || "Invalid credentials";
+        errorMessage =
+          error.message || error.data?.error || "Invalid credentials";
       }
 
       setInputError(errorMessage);
@@ -345,7 +344,7 @@ export function LoginForm({ className, ...props }) {
                 height={15}
                 className={showPassword ? "opacity-50" : "opacity-100"}
               />
-            </div> 
+            </div>
 
             <Link
               href="/resetPassword"

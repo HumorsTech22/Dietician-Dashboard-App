@@ -2847,7 +2847,6 @@
 
 
 
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -2863,11 +2862,19 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
   // State for the current text being typed in the active input
   const [inputValue, setInputValue] = useState("");
 
+  // ✅ Variable to store final JSON after submit
+  const [finalPlanJson, setFinalPlanJson] = useState(null);
+  console.log("finalPlanJson2867:-", finalPlanJson);
+
   useEffect(() => {
     if (open) setShowUploadModal(true);
     else {
       setShowUploadModal(false);
       setExpandedDay(null);
+      setInputValue("");
+      // optional reset:
+      // setDayFoods({});
+      // setFinalPlanJson(null);
     }
   }, [open]);
 
@@ -2887,7 +2894,7 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
   const handleRemoveFood = (dayIndex, foodIndex) => {
     setDayFoods((prev) => ({
       ...prev,
-      [dayIndex]: prev[dayIndex].filter((_, i) => i !== foodIndex),
+      [dayIndex]: (prev[dayIndex] || []).filter((_, i) => i !== foodIndex),
     }));
   };
 
@@ -2897,6 +2904,35 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
     0
   );
 
+  // ✅ Submit handler: ensures Day 1..10 always included, missing days => 0
+  const handleSubmit = () => {
+    const TOTAL_DAYS = 10;
+
+    const formattedJson = {
+      plan: Array.from({ length: TOTAL_DAYS }, (_, index) => ({
+        day: index + 1,
+        foods: dayFoods[index] || [], // missing day => []
+        count: dayFoods[index]?.length || 0, // missing day => 0
+      })),
+      totalItems,
+    };
+
+    // ✅ stored in variable
+    setFinalPlanJson(formattedJson);
+
+    // ✅ pass to parent if needed
+    onUploaded?.(formattedJson);
+
+     toast.success("Plan submitted successfully!");
+
+     onClose?.();
+  };
+
+  // Optional: see stored JSON in console
+  // useEffect(() => {
+  //   if (finalPlanJson) console.log("Saved Plan JSON:", finalPlanJson);
+  // }, [finalPlanJson]);
+
   if (!showUploadModal) return null;
 
   return (
@@ -2905,7 +2941,7 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
       onClick={onClose}
     >
       <div
-        className="relative bg-white w-[90%] max-w-[620px] rounded-[10px]"
+        className="relative bg-white w-[800px] rounded-[10px]"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -2970,7 +3006,7 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
                 {expandedDay === index && (
                   <div className="px-[38px] pb-[18px] animate-in fade-in slide-in-from-top-1">
                     {/* Input Box */}
-                    <div className="flex justify-between items-center bg-white border border-[#E1E6ED] rounded-[8px] py-[7px] pl-5 pr-2.5">
+                    <div className="flex justify-between items-center bg-white border border-[#E1E6ED] rounded-[8px] py-[7px] pl-5 pr-2.5  w-[468px]">
                       <input
                         type="text"
                         placeholder="Enter food"
@@ -3032,16 +3068,18 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
 
           <div className="flex justify-end mt-[23px]">
             <button
-              onClick={() => {
-                onUploaded?.(dayFoods);
-                toast.success("Plan submitted successfully!");
-              }}
+              onClick={handleSubmit}
               className="rounded-[10px] cursor-pointer text-[#FFFFFF] text-[12px] font-semibold bg-[#308BF9] px-5 py-[15px] hover:bg-blue-600 transition-colors"
             >
               Submit
             </button>
           </div>
         </div>
+
+        {/* Optional: Debug UI (remove in production) */}
+        {/* <pre className="p-4 text-xs overflow-auto">
+          {finalPlanJson ? JSON.stringify(finalPlanJson, null, 2) : ""}
+        </pre> */}
       </div>
     </div>
   );
