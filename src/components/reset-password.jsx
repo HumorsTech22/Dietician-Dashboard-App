@@ -722,7 +722,7 @@ export default function ResetPassword() {
                    peer-not-placeholder-shown:top-[-10px] peer-not-placeholder-shown:text-sm
                    bg-white px-1"
                 >
-                  Enter Registered Email Address
+                  Enter Registered Email 
                 </label>
                 {emailError && (
                   <p className="text-red-500 text-[12px] mt-1">{emailError}</p>

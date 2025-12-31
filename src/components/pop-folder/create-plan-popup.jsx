@@ -2864,7 +2864,6 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
 
   // ✅ Variable to store final JSON after submit
   const [finalPlanJson, setFinalPlanJson] = useState(null);
-  console.log("finalPlanJson2867:-", finalPlanJson);
 
   useEffect(() => {
     if (open) setShowUploadModal(true);
