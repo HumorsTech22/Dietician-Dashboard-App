@@ -2847,24 +2847,275 @@
 
 
 
+// "use client";
+
+// import { useState, useEffect } from "react";
+// import Image from "next/image";
+// import { toast } from "sonner";
+
+// export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
+//   const [showUploadModal, setShowUploadModal] = useState(false);
+//   const [expandedDay, setExpandedDay] = useState(null);
+
+//   // State to hold food items for each day: { 0: ["Idli", "Noodles"], 1: [] }
+//   const [dayFoods, setDayFoods] = useState({});
+//   // State for the current text being typed in the active input
+//   const [inputValue, setInputValue] = useState("");
+
+//   // ✅ Variable to store final JSON after submit
+//   const [finalPlanJson, setFinalPlanJson] = useState(null);
+//   console.log("finalPlanJson2867:-", finalPlanJson);
+
+//   useEffect(() => {
+//     if (open) setShowUploadModal(true);
+//     else {
+//       setShowUploadModal(false);
+//       setExpandedDay(null);
+//       setInputValue("");
+//       // optional reset:
+//       // setDayFoods({});
+//       // setFinalPlanJson(null);
+//     }
+//   }, [open]);
+
+//   // Handle adding a new food item
+//   const handleAddFood = (dayIndex) => {
+//     if (!inputValue.trim()) return;
+
+//     setDayFoods((prev) => ({
+//       ...prev,
+//       [dayIndex]: [...(prev[dayIndex] || []), inputValue.trim()],
+//     }));
+
+//     setInputValue(""); // Clear input after adding
+//   };
+
+//   // Handle removing a food item
+//   const handleRemoveFood = (dayIndex, foodIndex) => {
+//     setDayFoods((prev) => ({
+//       ...prev,
+//       [dayIndex]: (prev[dayIndex] || []).filter((_, i) => i !== foodIndex),
+//     }));
+//   };
+
+//   // Calculate total items across all days
+//   const totalItems = Object.values(dayFoods).reduce(
+//     (sum, foodsArray) => sum + (foodsArray?.length || 0),
+//     0
+//   );
+
+//   // ✅ Submit handler: ensures Day 1..10 always included, missing days => 0
+//  const handleSubmit = () => {
+//   const TOTAL_DAYS = 10;
+
+//   const days = {};
+//   for (let i = 0; i < TOTAL_DAYS; i++) {
+//     days[`day${i + 1}`] = dayFoods[i] || [];
+//   }
+
+//   // If you still want these for UI/debug
+//   const formattedJson = {
+//     plan: Array.from({ length: TOTAL_DAYS }, (_, index) => ({
+//       day: index + 1,
+//       foods: dayFoods[index] || [],
+//       count: dayFoods[index]?.length || 0,
+//     })),
+//     totalItems,
+//     days, // ✅ add this
+//   };
+
+//   setFinalPlanJson(formattedJson);
+
+//   // ✅ send ONLY what parent needs OR send full formattedJson
+//   onUploaded?.(days);
+
+//   toast.success("Plan submitted successfully!");
+//   onClose?.();
+// };
+
+
+
+//   // Optional: see stored JSON in console
+//   // useEffect(() => {
+//   //   if (finalPlanJson) console.log("Saved Plan JSON:", finalPlanJson);
+//   // }, [finalPlanJson]);
+
+//   if (!showUploadModal) return null;
+
+//   return (
+//     <div
+//       className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999]"
+//       onClick={onClose}
+//     >
+//       <div
+//         className="relative bg-white w-[800px] rounded-[10px]"
+//         onClick={(e) => e.stopPropagation()}
+//       >
+//         <button
+//           onClick={onClose}
+//           className="absolute -right-10 top-0 bg-white px-3 py-1 rounded shadow cursor-pointer text-black"
+//         >
+//           x
+//         </button>
+
+//         {/* Fixed Header */}
+//         <div className="px-5 pt-[31px]">
+//           <div className="px-[9px] py-[5px]">
+//             <p className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
+//               05 July - 12 July
+//             </p>
+//             <p className="text-[#252525] text-[25px] font-semibold leading-[110%] tracking-[-0.5px]">
+//               Add Food
+//             </p>
+//           </div>
+//           <div className="border-b border-[#E1E6ED]"></div>
+//         </div>
+
+//         {/* Scrollable Content */}
+//         <div className="max-h-[500px] overflow-y-auto scroll-hide px-5 pb-7">
+//           <div className="flex flex-col gap-3 border border-[#F5F7FA] bg-[#F5F7FA] rounded-[10px] px-[18px] py-7 mt-6">
+//             {[...Array(10)].map((_, index) => (
+//               <div
+//                 key={index}
+//                 className="flex flex-col bg-white rounded-[15px] transition-all duration-300"
+//               >
+//                 {/* Day Header */}
+//                 <div
+//                   onClick={() => {
+//                     setExpandedDay(expandedDay === index ? null : index);
+//                     setInputValue(""); // Clear input when switching days
+//                   }}
+//                   className="flex justify-between items-center py-[18px] pl-[38px] pr-7 cursor-pointer"
+//                 >
+//                   <div className="flex flex-col gap-2">
+//                     <p className="text-[#252525] text-[15px] font-normal leading-[110%] tracking-[-0.3px]">
+//                       Day {index + 1}
+//                     </p>
+//                     <p className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]">
+//                       {dayFoods[index]?.length || 0} Items added
+//                     </p>
+//                   </div>
+//                   <div
+//                     className={`transition-transform duration-200 ${
+//                       expandedDay === index ? "rotate-180" : ""
+//                     }`}
+//                   >
+//                     <Image
+//                       src="/icons/right-down button.svg"
+//                       alt="toggle"
+//                       width={24}
+//                       height={24}
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Expanded Content */}
+//                 {expandedDay === index && (
+//                   <div className="px-[38px] pb-[18px] animate-in fade-in slide-in-from-top-1">
+//                     {/* Input Box */}
+//                     <div className="flex justify-between items-center bg-white border border-[#E1E6ED] rounded-[8px] py-[7px] pl-5 pr-2.5  w-[468px]">
+//                       <input
+//                         type="text"
+//                         placeholder="Enter food"
+//                         value={inputValue}
+//                         onChange={(e) => setInputValue(e.target.value)}
+//                         onKeyDown={(e) =>
+//                           e.key === "Enter" && handleAddFood(index)
+//                         }
+//                         className="text-[#252525] text-[12px] font-normal outline-none w-full"
+//                       />
+//                       <div
+//                         onClick={() => handleAddFood(index)}
+//                         className="flex justify-center items-center bg-[#308BF9] rounded-[4px] p-1 cursor-pointer hover:bg-blue-600 transition-colors"
+//                       >
+//                         <Image
+//                           src="/icons/hugeicons_addplus-01.svg"
+//                           alt="add"
+//                           width={20}
+//                           height={20}
+//                         />
+//                       </div>
+//                     </div>
+
+//                     {/* Tags List */}
+//                     <div className="flex flex-wrap gap-[12px] mt-[13px]">
+//                       {(dayFoods[index] || []).map((food, foodIndex) => (
+//                         <div
+//                           key={foodIndex}
+//                           className="flex items-center gap-3 py-[5px] pl-3 pr-[7px] bg-[#CAE1FF99] rounded-[8px]"
+//                         >
+//                           <p className="text-[#252525] text-[15px] font-normal leading-[130%] tracking-[-0.3px]">
+//                             {food}
+//                           </p>
+//                           <Image
+//                             src="/icons/close cancel icon.svg"
+//                             alt="remove"
+//                             width={16}
+//                             height={16}
+//                             className="cursor-pointer"
+//                             onClick={() => handleRemoveFood(index, foodIndex)}
+//                           />
+//                         </div>
+//                       ))}
+//                     </div>
+//                   </div>
+//                 )}
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+
+//         {/* Fixed Footer */}
+//         <div className="flex gap-3.5 justify-end items-center px-5 pb-7">
+//           <div className="mt-[23px] p-2.5">
+//             <p className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
+//               {totalItems} Items added
+//             </p>
+//           </div>
+
+//           <div className="flex justify-end mt-[23px]">
+//             <button
+//               onClick={handleSubmit}
+//               className="rounded-[10px] cursor-pointer text-[#FFFFFF] text-[12px] font-semibold bg-[#308BF9] px-5 py-[15px] hover:bg-blue-600 transition-colors"
+//             >
+//               Submit
+//             </button>
+//           </div>
+//         </div>
+
+//         {/* Optional: Debug UI (remove in production) */}
+//         {/* <pre className="p-4 text-xs overflow-auto">
+//           {finalPlanJson ? JSON.stringify(finalPlanJson, null, 2) : ""}
+//         </pre> */}
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
 "use client";
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 
-export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
+export default function CreatePlanPopUp({ open, onClose, onUploaded, selectedWeekText  }) {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [expandedDay, setExpandedDay] = useState(null);
 
-  // State to hold food items for each day: { 0: ["Idli", "Noodles"], 1: [] }
+  // { 0: ["Idli"], 1: [] }
   const [dayFoods, setDayFoods] = useState({});
-  // State for the current text being typed in the active input
   const [inputValue, setInputValue] = useState("");
-
-  // ✅ Variable to store final JSON after submit
-  const [finalPlanJson, setFinalPlanJson] = useState(null);
-  console.log("finalPlanJson2867:-", finalPlanJson);
 
   useEffect(() => {
     if (open) setShowUploadModal(true);
@@ -2872,13 +3123,9 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
       setShowUploadModal(false);
       setExpandedDay(null);
       setInputValue("");
-      // optional reset:
-      // setDayFoods({});
-      // setFinalPlanJson(null);
     }
   }, [open]);
 
-  // Handle adding a new food item
   const handleAddFood = (dayIndex) => {
     if (!inputValue.trim()) return;
 
@@ -2887,10 +3134,9 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
       [dayIndex]: [...(prev[dayIndex] || []), inputValue.trim()],
     }));
 
-    setInputValue(""); // Clear input after adding
+    setInputValue("");
   };
 
-  // Handle removing a food item
   const handleRemoveFood = (dayIndex, foodIndex) => {
     setDayFoods((prev) => ({
       ...prev,
@@ -2898,40 +3144,25 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
     }));
   };
 
-  // Calculate total items across all days
   const totalItems = Object.values(dayFoods).reduce(
     (sum, foodsArray) => sum + (foodsArray?.length || 0),
     0
   );
 
-  // ✅ Submit handler: ensures Day 1..10 always included, missing days => 0
+  // ✅ Submit => return days payload exactly as required
   const handleSubmit = () => {
-    const TOTAL_DAYS = 10;
+    const TOTAL_DAYS = 7;
 
-    const formattedJson = {
-      plan: Array.from({ length: TOTAL_DAYS }, (_, index) => ({
-        day: index + 1,
-        foods: dayFoods[index] || [], // missing day => []
-        count: dayFoods[index]?.length || 0, // missing day => 0
-      })),
-      totalItems,
-    };
+    const days = {};
+    for (let i = 0; i < TOTAL_DAYS; i++) {
+      days[`day${i + 1}`] = dayFoods[i] || [];
+    }
 
-    // ✅ stored in variable
-    setFinalPlanJson(formattedJson);
+    onUploaded?.(days);
 
-    // ✅ pass to parent if needed
-    onUploaded?.(formattedJson);
-
-     toast.success("Plan submitted successfully!");
-
-     onClose?.();
+    toast.success("Food submitted successfully!");
+    onClose?.();
   };
-
-  // Optional: see stored JSON in console
-  // useEffect(() => {
-  //   if (finalPlanJson) console.log("Saved Plan JSON:", finalPlanJson);
-  // }, [finalPlanJson]);
 
   if (!showUploadModal) return null;
 
@@ -2951,12 +3182,12 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
           x
         </button>
 
-        {/* Fixed Header */}
+        {/* Header */}
         <div className="px-5 pt-[31px]">
           <div className="px-[9px] py-[5px]">
-            <p className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
-              05 July - 12 July
-            </p>
+           <p className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
+  {selectedWeekText || "selected week"}
+</p>
             <p className="text-[#252525] text-[25px] font-semibold leading-[110%] tracking-[-0.5px]">
               Add Food
             </p>
@@ -2967,7 +3198,7 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
         {/* Scrollable Content */}
         <div className="max-h-[500px] overflow-y-auto scroll-hide px-5 pb-7">
           <div className="flex flex-col gap-3 border border-[#F5F7FA] bg-[#F5F7FA] rounded-[10px] px-[18px] py-7 mt-6">
-            {[...Array(10)].map((_, index) => (
+            {[...Array(7)].map((_, index) => (
               <div
                 key={index}
                 className="flex flex-col bg-white rounded-[15px] transition-all duration-300"
@@ -2976,7 +3207,7 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
                 <div
                   onClick={() => {
                     setExpandedDay(expandedDay === index ? null : index);
-                    setInputValue(""); // Clear input when switching days
+                    setInputValue("");
                   }}
                   className="flex justify-between items-center py-[18px] pl-[38px] pr-7 cursor-pointer"
                 >
@@ -2988,6 +3219,7 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
                       {dayFoods[index]?.length || 0} Items added
                     </p>
                   </div>
+
                   <div
                     className={`transition-transform duration-200 ${
                       expandedDay === index ? "rotate-180" : ""
@@ -3006,15 +3238,13 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
                 {expandedDay === index && (
                   <div className="px-[38px] pb-[18px] animate-in fade-in slide-in-from-top-1">
                     {/* Input Box */}
-                    <div className="flex justify-between items-center bg-white border border-[#E1E6ED] rounded-[8px] py-[7px] pl-5 pr-2.5  w-[468px]">
+                    <div className="flex justify-between items-center bg-white border border-[#E1E6ED] rounded-[8px] py-[7px] pl-5 pr-2.5 w-[468px]">
                       <input
                         type="text"
                         placeholder="Enter food"
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
-                        onKeyDown={(e) =>
-                          e.key === "Enter" && handleAddFood(index)
-                        }
+                        onKeyDown={(e) => e.key === "Enter" && handleAddFood(index)}
                         className="text-[#252525] text-[12px] font-normal outline-none w-full"
                       />
                       <div
@@ -3058,7 +3288,7 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
           </div>
         </div>
 
-        {/* Fixed Footer */}
+        {/* Footer */}
         <div className="flex gap-3.5 justify-end items-center px-5 pb-7">
           <div className="mt-[23px] p-2.5">
             <p className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
@@ -3075,11 +3305,6 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded }) {
             </button>
           </div>
         </div>
-
-        {/* Optional: Debug UI (remove in production) */}
-        {/* <pre className="p-4 text-xs overflow-auto">
-          {finalPlanJson ? JSON.stringify(finalPlanJson, null, 2) : ""}
-        </pre> */}
       </div>
     </div>
   );

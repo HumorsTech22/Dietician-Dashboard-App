@@ -559,8 +559,8 @@ export default function DashboardGraph({ testAnalyticsData }) {
   };
 
   return (
-    <div className="px-6">
-      <div className="flex justify-center w-full h-[300px]">
+    <div className="px-6 flex flex-col items-center overflow-x-auto">
+      <div className="flex items-center justify-center w-[1000px] h-[300px]">
         {chartData.labels.length > 0 ? (
           <Bar data={chartData} options={options} />
         ) : (
@@ -570,7 +570,7 @@ export default function DashboardGraph({ testAnalyticsData }) {
         )}
       </div>
 
-      <div className="flex justify-center border-t border-[#E1E6ED] mt-[13px] pt-[13px]">
+      <div className="w-full flex justify-center border-t border-[#E1E6ED] mt-[13px] pt-[13px]">
         <span className="text-[#535359] text-[10px] font-normal leading-[110%] tracking-[-0.2px]">
           {dateRange}
         </span>
