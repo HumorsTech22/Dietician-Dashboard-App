@@ -137,8 +137,19 @@ export const fetchClientProfileData = async (dieticianId, profileId) => {
 
 
 
-export const fetchWeeklyAnalysisComplete = async (requestData) => {
-  return apiFetcher(API_ENDPOINTS.MEALANALYSIS.WEEKLYANALYSISCOMPLETE, {
+// export const fetchWeeklyAnalysisComplete = async (requestData) => {
+//   return apiFetcher(API_ENDPOINTS.MEALANALYSIS.WEEKLYANALYSISCOMPLETE, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify(requestData),
+//   });
+// };
+
+
+export const fetchWeeklyAnalysisComplete1 = async (requestData) => {
+  return apiFetcher(API_ENDPOINTS.MEALANALYSIS.WEEKLYANALYSISCOMPLETE1, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
