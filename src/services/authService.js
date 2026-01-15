@@ -147,6 +147,21 @@ export const fetchClientProfileData = async (dieticianId, profileId) => {
 //   });
 // };
 
+export const checkWeeklyAnalysisService = async (dieticianId, profileId, startDate, endDate) => {
+  return apiFetcher(API_ENDPOINTS.MEALANALYSIS.CHECKWEEKLYANALYSIS, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      dietician_id: dieticianId,
+      profile_id: profileId,
+      start_date: startDate,
+      end_date: endDate,
+    }),
+  });
+};
+
 
 export const fetchWeeklyAnalysisComplete1 = async (requestData) => {
   return apiFetcher(API_ENDPOINTS.MEALANALYSIS.WEEKLYANALYSISCOMPLETE1, {
@@ -157,6 +172,7 @@ export const fetchWeeklyAnalysisComplete1 = async (requestData) => {
     body: JSON.stringify(requestData),
   });
 };
+
 
 
 export const fetchDashboardTableCards = async (dieticianId) => {
