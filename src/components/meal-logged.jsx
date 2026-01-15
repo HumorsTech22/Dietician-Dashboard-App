@@ -1380,6 +1380,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useSelector } from "react-redux";
 import { fetchWeeklyAnalysisComplete1 } from "../services/authService";
+import { checkWeeklyAnalysisService } from "../services/authService";
 import CreatePlanPopUp from "./pop-folder/create-plan-popup";
 import MealSidebar from "./meal-sidebar";
 import MealTracked from "./meal-tracked";
@@ -1503,68 +1504,206 @@ export default function MealLogged() {
     return { start: w.startDate, end: w.endDate };
   };
 
-  const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId, days) => {
+  // const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId, days) => {
    
+  //   setLoading(true);
+  //   setError(null);
+  //   setErrorType(null);
+  //   setApiMessage(null);
+
+  //   try {
+  //     const requestBody = {
+  //       dietician_id: clientProfile?.dietician_id,
+  //       profile_id: clientProfile?.profile_id,
+  //       start_date: startDate,
+  //       end_date: endDate,
+  //       ...(dietPlanId && { diet_plan_id: dietPlanId }),
+  // //       "days": {
+  // //   "day1": ["idli", "sambar","coconut chutny", "sex power tablet","Weed"],
+  // //   "day2": [],
+  // //   "day3": ["roti", "dal"],
+  // //   "day4": []
+  // // }
+  //      days: days || {},
+  //     };
+
+  //     const response = await fetchWeeklyAnalysisComplete1(requestBody);
+  //     if (response?.error) {
+  //       setWeeklyAnalysisData([]);
+  //       setApiMessage(null);
+  //       setError(response.error || "Something went wrong.");
+  //       setErrorType("generic");
+  //       return;
+  //     }
+
+  //     if (response?.api_response?.food_level_evaluation) {
+  //       const arr = response.api_response.food_level_evaluation;
+  //       setWeeklyAnalysisData(arr);
+  //       setApiMessage(null);
+  //       setError(null);
+  //       setErrorType(null);
+  //     } else if (response?.message) {
+  //       setApiMessage({
+  //         message: response.message,
+  //         ...(response.end_date && { end_date: response.end_date }),
+  //       });
+  //       setWeeklyAnalysisData([]);
+  //       setError(null);
+  //       setErrorType(null);
+  //     } else {
+  //       setWeeklyAnalysisData([]);
+  //       setApiMessage({ message: "No food data available for this week." });
+  //       setError(null);
+  //       setErrorType(null);
+  //     }
+  //   } catch (err) {
+  //     console.error("API Error:", err);
+  //     setError(err?.message || "Failed to fetch weekly analysis");
+  //     setErrorType("generic");
+  //     setWeeklyAnalysisData([]);
+  //     setApiMessage(null);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
+  // const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId, days) => {
+  //   setLoading(true);
+  //   setError(null);
+  //   setErrorType(null);
+  //   setApiMessage(null);
+
+  //   console.log("API Request Data:", {
+  //     dietician_id: clientProfile?.dietician_id,
+  //     profile_id: clientProfile?.profile_id,
+  //     start_date: startDate,
+  //     end_date: endDate,
+  //     diet_plan_id: dietPlanId,
+  //     days: days,
+  //     hasDaysData: !!days && Object.keys(days).length > 0
+  //   });
+  
+  //   try {
+  //     // 🔹 STEP 1: CHECK WEEKLY ANALYSIS
+  //     const checkResponse = await checkWeeklyAnalysisService(
+  //       clientProfile?.dietician_id,
+  //       clientProfile?.profile_id,
+  //       startDate,
+  //       endDate
+
+  //       // {
+  //       //   "dietician_id": "RespyrD01",
+  //       //  "end_date": "2025-12-27",
+  //       //  "profile_id":"profile8",
+  //       //  "start_date":"2025-12-21"}
+  //     );
+  
+  //     // If API says analysis not available
+  //     if (checkResponse?.success === false || checkResponse?.exists === false) {
+  //       setWeeklyAnalysisData([]);
+  //       setApiMessage({ message: "No weekly analysis found for this week." });
+  //       setLoading(false);
+  //       return;
+  //     }
+  
+  //     // 🔹 STEP 2: EXISTING API (UNCHANGED)
+  //     const requestBody = {
+  //       dietician_id: clientProfile?.dietician_id,
+  //       profile_id: clientProfile?.profile_id,
+  //       start_date: startDate,
+  //       end_date: endDate,
+  //       ...(dietPlanId && { diet_plan_id: dietPlanId }),
+  //       days: days || {},
+  //     };
+  
+  //     const response = await fetchWeeklyAnalysisComplete1(requestBody);
+  //     console.log("API Response1622:", response);
+  
+  //     if (response?.api_response?.food_level_evaluation) {
+  //       setWeeklyAnalysisData(response.api_response.food_level_evaluation);
+  //     } else {
+  //       setWeeklyAnalysisData([]);
+  //       setApiMessage({ message: "No food data available for this week." });
+  //     }
+  //   } catch (err) {
+  //     console.error("API Error:", err);
+  //     setError(err?.message || "Failed to fetch weekly analysis");
+  //     setWeeklyAnalysisData([]);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
+  const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId, days) => {
     setLoading(true);
     setError(null);
     setErrorType(null);
     setApiMessage(null);
-
+  
+  
     try {
-      const requestBody = {
-        dietician_id: clientProfile?.dietician_id,
-        profile_id: clientProfile?.profile_id,
-        start_date: startDate,
-        end_date: endDate,
-        ...(dietPlanId && { diet_plan_id: dietPlanId }),
-        "days": {
-    "day1": ["idli", "sambar","coconut chutny", "sex power tablet","Weed"],
-    "day2": [],
-    "day3": ["roti", "dal"],
-    "day4": []
-  }
-        // days: days || {},
-      };
-
-      const response = await fetchWeeklyAnalysisComplete1(requestBody);
-      if (response?.error) {
-        setWeeklyAnalysisData([]);
-        setApiMessage(null);
-        setError(response.error || "Something went wrong.");
-        setErrorType("generic");
+      // 🔹 STEP 1: CHECK WEEKLY ANALYSIS
+      const checkResponse = await checkWeeklyAnalysisService(
+        clientProfile?.dietician_id,
+        clientProfile?.profile_id,
+        startDate,
+        endDate
+      );
+  
+      // Check if analysis exists based on the actual response structure
+      const hasAnalysisData = checkResponse?.status === true && 
+                             checkResponse?.data_json?.food_level_evaluation;
+  
+      if (!hasAnalysisData) {
+       
+        // Only proceed to fetchWeeklyAnalysisComplete1 if we have days data
+        if (days && Object.keys(days).length > 0) {
+          const requestBody = {
+            dietician_id: clientProfile?.dietician_id,
+            profile_id: clientProfile?.profile_id,
+            start_date: startDate,
+            end_date: endDate,
+            ...(dietPlanId && { diet_plan_id: dietPlanId }),
+            days: days || {},
+          };
+  
+          const response = await fetchWeeklyAnalysisComplete1(requestBody);
+  
+          if (response?.api_response?.food_level_evaluation) {
+            setWeeklyAnalysisData(response.api_response.food_level_evaluation);
+            setApiMessage(null);
+          } else if (response?.message) {
+            setWeeklyAnalysisData([]);
+            setApiMessage({ message: response.message });
+          } else {
+            setWeeklyAnalysisData([]);
+            setApiMessage({ message: "No food data available for this week." });
+          }
+        } else {
+          // No days data and no existing analysis
+          setWeeklyAnalysisData([]);
+          setApiMessage({ message: "No weekly analysis found. Please add food to generate analysis." });
+        }
         return;
       }
-
-      if (response?.api_response?.food_level_evaluation) {
-        const arr = response.api_response.food_level_evaluation;
-        setWeeklyAnalysisData(arr);
-        setApiMessage(null);
-        setError(null);
-        setErrorType(null);
-      } else if (response?.message) {
-        setApiMessage({
-          message: response.message,
-          ...(response.end_date && { end_date: response.end_date }),
-        });
-        setWeeklyAnalysisData([]);
-        setError(null);
-        setErrorType(null);
-      } else {
-        setWeeklyAnalysisData([]);
-        setApiMessage({ message: "No food data available for this week." });
-        setError(null);
-        setErrorType(null);
-      }
+  
+      // 🔹 If we have existing analysis data from check API, use it
+      console.log("Using existing analysis data from check API");
+      setWeeklyAnalysisData(checkResponse.data_json.food_level_evaluation);
+      setApiMessage(null);
+  
     } catch (err) {
       console.error("API Error:", err);
       setError(err?.message || "Failed to fetch weekly analysis");
-      setErrorType("generic");
       setWeeklyAnalysisData([]);
-      setApiMessage(null);
     } finally {
       setLoading(false);
     }
   };
+  
+
 
   // ✅ API call happens automatically when daysPayload changes (submit)
   useEffect(() => {
