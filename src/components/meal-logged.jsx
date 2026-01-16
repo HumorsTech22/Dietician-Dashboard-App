@@ -1914,6 +1914,87 @@ const selectedWeekText = selectedWeek
           </div>
         )}
 
+
+                 <div className="flex justify-between bg-[#E1E6ED] rounded-[15px] px-5 py-[19px] ml-[59px] mr-[59px]">
+              <div className="flex flex-col justify-between w-[170px] bg-white rounded-[8px] py-[19px] pl-5 pr-10">
+                 <span className="text-[#252525] text-[25px] font-semibold tracking-[-0.5px] leading-[126%]">
+                   {totalFoods}
+                 </span>
+                 <p className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[0.2px]">
+                   Total Foods
+                 </p>
+               </div>
+
+               <div className="flex gap-20 bg-white rounded-[8px] py-[19px] px-5">
+                 <div className="flex flex-col justify-between">
+                   <span className="text-[#252525] text-[25px] font-semibold tracking-[-0.5px] leading-[126%]">
+                     {goalCounts.Support || 0}
+                   </span>
+                   <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[0.2px]">
+                     Foods Consumed
+                   </span>
+                 </div>
+
+                 <div className="flex flex-col justify-between">
+                   <span className="text-[#252525] text-[25px] font-semibold tracking-[-0.5px] leading-[126%]">
+                     {goalCounts.Low || 0}
+                   </span>
+                   <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[0.2px]">
+                     Foods Missed
+                   </span>
+                 </div>
+               </div>
+
+               <div className="flex flex-col gap-[12px] bg-white rounded-[8px] py-[19px] pl-5 pr-10">
+                 <div className="flex flex-col gap-5">
+                   <div className="flex items-center gap-2.5">
+                     <span className="text-[#252525] text-[18px] font-semibold tracking-[-0.5px] leading-[126%]">
+                      {avgScore}
+                     </span>
+                    <div className="w-px h-4 bg-[#D9D9D9]" />
+                     <span className="text-[#252525] text-[18px] font-semibold tracking-[-0.36px] leading-[126%]">
+                      {zone}
+                     </span>
+                   </div>
+                   <div className="flex justify-start">
+                     <svg
+                       xmlns="http://www.w3.org/2000/svg"
+                      width="117"
+                       height="6"
+                       viewBox="0 0 117 6"
+                       fill="none"
+                     >
+                       <path
+                        d="M3 3H114"
+                       stroke="#D9D9D9"
+                        strokeWidth="5"
+                         strokeLinecap="round"
+                      />
+                       <path
+                         d={`M3 3H${Math.max(
+                           3,
+                           Math.min(
+                             114,
+                             Math.round((avgScore / 100) * 111) + 3
+                           )
+                        )}`}
+                        stroke="#FFC412"
+                         strokeWidth="5"
+                         strokeLinecap="round"
+                       />
+                    </svg>
+                  </div>
+                 </div>
+                 <div>
+                  <p className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">
+                     Overall Metabolic Compatibility Score
+                   </p>
+                </div>
+               </div>
+            </div>
+
+                
+
         {showMessageState && (
           <div className="flex justify-between items-center px-5 py-[19px] bg-[#E1E6ED] rounded-[15px]">
             <p className="text-[16px] font-semibold leading-[110%] tracking-[-0.4px] text-[#535359]">
