@@ -3121,6 +3121,7 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded, selectedWee
       setExpandedDay(null);
       setInputValue("");
       setIsSubmitting(false);
+      setDayFoods({});
     }
   }, [open]);
 
@@ -3160,8 +3161,6 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded, selectedWee
       for (let i = 0; i < TOTAL_DAYS; i++) {
         days[`day${i + 1}`] = dayFoods[i] || [];
       }
-
-      console.log("Submitting days payload:", days);
       
       // Call onUploaded first, wait for it if it's async
       if (onUploaded) {
