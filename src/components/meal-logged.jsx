@@ -1374,6 +1374,7 @@
 
 
 
+
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -1864,6 +1865,14 @@ export default function MealLogged() {
   const showNoDataState = !apiMessage && dataArr.length === 0 && !loading && !error;
   const showDataState = dataArr.length > 0;
 
+  const hideAddFoodButton =
+  apiMessage?.message?.includes("No test taken in last 72 hrs") ||
+  apiMessage?.message?.includes("Weekly analysis will be available after") ||
+  apiMessage?.end_date;
+
+const showAddFoodButton = !hideAddFoodButton;
+
+
 
     const effectiveWeekIdx = selectedWeekIdx === null ? currentWeekIdx : selectedWeekIdx;
 const selectedWeek = weeks?.[effectiveWeekIdx] || null;
@@ -2058,12 +2067,14 @@ const selectedWeekText = selectedWeek
             <p className="text-[16px] font-semibold leading-[110%] tracking-[-0.4px] text-[#535359]">
               {apiMessage?.message}
             </p>
+            {showAddFoodButton && (
             <button
               onClick={handleCreatePlanClick}
               className="w-[146px] font-semibold text-[#308BF9] text-[12px] px-5 py-[15px] cursor-pointer rounded-[10px] bg-[#FFFFFF] border border-[#308BF9]"
             >
               Add Food
             </button>
+             )}
           </div>
         )}
 
@@ -2072,12 +2083,14 @@ const selectedWeekText = selectedWeek
             <p className="text-[16px] font-semibold leading-[110%] tracking-[-0.4px] text-[#535359]">
               No food added for this week.
             </p>
+            {showAddFoodButton && (
             <button
               onClick={handleCreatePlanClick}
               className="w-[146px] font-semibold text-[#308BF9] text-[12px] px-5 py-[15px] cursor-pointer rounded-[10px] bg-[#FFFFFF] border border-[#308BF9]"
             >
               Add Food
             </button>
+             )}
           </div>
         )}
 
