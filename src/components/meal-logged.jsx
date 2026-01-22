@@ -1375,6 +1375,9 @@
 
 
 
+
+
+
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -1394,8 +1397,9 @@ export default function MealLogged() {
   const [error, setError] = useState(null);
   const [errorType, setErrorType] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // ✅ FIXED: Initialize with 0
   const [visibleWeekStart, setVisibleWeekStart] = useState(0);
-  const visibleWeeksCount = 4;
+
   const [selectedWeekIdx, setSelectedWeekIdx] = useState(null);
   console.log("selectedWeekIdx1399:-", selectedWeekIdx);
 
@@ -1403,6 +1407,7 @@ export default function MealLogged() {
   const [daysPayload, setDaysPayload] = useState({});
 
   const clientProfile = useSelector((state) => state.clientProfile.data);
+  const visibleWeeksCount = 4;
 
   const handleFilterChange = (filter) => setActiveFilter(filter);
 
@@ -1500,351 +1505,38 @@ export default function MealLogged() {
     return result;
   }, [clientProfile]);
 
+  // ✅ ADD THIS: Update visibleWeekStart when weeks is ready
+  useEffect(() => {
+    if (weeks?.length > 0 && currentWeekIdx !== null) {
+      const middlePosition = 2;
+      const idealStart = Math.max(0, currentWeekIdx - middlePosition);
+      const maxStart = Math.max(0, weeks.length - visibleWeeksCount);
+      const newStart = Math.min(idealStart, maxStart);
+  
+      setVisibleWeekStart(newStart);
+    }
+
+  }, [weeks, currentWeekIdx, visibleWeeksCount]);
+  
+
   const getWeekDateRange = (weekIdx) => {
     const w = weeks?.[weekIdx];
     if (!w) return null;
     return { start: w.startDate, end: w.endDate };
   };
 
-  // const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId, days) => {
-   
-  //   setLoading(true);
-  //   setError(null);
-  //   setErrorType(null);
-  //   setApiMessage(null);
-
-  //   try {
-  //     const requestBody = {
-  //       dietician_id: clientProfile?.dietician_id,
-  //       profile_id: clientProfile?.profile_id,
-  //       start_date: startDate,
-  //       end_date: endDate,
-  //       ...(dietPlanId && { diet_plan_id: dietPlanId }),
-  // //       "days": {
-  // //   "day1": ["idli", "sambar","coconut chutny", "sex power tablet","Weed"],
-  // //   "day2": [],
-  // //   "day3": ["roti", "dal"],
-  // //   "day4": []
-  // // }
-  //      days: days || {},
-  //     };
-
-  //     const response = await fetchWeeklyAnalysisComplete1(requestBody);
-  //     if (response?.error) {
-  //       setWeeklyAnalysisData([]);
-  //       setApiMessage(null);
-  //       setError(response.error || "Something went wrong.");
-  //       setErrorType("generic");
-  //       return;
-  //     }
-
-  //     if (response?.api_response?.food_level_evaluation) {
-  //       const arr = response.api_response.food_level_evaluation;
-  //       setWeeklyAnalysisData(arr);
-  //       setApiMessage(null);
-  //       setError(null);
-  //       setErrorType(null);
-  //     } else if (response?.message) {
-  //       setApiMessage({
-  //         message: response.message,
-  //         ...(response.end_date && { end_date: response.end_date }),
-  //       });
-  //       setWeeklyAnalysisData([]);
-  //       setError(null);
-  //       setErrorType(null);
-  //     } else {
-  //       setWeeklyAnalysisData([]);
-  //       setApiMessage({ message: "No food data available for this week." });
-  //       setError(null);
-  //       setErrorType(null);
-  //     }
-  //   } catch (err) {
-  //     console.error("API Error:", err);
-  //     setError(err?.message || "Failed to fetch weekly analysis");
-  //     setErrorType("generic");
-  //     setWeeklyAnalysisData([]);
-  //     setApiMessage(null);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-
-  // const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId, days) => {
-  //   setLoading(true);
-  //   setError(null);
-  //   setErrorType(null);
-  //   setApiMessage(null);
-
-  //   console.log("API Request Data:", {
-  //     dietician_id: clientProfile?.dietician_id,
-  //     profile_id: clientProfile?.profile_id,
-  //     start_date: startDate,
-  //     end_date: endDate,
-  //     diet_plan_id: dietPlanId,
-  //     days: days,
-  //     hasDaysData: !!days && Object.keys(days).length > 0
-  //   });
-  
-  //   try {
-  //     // 🔹 STEP 1: CHECK WEEKLY ANALYSIS
-  //     const checkResponse = await checkWeeklyAnalysisService(
-  //       clientProfile?.dietician_id,
-  //       clientProfile?.profile_id,
-  //       startDate,
-  //       endDate
-
-  //       // {
-  //       //   "dietician_id": "RespyrD01",
-  //       //  "end_date": "2025-12-27",
-  //       //  "profile_id":"profile8",
-  //       //  "start_date":"2025-12-21"}
-  //     );
-  
-  //     // If API says analysis not available
-  //     if (checkResponse?.success === false || checkResponse?.exists === false) {
-  //       setWeeklyAnalysisData([]);
-  //       setApiMessage({ message: "No weekly analysis found for this week." });
-  //       setLoading(false);
-  //       return;
-  //     }
-  
-  //     // 🔹 STEP 2: EXISTING API (UNCHANGED)
-  //     const requestBody = {
-  //       dietician_id: clientProfile?.dietician_id,
-  //       profile_id: clientProfile?.profile_id,
-  //       start_date: startDate,
-  //       end_date: endDate,
-  //       ...(dietPlanId && { diet_plan_id: dietPlanId }),
-  //       days: days || {},
-  //     };
-  
-  //     const response = await fetchWeeklyAnalysisComplete1(requestBody);
-  //     console.log("API Response1622:", response);
-  
-  //     if (response?.api_response?.food_level_evaluation) {
-  //       setWeeklyAnalysisData(response.api_response.food_level_evaluation);
-  //     } else {
-  //       setWeeklyAnalysisData([]);
-  //       setApiMessage({ message: "No food data available for this week." });
-  //     }
-  //   } catch (err) {
-  //     console.error("API Error:", err);
-  //     setError(err?.message || "Failed to fetch weekly analysis");
-  //     setWeeklyAnalysisData([]);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-
-  const formatAvailabilityMessage = (endDateObj) => {
-    const date = new Date(endDateObj);
-  
-    // 9:00 PM IST
-    date.setHours(21, 0, 0, 0);
-  
-    return date.toLocaleString("en-GB", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-      timeZone: "Asia/Kolkata",
-    });
+  const formatDisplayDate = (date) => {
+    // Format: "24 January 2026 9:00 PM"
+    const day = date.getDate();
+    const month = date.toLocaleString('en-US', { month: 'long' });
+    const year = date.getFullYear();
+    const hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12;
+    
+    return `${day} ${month} ${year} ${formattedHours}:${minutes} ${ampm}`;
   };
-
-  
-
-  // const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId, days) => {
-  //   setLoading(true);
-  //   setError(null);
-  //   setErrorType(null);
-  //   setApiMessage(null);
-  
-  
-  //   try {
-  //     // 🔹 STEP 1: CHECK WEEKLY ANALYSIS
-  //     const checkResponse = await checkWeeklyAnalysisService(
-  //       clientProfile?.dietician_id,
-  //       clientProfile?.profile_id,
-  //       startDate,
-  //       endDate
-  //     );
-  
-  //     // Check if analysis exists based on the actual response structure
-  //     const hasAnalysisData = checkResponse?.status === true && 
-  //                            checkResponse?.data_json?.food_level_evaluation;
-  
-  //     if (!hasAnalysisData) {
-       
-  //       // Only proceed to fetchWeeklyAnalysisComplete1 if we have days data
-  //       if (days && Object.keys(days).length > 0) {
-  //         const requestBody = {
-  //           dietician_id: clientProfile?.dietician_id,
-  //           profile_id: clientProfile?.profile_id,
-  //           start_date: startDate,
-  //           end_date: endDate,
-  //           ...(dietPlanId && { diet_plan_id: dietPlanId }),
-  //           days: days || {},
-  //         };
-  
-  //         const response = await fetchWeeklyAnalysisComplete1(requestBody);
-
-  //         // ✅ CUSTOM MESSAGE HANDLING
-  //         const apiMsg = response?.message || "";
-
-  //         if (apiMsg.includes("Latest test data is older than 72 hours")) {
-  //           setWeeklyAnalysisData([]);
-  //           setApiMessage({
-  //             message:
-  //               "No test taken in last 72 hrs, so weekly analysis will not be available.",
-  //           });
-  //           return;
-  //         }
-  
-  //         if (response?.api_response?.food_level_evaluation) {
-  //           setWeeklyAnalysisData(response.api_response.food_level_evaluation);
-  //           setApiMessage(null);
-  //         } else if (response?.message) {
-  //           setWeeklyAnalysisData([]);
-  //           setApiMessage({ message: response.message });
-  //         } else {
-  //           setWeeklyAnalysisData([]);
-  //           setApiMessage({ message: "No food data available for this week." });
-  //         }
-  //       } else {
-  //         // No days data and no existing analysis
-  //         setWeeklyAnalysisData([]);
-  //         setApiMessage({ message: "No weekly analysis found. Please add food to generate analysis." });
-  //       }
-  //       return;
-  //     }
-  
-  //     // 🔹 If we have existing analysis data from check API, use it
-  //     console.log("Using existing analysis data from check API");
-  //     setWeeklyAnalysisData(checkResponse.data_json.food_level_evaluation);
-  //     setApiMessage(null);
-  
-  //   } catch (err) {
-  //     console.error("API Error:", err);
-  //     setError(err?.message || "Failed to fetch weekly analysis");
-  //     setWeeklyAnalysisData([]);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-
-
-  // const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId, days) => {
-  //   setLoading(true);
-  //   setError(null);
-  //   setErrorType(null);
-  //   setApiMessage(null);
-  
-  //   try {
-  //     // 🔹 STEP 1: CHECK WEEKLY ANALYSIS
-  //     const checkResponse = await checkWeeklyAnalysisService(
-  //       clientProfile?.dietician_id,
-  //       clientProfile?.profile_id,
-  //       startDate,
-  //       endDate
-  //     );
-  
-  //     // Check if analysis exists based on the actual response structure
-  //     const hasAnalysisData = checkResponse?.status === true && 
-  //                            checkResponse?.data_json?.food_level_evaluation;
-  
-  //     if (!hasAnalysisData) {
-  //       // Get the current week index
-  //       const weekIdxToUse = selectedWeekIdx === null ? currentWeekIdx : selectedWeekIdx;
-        
-  //       // Only show the availability message for the last week (previous week)
-  //       const isLastWeek = weekIdxToUse === currentWeekIdx - 1;
-        
-  //       let availabilityMessage = null;
-        
-  //       if (isLastWeek) {
-  //         // Parse the end date to get the target date for the message
-  //         const [year, month, day] = endDate.split("-").map(Number);
-  //         const endDateObj = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
-          
-  //         // Format the date for display (e.g., "22 January 2026")
-  //         const formattedDate = endDateObj.toLocaleDateString('en-GB', {
-  //           day: 'numeric',
-  //           month: 'long',
-  //           year: 'numeric',
-  //           timeZone: 'UTC'
-  //         });
-          
-  //         // Calculate the time (9:00 PM) - you can adjust this as needed
-  //         const availableTime = "9:00 PM";
-          
-  //         availabilityMessage = `Weekly analysis will be available after ${formattedDate} ${availableTime}`;
-  //       }
-        
-  //       // Only proceed to fetchWeeklyAnalysisComplete1 if we have days data
-  //       if (days && Object.keys(days).length > 0) {
-  //         const requestBody = {
-  //           dietician_id: clientProfile?.dietician_id,
-  //           profile_id: clientProfile?.profile_id,
-  //           start_date: startDate,
-  //           end_date: endDate,
-  //           ...(dietPlanId && { diet_plan_id: dietPlanId }),
-  //           days: days || {},
-  //         };
-  
-  //         const response = await fetchWeeklyAnalysisComplete1(requestBody);
-  
-  //         // ✅ CUSTOM MESSAGE HANDLING
-  //         const apiMsg = response?.message || "";
-  
-  //         if (apiMsg.includes("Latest test data is older than 72 hours")) {
-  //           setWeeklyAnalysisData([]);
-  //           setApiMessage({
-  //             message:
-  //               "No test taken in last 72 hrs, so weekly analysis will not be available.",
-  //           });
-  //           return;
-  //         }
-  
-  //         if (response?.api_response?.food_level_evaluation) {
-  //           setWeeklyAnalysisData(response.api_response.food_level_evaluation);
-  //           setApiMessage(null);
-  //         } else if (response?.message) {
-  //           setWeeklyAnalysisData([]);
-  //           setApiMessage({ message: response.message });
-  //         } else {
-  //           setWeeklyAnalysisData([]);
-  //           setApiMessage({ message: availabilityMessage || "No food data available for this week." });
-  //         }
-  //       } else {
-  //         // No days data and no existing analysis
-  //         setWeeklyAnalysisData([]);
-  //         setApiMessage({ 
-  //           message: availabilityMessage || "No weekly analysis found. Please add food to generate analysis.",
-  //           end_date: endDate
-  //         });
-  //       }
-  //       return;
-  //     }
-  
-  //     // 🔹 If we have existing analysis data from check API, use it
-  //     console.log("Using existing analysis data from check API");
-  //     setWeeklyAnalysisData(checkResponse.data_json.food_level_evaluation);
-  //     setApiMessage(null);
-  
-  //   } catch (err) {
-  //     console.error("API Error:", err);
-  //     setError(err?.message || "Failed to fetch weekly analysis");
-  //     setWeeklyAnalysisData([]);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
 
   const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId, days) => {
     setLoading(true);
@@ -1952,75 +1644,6 @@ export default function MealLogged() {
       setLoading(false);
     }
   };
-  
-  // Helper function to format date for display (with time)
-  const formatDisplayDate = (date) => {
-    // Format: "24 January 2026 9:00 PM"
-    const day = date.getDate();
-    const month = date.toLocaleString('en-US', { month: 'long' });
-    const year = date.getFullYear();
-    const hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    const formattedHours = hours % 12 || 12;
-    
-    return `${day} ${month} ${year} ${formattedHours}:${minutes} ${ampm}`;
-  };
-
-
-  // ✅ API call happens automatically when daysPayload changes (submit)
-  // useEffect(() => {
-  //   if (!clientProfile?.dietician_id || !clientProfile?.profile_id) {
-  //     setWeeklyAnalysisData([]);
-  //     setApiMessage(null);
-  //     setError(null);
-  //     setErrorType(null);
-  //     return;
-  //   }
-
-  //   const activePlan = clientProfile?.plans_summary?.active?.[0];
-    
-  //   let dietPlanId = null;
-  //   let planStart = null;
-  //   let planEnd = null;
-
-  //   if (activePlan) {
-  //     dietPlanId = activePlan.id;
-  //     planStart = toLocalMidnight(activePlan.plan_start_date);
-  //     planEnd = toLocalMidnight(activePlan.plan_end_date);
-  //   }
-
-  //   const weekIdxToUse = selectedWeekIdx === null ? currentWeekIdx : selectedWeekIdx;
-  //   const range = getWeekDateRange(weekIdxToUse);
-    
-  //   if (!range) {
-  //     // If no week range, use current week
-  //     const today = new Date();
-  //     const weekAgo = new Date(today);
-  //     weekAgo.setUTCDate(today.getUTCDate() - 6);
-      
-  //     const startDate = formatDateForApi(weekAgo);
-  //     const endDate = formatDateForApi(today);
-      
-  //     fetchWeeklyAnalysis(startDate, endDate, dietPlanId, daysPayload);
-  //     return;
-  //   }
-
-  //   const todayEnd = endOfDay(new Date());
-
-  //   let startDateObj = range.start;
-  //   let endDateObj = range.end;
-
-  //   // Adjust dates based on plan dates if available
-  //   if (planStart && startDateObj < planStart) startDateObj = planStart;
-  //   if (planEnd && endDateObj > planEnd) endDateObj = planEnd;
-  //   if (endDateObj > todayEnd) endDateObj = todayEnd;
-
-  //   const startDate = formatDateForApi(startDateObj);
-  //   const endDate = formatDateForApi(endDateObj);
-
-  //   fetchWeeklyAnalysis(startDate, endDate, dietPlanId, daysPayload);
-  // }, [clientProfile, selectedWeekIdx, currentWeekIdx, weeks?.length, daysPayload]);
 
   useEffect(() => {
     const activePlan = clientProfile?.plans_summary?.active?.[0];
@@ -2060,12 +1683,10 @@ export default function MealLogged() {
     clientProfile,
     selectedWeekIdx,
     currentWeekIdx,
-    weeks?.length ?? 0,   // ✅ ALWAYS a number
+    weeks?.length ?? 0,
     daysPayload
   ]);
   
-  
-
   // Clear daysPayload when week changes
   useEffect(() => {
     setDaysPayload({});
@@ -2088,11 +1709,19 @@ export default function MealLogged() {
   const canGoPrev = visibleWeekStart > 0;
 
   const handleNextWeeks = () => {
-    if (canGoNext) setVisibleWeekStart((p) => p + 1);
+    if (canGoNext) {
+      setVisibleWeekStart((prev) => {
+        const newStart = prev + 1;
+        const maxStart = Math.max(0, (weeks?.length || 0) - visibleWeeksCount);
+        return Math.min(newStart, maxStart);
+      });
+    }
   };
 
   const handlePrevWeeks = () => {
-    if (canGoPrev) setVisibleWeekStart((p) => p - 1);
+    if (canGoPrev) {
+      setVisibleWeekStart((prev) => Math.max(0, prev - 1));
+    }
   };
 
   const visibleWeeks = (weeks || []).slice(visibleWeekStart, visibleWeekStart + visibleWeeksCount);
@@ -2104,7 +1733,6 @@ export default function MealLogged() {
 
   const handlePopupClose = () => setIsModalOpen(false);
 
-  // ✅ THIS is the main part: submit -> update daysPayload -> useEffect calls API -> UI updates
   const handleFoodUploaded = (days) => {
     setDaysPayload(days || {});
     setIsModalOpen(false);
@@ -2119,17 +1747,14 @@ export default function MealLogged() {
   apiMessage?.message?.includes("Weekly analysis will be available after") ||
   apiMessage?.end_date;
 
-const showAddFoodButton = !hideAddFoodButton;
+  const showAddFoodButton = !hideAddFoodButton;
 
+  const effectiveWeekIdx = selectedWeekIdx === null ? currentWeekIdx : selectedWeekIdx;
+  const selectedWeek = weeks?.[effectiveWeekIdx] || null;
 
-
-    const effectiveWeekIdx = selectedWeekIdx === null ? currentWeekIdx : selectedWeekIdx;
-const selectedWeek = weeks?.[effectiveWeekIdx] || null;
-
-const selectedWeekText = selectedWeek
-  ? `${fmt(selectedWeek.startDate)} - ${fmt(selectedWeek.endDate)}`
-  : "";
-
+  const selectedWeekText = selectedWeek
+    ? `${fmt(selectedWeek.startDate)} - ${fmt(selectedWeek.endDate)}`
+    : "";
 
   return (
     <>
@@ -2228,87 +1853,85 @@ const selectedWeekText = selectedWeek
           </div>
         )}
 
-{showDataState && (
-                 <div className="flex justify-between bg-[#E1E6ED] rounded-[15px] px-5 py-[19px] ml-[59px] mr-[59px]">
-              <div className="flex flex-col justify-between w-[170px] bg-white rounded-[8px] py-[19px] pl-5 pr-10">
-                 <span className="text-[#252525] text-[25px] font-semibold tracking-[-0.5px] leading-[126%]">
-                   {totalFoods}
-                 </span>
-                 <p className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[0.2px]">
-                   Total Foods
-                 </p>
-               </div>
-
-               <div className="flex gap-20 bg-white rounded-[8px] py-[19px] px-5">
-                 <div className="flex flex-col justify-between">
-                   <span className="text-[#252525] text-[25px] font-semibold tracking-[-0.5px] leading-[126%]">
-                     {goalCounts.Support || 0}
-                   </span>
-                   <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[0.2px]">
-                     Foods Consumed
-                   </span>
-                 </div>
-
-                 <div className="flex flex-col justify-between">
-                   <span className="text-[#252525] text-[25px] font-semibold tracking-[-0.5px] leading-[126%]">
-                     {goalCounts.Low || 0}
-                   </span>
-                   <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[0.2px]">
-                     Foods Missed
-                   </span>
-                 </div>
-               </div>
-
-               <div className="flex flex-col gap-[12px] bg-white rounded-[8px] py-[19px] pl-5 pr-10">
-                 <div className="flex flex-col gap-5">
-                   <div className="flex items-center gap-2.5">
-                     <span className="text-[#252525] text-[18px] font-semibold tracking-[-0.5px] leading-[126%]">
-                      {avgScore}
-                     </span>
-                    <div className="w-px h-4 bg-[#D9D9D9]" />
-                     <span className="text-[#252525] text-[18px] font-semibold tracking-[-0.36px] leading-[126%]">
-                      {zone}
-                     </span>
-                   </div>
-                   <div className="flex justify-start">
-                     <svg
-                       xmlns="http://www.w3.org/2000/svg"
-                      width="117"
-                       height="6"
-                       viewBox="0 0 117 6"
-                       fill="none"
-                     >
-                       <path
-                        d="M3 3H114"
-                       stroke="#D9D9D9"
-                        strokeWidth="5"
-                         strokeLinecap="round"
-                      />
-                       <path
-                         d={`M3 3H${Math.max(
-                           3,
-                           Math.min(
-                             114,
-                             Math.round((avgScore / 100) * 111) + 3
-                           )
-                        )}`}
-                        stroke="#FFC412"
-                         strokeWidth="5"
-                         strokeLinecap="round"
-                       />
-                    </svg>
-                  </div>
-                 </div>
-                 <div>
-                  <p className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">
-                     Overall Metabolic Compatibility Score
-                   </p>
-                </div>
-               </div>
+        {showDataState && (
+          <div className="flex justify-between bg-[#E1E6ED] rounded-[15px] px-5 py-[19px] ml-[59px] mr-[59px]">
+            <div className="flex flex-col justify-between w-[170px] bg-white rounded-[8px] py-[19px] pl-5 pr-10">
+              <span className="text-[#252525] text-[25px] font-semibold tracking-[-0.5px] leading-[126%]">
+                {totalFoods}
+              </span>
+              <p className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[0.2px]">
+                Total Foods
+              </p>
             </div>
-            )}
 
+            <div className="flex gap-20 bg-white rounded-[8px] py-[19px] px-5">
+              <div className="flex flex-col justify-between">
+                <span className="text-[#252525] text-[25px] font-semibold tracking-[-0.5px] leading-[126%]">
+                  {goalCounts.Support || 0}
+                </span>
+                <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[0.2px]">
+                  Foods Consumed
+                </span>
+              </div>
 
+              <div className="flex flex-col justify-between">
+                <span className="text-[#252525] text-[25px] font-semibold tracking-[-0.5px] leading-[126%]">
+                  {goalCounts.Low || 0}
+                </span>
+                <span className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[0.2px]">
+                  Foods Missed
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-[12px] bg-white rounded-[8px] py-[19px] pl-5 pr-10">
+              <div className="flex flex-col gap-5">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[#252525] text-[18px] font-semibold tracking-[-0.5px] leading-[126%]">
+                    {avgScore}
+                  </span>
+                  <div className="w-px h-4 bg-[#D9D9D9]" />
+                  <span className="text-[#252525] text-[18px] font-semibold tracking-[-0.36px] leading-[126%]">
+                    {zone}
+                  </span>
+                </div>
+                <div className="flex justify-start">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="117"
+                    height="6"
+                    viewBox="0 0 117 6"
+                    fill="none"
+                  >
+                    <path
+                      d="M3 3H114"
+                      stroke="#D9D9D9"
+                      strokeWidth="5"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d={`M3 3H${Math.max(
+                        3,
+                        Math.min(
+                          114,
+                          Math.round((avgScore / 100) * 111) + 3
+                        )
+                      )}`}
+                      stroke="#FFC412"
+                      strokeWidth="5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <p className="text-[#535359] text-[10px] font-semibold leading-[110%] tracking-[-0.2px]">
+                  Overall Metabolic Compatibility Score
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {showMessageState && (
           <div className="flex justify-between items-center px-5 py-[19px] bg-[#E1E6ED] rounded-[15px]">
@@ -2316,13 +1939,13 @@ const selectedWeekText = selectedWeek
               {apiMessage?.message}
             </p>
             {showAddFoodButton && (
-            <button
-              onClick={handleCreatePlanClick}
-              className="w-[146px] font-semibold text-[#308BF9] text-[12px] px-5 py-[15px] cursor-pointer rounded-[10px] bg-[#FFFFFF] border border-[#308BF9]"
-            >
-              Add Food
-            </button>
-             )}
+              <button
+                onClick={handleCreatePlanClick}
+                className="w-[146px] font-semibold text-[#308BF9] text-[12px] px-5 py-[15px] cursor-pointer rounded-[10px] bg-[#FFFFFF] border border-[#308BF9]"
+              >
+                Add Food
+              </button>
+            )}
           </div>
         )}
 
@@ -2332,13 +1955,13 @@ const selectedWeekText = selectedWeek
               No food added for this week.
             </p>
             {showAddFoodButton && (
-            <button
-              onClick={handleCreatePlanClick}
-              className="w-[146px] font-semibold text-[#308BF9] text-[12px] px-5 py-[15px] cursor-pointer rounded-[10px] bg-[#FFFFFF] border border-[#308BF9]"
-            >
-              Add Food
-            </button>
-             )}
+              <button
+                onClick={handleCreatePlanClick}
+                className="w-[146px] font-semibold text-[#308BF9] text-[12px] px-5 py-[15px] cursor-pointer rounded-[10px] bg-[#FFFFFF] border border-[#308BF9]"
+              >
+                Add Food
+              </button>
+            )}
           </div>
         )}
 
