@@ -4156,7 +4156,7 @@ if (!loading && !error && (!hasTrendData || apiMessage)) {
                   {/* Graph */}
                   <div className="flex-1 w-full lg:w-1/2 min-w-0">
                     <div className="mx-[15px] my-4">
-                      <div className="flex gap-3">
+                      <div className="flex justify-between gap-3">
                         {/* Weekly/Monthly */}
                         <div className="relative">
                           <div
@@ -4369,3 +4369,4 @@ if (!loading && !error && (!hasTrendData || apiMessage)) {
 }
 
 export default React.memo(TrendsComponent);
+
