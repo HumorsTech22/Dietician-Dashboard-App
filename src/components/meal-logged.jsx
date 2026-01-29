@@ -526,7 +526,7 @@ export default function MealLogged() {
               </p>
             </div>
 
-            <div className="flex gap-20 bg-white rounded-[8px] py-[19px] px-5">
+            {/* <div className="flex gap-20 bg-white rounded-[8px] py-[19px] px-5">
               <div className="flex flex-col justify-between">
                 <span className="text-[#252525] text-[25px] font-semibold tracking-[-0.5px] leading-[126%]">
                   {goalCounts.Support || 0}
@@ -544,7 +544,7 @@ export default function MealLogged() {
                   Foods Missed
                 </span>
               </div>
-            </div>
+            </div> */}
 
             <div className="flex flex-col gap-[12px] bg-white rounded-[8px] py-[19px] pl-5 pr-10">
               <div className="flex flex-col gap-5">
@@ -648,6 +648,7 @@ export default function MealLogged() {
     </>
   );
 }
+
 
 
 
