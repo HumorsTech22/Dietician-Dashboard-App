@@ -215,7 +215,6 @@
 
 
 
-
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -344,7 +343,7 @@ export default function ClientReminder({ selectedDate, isInsightLoading = false 
         {showCountdown && (
           <div className="flex flex-col gap-5 items-center pt-[56px] px-[64px] pb-[31px]">
             <p className="text-[#738298] text-[25px] font-semibold tracking-[-1px]">
-              Your client hasn’t taken the test yet!
+              Your client hasn’t taken the test yet! Request them to take rest before 11
             </p>
 
             <div className="flex flex-col items-center gap-4 bg-white rounded-[15px] shadow-[0_4px_4px_rgba(0,0,0,0.25)] px-4 py-5">
