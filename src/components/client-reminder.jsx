@@ -215,6 +215,7 @@
 
 
 
+
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -372,12 +373,12 @@ export default function ClientReminder({ selectedDate, isInsightLoading = false 
               </div>
             </div>
 
-            <div className="flex gap-2.5 bg-[#308BF9] rounded-[10px] px-[18px] pt-3 pb-[9px] cursor-pointer">
+            {/* <div className="flex gap-2.5 bg-[#308BF9] rounded-[10px] px-[18px] pt-3 pb-[9px] cursor-pointer">
               <Image src="/icons/Group.svg" alt="Group" width={15} height={15} />
               <p className="text-white text-[12px] font-semibold tracking-[-0.24px]">
                 Send reminder
               </p>
-            </div>
+            </div> */}
           </div>
         )}
       </div>
