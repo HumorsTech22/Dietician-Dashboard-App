@@ -34,12 +34,10 @@ export default function TestEvaluation() {
 
   // Get scores from the nested structure
   const scores = scoresInsight?.latest_test?.scores;
-  console.log("scores307:-", scores);
   const testDate = scoresInsight?.latest_test?.date_time;
   const metabolismScores = scoresInsight?.latest_test?.test_json?.Metabolism_Score_Analysis;
   const fatLossMetabolism =
     scoresInsight?.latest_test?.test_json?.fat_loss_metabolism_score;
-    console.log("fatLossMetabolism311:-", fatLossMetabolism);
   const scientificInterpretation =
     scoresInsight?.latest_test?.test_json?.fat_loss_metabolism_score
       ?.scientific_interpretation || "";
