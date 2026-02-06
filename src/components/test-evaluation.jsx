@@ -38,6 +38,7 @@ export default function TestEvaluation() {
   const metabolismScores = scoresInsight?.latest_test?.test_json?.Metabolism_Score_Analysis;
   const fatLossMetabolism =
     scoresInsight?.latest_test?.test_json?.fat_loss_metabolism_score;
+    console.log("fatLossMetabolism41:-", fatLossMetabolism);
   const scientificInterpretation =
     scoresInsight?.latest_test?.test_json?.fat_loss_metabolism_score
       ?.scientific_interpretation || "";
