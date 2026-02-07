@@ -343,7 +343,7 @@ export default function ClientReminder({ selectedDate, isInsightLoading = false 
         {showCountdown && (
           <div className="flex flex-col gap-5 items-center pt-[56px] px-[64px] pb-[31px]">
             <p className="text-[#738298] text-[25px] font-semibold tracking-[-1px]">
-              Your client hasn’t taken the test yet!
+              Your client hasn’t taken the test yet! Request them to take rest before 11
             </p>
 
             <div className="flex flex-col items-center gap-4 bg-white rounded-[15px] shadow-[0_4px_4px_rgba(0,0,0,0.25)] px-4 py-5">
@@ -372,12 +372,12 @@ export default function ClientReminder({ selectedDate, isInsightLoading = false 
               </div>
             </div>
 
-            <div className="flex gap-2.5 bg-[#308BF9] rounded-[10px] px-[18px] pt-3 pb-[9px] cursor-pointer">
+            {/* <div className="flex gap-2.5 bg-[#308BF9] rounded-[10px] px-[18px] pt-3 pb-[9px] cursor-pointer">
               <Image src="/icons/Group.svg" alt="Group" width={15} height={15} />
               <p className="text-white text-[12px] font-semibold tracking-[-0.24px]">
                 Send reminder
               </p>
-            </div>
+            </div> */}
           </div>
         )}
       </div>

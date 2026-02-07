@@ -3102,18 +3102,16 @@
 
 
 
-
 "use client";
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 
-export default function CreatePlanPopUp({ open, onClose, onUploaded, selectedWeekText  }) {
+export default function CreatePlanPopUp({ open, onClose, onUploaded, selectedWeekText }) {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [expandedDay, setExpandedDay] = useState(null);
-
-  // { 0: ["Idli"], 1: [] }
+  const [isSubmitting, setIsSubmitting] = useState(false); // Add loading state
   const [dayFoods, setDayFoods] = useState({});
   const [inputValue, setInputValue] = useState("");
 
@@ -3123,6 +3121,8 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded, selectedWee
       setShowUploadModal(false);
       setExpandedDay(null);
       setInputValue("");
+      setIsSubmitting(false);
+      setDayFoods({});
     }
   }, [open]);
 
@@ -3150,18 +3150,37 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded, selectedWee
   );
 
   // ✅ Submit => return days payload exactly as required
-  const handleSubmit = () => {
-    const TOTAL_DAYS = 7;
-
-    const days = {};
-    for (let i = 0; i < TOTAL_DAYS; i++) {
-      days[`day${i + 1}`] = dayFoods[i] || [];
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      const TOTAL_DAYS = 7;
+      const days = {};
+      
+      for (let i = 0; i < TOTAL_DAYS; i++) {
+        days[`day${i + 1}`] = dayFoods[i] || [];
+      }
+      
+      // Call onUploaded first, wait for it if it's async
+      if (onUploaded) {
+        await Promise.resolve(onUploaded(days));
+      }
+      
+      toast.success("Food submitted successfully!");
+      
+      // Wait a moment before closing to ensure API call starts
+      setTimeout(() => {
+        onClose?.();
+      }, 100);
+      
+    } catch (error) {
+      console.error("Error submitting food:", error);
+      toast.error("Failed to submit food");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    onUploaded?.(days);
-
-    toast.success("Food submitted successfully!");
-    onClose?.();
   };
 
   if (!showUploadModal) return null;
@@ -3169,15 +3188,16 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded, selectedWee
   return (
     <div
       className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999]"
-      onClick={onClose}
+      onClick={() => !isSubmitting && onClose()}
     >
       <div
         className="relative bg-white w-[800px] rounded-[10px]"
         onClick={(e) => e.stopPropagation()}
       >
         <button
-          onClick={onClose}
-          className="absolute -right-10 top-0 bg-white px-3 py-1 rounded shadow cursor-pointer text-black"
+          onClick={() => !isSubmitting && onClose()}
+          className="absolute -right-10 top-0 bg-white px-3 py-1 rounded shadow cursor-pointer text-black disabled:opacity-50"
+          disabled={isSubmitting}
         >
           x
         </button>
@@ -3185,9 +3205,9 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded, selectedWee
         {/* Header */}
         <div className="px-5 pt-[31px]">
           <div className="px-[9px] py-[5px]">
-           <p className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
-  {selectedWeekText || "selected week"}
-</p>
+            <p className="text-[#252525] text-[12px] font-normal leading-[110%] tracking-[-0.24px]">
+              {selectedWeekText || "selected week"}
+            </p>
             <p className="text-[#252525] text-[25px] font-semibold leading-[110%] tracking-[-0.5px]">
               Add Food
             </p>
@@ -3206,8 +3226,10 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded, selectedWee
                 {/* Day Header */}
                 <div
                   onClick={() => {
-                    setExpandedDay(expandedDay === index ? null : index);
-                    setInputValue("");
+                    if (!isSubmitting) {
+                      setExpandedDay(expandedDay === index ? null : index);
+                      setInputValue("");
+                    }
                   }}
                   className="flex justify-between items-center py-[18px] pl-[38px] pr-7 cursor-pointer"
                 >
@@ -3223,7 +3245,7 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded, selectedWee
                   <div
                     className={`transition-transform duration-200 ${
                       expandedDay === index ? "rotate-180" : ""
-                    }`}
+                    } ${isSubmitting ? "opacity-50" : ""}`}
                   >
                     <Image
                       src="/icons/right-down button.svg"
@@ -3244,12 +3266,13 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded, selectedWee
                         placeholder="Enter food"
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleAddFood(index)}
-                        className="text-[#252525] text-[12px] font-normal outline-none w-full"
+                        onKeyDown={(e) => e.key === "Enter" && !isSubmitting && handleAddFood(index)}
+                        className="text-[#252525] text-[12px] font-normal outline-none w-full disabled:opacity-50"
+                        disabled={isSubmitting}
                       />
                       <div
-                        onClick={() => handleAddFood(index)}
-                        className="flex justify-center items-center bg-[#308BF9] rounded-[4px] p-1 cursor-pointer hover:bg-blue-600 transition-colors"
+                        onClick={() => !isSubmitting && handleAddFood(index)}
+                        className="flex justify-center items-center bg-[#308BF9] rounded-[4px] p-1 cursor-pointer hover:bg-blue-600 transition-colors disabled:opacity-50"
                       >
                         <Image
                           src="/icons/hugeicons_addplus-01.svg"
@@ -3275,8 +3298,8 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded, selectedWee
                             alt="remove"
                             width={16}
                             height={16}
-                            className="cursor-pointer"
-                            onClick={() => handleRemoveFood(index, foodIndex)}
+                            className={`cursor-pointer ${isSubmitting ? "opacity-50" : ""}`}
+                            onClick={() => !isSubmitting && handleRemoveFood(index, foodIndex)}
                           />
                         </div>
                       ))}
@@ -3299,9 +3322,10 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded, selectedWee
           <div className="flex justify-end mt-[23px]">
             <button
               onClick={handleSubmit}
-              className="rounded-[10px] cursor-pointer text-[#FFFFFF] text-[12px] font-semibold bg-[#308BF9] px-5 py-[15px] hover:bg-blue-600 transition-colors"
+              disabled={isSubmitting || totalItems === 0}
+              className="rounded-[10px] cursor-pointer text-[#FFFFFF] text-[12px] font-semibold bg-[#308BF9] px-5 py-[15px] hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Submit
+              {isSubmitting ? "Submitting..." : "Submit"}
             </button>
           </div>
         </div>
@@ -3309,3 +3333,4 @@ export default function CreatePlanPopUp({ open, onClose, onUploaded, selectedWee
     </div>
   );
 }
+
