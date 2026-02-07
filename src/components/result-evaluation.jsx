@@ -2450,9 +2450,13 @@ export const ResultEvaluation = () => {
     : clientData?.plans_summary?.completed[0];
 
   const planStartDate = currentPlan ? startOfDay(new Date(currentPlan.plan_start_date)) : null;
-  const planEndDate = currentPlan ? startOfDay(new Date(currentPlan.plan_end_date)) : null;
+  // const planEndDate = currentPlan ? startOfDay(new Date(currentPlan.plan_end_date)) : null;
+  // console.log("planEndDate2456:-", planEndDate);
+
+  const planEndDate = null;
 
   // 🔹 Logic to Center Today in the 16-day window
+
   const getInitialWindowStart = () => {
     // Center Today (offset by ~7 days)
     const middleOffset = Math.floor(VISIBLE_COUNT / 2);
@@ -2468,6 +2472,9 @@ export const ResultEvaluation = () => {
 
     return idealStart;
   };
+
+
+
 
   const getInitialSelectedDate = () => {
     if (planEndDate && today > planEndDate) return planEndDate;
