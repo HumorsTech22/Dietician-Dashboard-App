@@ -21,7 +21,6 @@ export default function MealLogged() {
   const [visibleWeekStart, setVisibleWeekStart] = useState(0);
 
   const [selectedWeekIdx, setSelectedWeekIdx] = useState(null);
-  console.log("selectedWeekIdx1399:-", selectedWeekIdx);
 
   // ✅ this is the ONLY thing we need from popup
   const [daysPayload, setDaysPayload] = useState({});

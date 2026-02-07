@@ -48,7 +48,6 @@ export default function TestEvaluation() {
     ? scoresInsight.latest_test.test_json.fat_loss_metabolism_score.scientific_interpretation
     : "";
 
-      console.log("scientificInterpretation52:-", scientificInterpretation);
 
 
   let fatImpact = "-";
