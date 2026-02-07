@@ -3297,7 +3297,7 @@ function TrendsComponent({ selectedDate, showMainMarker = true, compactGraphs = 
         return { name: "Hydrogen", value: scoresInsightData?.latest_test?.ppm?.h2, unit: "ppm" };
       case "Glucose -Vs- Fat":
         return { name: "Acetone", value: scoresInsightData?.latest_test?.ppm?.acetone, unit: "ppm" };
-      case "Liver Heptic":
+      case "Liver Hepatic":
         return { name: "Ethanol", value: scoresInsightData?.latest_test?.ppm?.ethanol, unit: "ppm" };
       default:
         return { name: "Hydrogen", value: scoresInsightData?.latest_test?.ppm?.h2, unit: "ppm" };
@@ -3385,7 +3385,7 @@ function TrendsComponent({ selectedDate, showMainMarker = true, compactGraphs = 
           firstScoreType: "fat",
           secondScoreType: "glucose",
         };
-      case "Liver Heptic":
+      case "Liver Hepatic":
         return {
           firstTitle: "Detoxification Metabolism Score",
           secondTitle: "Hepatic Stress Score",
@@ -3542,7 +3542,7 @@ function TrendsComponent({ selectedDate, showMainMarker = true, compactGraphs = 
           },
         ];
 
-      case "Liver Heptic":
+      case "Liver Hepatic":
         return [
           {
             percentage: scores.detoxification || 0,
@@ -3834,7 +3834,7 @@ function TrendsComponent({ selectedDate, showMainMarker = true, compactGraphs = 
     if (!metabolismData) {
       if (tabLabel === "Gut Fermentation") return "#DA5747";
       if (tabLabel === "Glucose -Vs- Fat") return "#3FAF58";
-      if (tabLabel === "Liver Heptic") return "#3FAF58";
+      if (tabLabel === "Liver Hepatic") return "#3FAF58";
       return "#E1E6ED";
     }
 
@@ -3850,7 +3850,7 @@ function TrendsComponent({ selectedDate, showMainMarker = true, compactGraphs = 
         zone1 = metabolismData.fat_metabolism?.zone || "";
         zone2 = metabolismData.glucose_metabolism?.zone || "";
         break;
-      case "Liver Heptic":
+      case "Liver Hepatic":
         zone1 = metabolismData.detoxification?.zone || "";
         zone2 = metabolismData.hepatic_stress?.zone || "";
         break;
@@ -3871,7 +3871,7 @@ function TrendsComponent({ selectedDate, showMainMarker = true, compactGraphs = 
   const tabs = [
     { label: "Gut Fermentation" },
     { label: "Glucose -Vs- Fat" },
-    { label: "Liver Heptic" },
+    { label: "Liver Hepatic" },
   ];
 
   const firstSectionData = useMemo(
