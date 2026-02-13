@@ -180,6 +180,69 @@ export const checkWeeklyAnalysisService = async (dieticianId, profileId, startDa
 };
 
 
+export const saveWeeklyFoodJson = async (dietitian_id, profile_id, start_date, end_date, food_json) => {
+  return apiFetcher(API_ENDPOINTS.MEALANALYSIS.ADDFOOD, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      dietitian_id: dietitian_id,
+      profile_id: profile_id,
+      start_date: start_date,
+      end_date: end_date,
+      food_json: food_json,
+    }),
+  });
+};
+
+
+// services/authService.js
+
+export const fetchSavedWeeklyFoodJson = async (profileId, startDate, endDate, dieticianId = null) => {
+  // Build query parameters
+  const params = new URLSearchParams();
+  params.append('profile_id', profileId);
+  params.append('start_date', startDate);
+  params.append('end_date', endDate);
+  
+  // Add dietitian_id if provided
+  if (dieticianId) {
+    params.append('dietician_id', dieticianId);
+  }
+  
+  // Make GET request with query parameters
+  const url = `${API_ENDPOINTS.MEALANALYSIS.GETFOOD}?${params.toString()}`;
+  
+  try {
+    const response = await apiFetcher(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    
+    return response;
+  } catch (error) {
+    // Check if it's the "no data found" error
+    if (error.message?.includes("No data found") || 
+        error.data?.message?.includes("No data found") ||
+        error.message === "Weekly food data not found") {
+      
+      // Return a special response object instead of throwing
+      return { 
+        success: false, 
+        noData: true, 
+        message: "No data found for this week" 
+      };
+    }
+    
+    // Re-throw other errors
+    throw error;
+  }
+};
+
+  
 export const fetchWeeklyAnalysisComplete1 = async (requestData) => {
   return apiFetcher(API_ENDPOINTS.MEALANALYSIS.WEEKLYANALYSISCOMPLETE1, {
     method: "POST",
