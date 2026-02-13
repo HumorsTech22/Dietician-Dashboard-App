@@ -169,182 +169,435 @@ export default function MealLogged() {
     return `${day} ${month} ${year} ${formattedHours}:${minutes} ${ampm}`;
   };
 
-  const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId, days) => {
-    setLoading(true);
-    setError(null);
-    setErrorType(null);
-    setApiMessage(null);
+
+  const MSG_NO_WEEKLY_FULL = "No weekly analysis found. Please add food to generate analysis.";
+const MSG_NO_WEEKLY_SHORT = "No weekly analysis found.";
+
+
+
+  // const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId, days) => {
+  //   setLoading(true);
+  //   setError(null);
+  //   setErrorType(null);
+  //   setApiMessage(null);
   
-    try {
-      // 🔹 STEP 1: CHECK WEEKLY ANALYSIS
-      const checkResponse = await checkWeeklyAnalysisService(
-        clientProfile?.dietician_id,
-        clientProfile?.profile_id,
-        withStartOfDayTime(startDate),
-        withCurrentTime(endDate)
-      );
+  //   try {
+  //     // 🔹 STEP 1: CHECK WEEKLY ANALYSIS
+  //     const checkResponse = await checkWeeklyAnalysisService(
+  //       clientProfile?.dietician_id,
+  //       clientProfile?.profile_id,
+  //       withStartOfDayTime(startDate),
+  //       withCurrentTime(endDate)
+  //     );
       
-      // ✅ CHECK FOR SPECIFIC API RESPONSE: "No record found for the given date range"
-      if (checkResponse?.status === false && 
-          checkResponse?.message === "No record found for the given date range") {
-        setWeeklyAnalysisData([]);
-        // Get the week range for display
+  //     // ✅ CHECK FOR SPECIFIC API RESPONSE: "No record found for the given date range"
+  //     if (checkResponse?.status === false && 
+  //         checkResponse?.message === "No record found for the given date range") {
+  //       setWeeklyAnalysisData([]);
+  //       // Get the week range for display
+  //       const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
+  //       const [endYear, endMonth, endDay] = endDate.split('-').map(Number);
+        
+  //       const startDateObj = new Date(Date.UTC(startYear, startMonth - 1, startDay));
+  //       const endDateObj = new Date(Date.UTC(endYear, endMonth - 1, endDay));
+        
+  //       setApiMessage({ 
+  //         message: `No data available for ${fmt(startDateObj)} and ${fmt(endDateObj)}` 
+  //       });
+  //       setLoading(false);
+  //       return;
+  //     }
+
+  //     // ✅ CHECK FOR FOOD_LEVEL_EVALUATION IN DATA_JSON
+  //     if (checkResponse?.status === true && 
+  //         checkResponse?.data_json?.food_level_evaluation) {
+  //       console.log("Using existing analysis data from check API");
+  //       setWeeklyAnalysisData(checkResponse.data_json.food_level_evaluation);
+  //       setApiMessage(null);
+  //       setLoading(false);
+  //       return;
+  //     }
+
+  //     // If we get here, there's no analysis data in checkResponse
+  //     // Parse end date string to Date object (treat as UTC, then convert to local)
+  //     const [year, month, day] = endDate.split('-').map(Number);
+  //     const endDateObj = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+      
+  //     // Get today's date at midnight (local time)
+  //     const today = new Date();
+  //     const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      
+  //     // Check if this is the current week (end date is today or in the future)
+  //     const isCurrentWeek = endDateObj >= todayMidnight;
+      
+  //     // Only proceed to fetchWeeklyAnalysisComplete1 if we have days data
+  //     if (days && Object.keys(days).length > 0) {
+  //       const requestBody = {
+  //         dietician_id: clientProfile?.dietician_id,
+  //         profile_id: clientProfile?.profile_id,
+  //         start_date: startDate,
+  //         end_date: endDate,
+  //         ...(dietPlanId && { diet_plan_id: dietPlanId }),
+  //         days: days || {},
+  //       };
+
+  //       const response = await fetchWeeklyAnalysisComplete1(requestBody);
+
+  //       // ✅ CHECK FOR SPECIFIC API RESPONSE IN SECOND API CALL TOO
+  //       if (response?.status === false && 
+  //           response?.message === "No record found for the given date range") {
+  //         const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
+  //         const [endYear, endMonth, endDay] = endDate.split('-').map(Number);
+          
+  //         const startDateObj = new Date(Date.UTC(startYear, startMonth - 1, startDay));
+  //         const endDateObj = new Date(Date.UTC(endYear, endMonth - 1, endDay));
+          
+  //         setWeeklyAnalysisData([]);
+  //         setApiMessage({ 
+  //           message: `No data available for ${fmt(startDateObj)} and ${fmt(endDateObj)}` 
+  //         });
+  //         return;
+  //       }
+
+  //       // ✅ CHECK IF RESPONSE HAS FOOD_LEVEL_EVALUATION IN API_RESPONSE
+  //       if (response?.api_response?.food_level_evaluation) {
+  //         setWeeklyAnalysisData(response.api_response.food_level_evaluation);
+  //         setApiMessage(null);
+  //       } 
+  //       // ✅ CUSTOM MESSAGE HANDLING
+  //       else if (response?.message?.includes("Latest test data is older than 72 hours")) {
+  //         setWeeklyAnalysisData([]);
+  //         setApiMessage({
+  //           message: "No test taken in last 72 hrs, so weekly analysis will not be available.",
+  //         });
+  //       }
+  //       else if (response?.message) {
+  //         setWeeklyAnalysisData([]);
+  //         setApiMessage({ message: response.message });
+  //       } else {
+  //         setWeeklyAnalysisData([]);
+  //         setApiMessage({ 
+  //           message: "No food data available for this week." 
+  //         });
+  //       }
+  //     } else {
+  //       // No days data and no existing analysis
+  //       // if (isCurrentWeek) {
+  //       //   // For current week, show the "Weekly analysis will be available after" message
+  //       //   const analysisAvailableDate = new Date(endDateObj);
+  //       //   analysisAvailableDate.setHours(21, 0, 0, 0); // 9:00 PM local time
+          
+  //       //   const formattedDate = formatDisplayDate(analysisAvailableDate);
+  //       //   setWeeklyAnalysisData([]);
+  //       //   setApiMessage({ 
+  //       //     message: `Weekly analysis will be available after ${formattedDate}` 
+  //       //   });
+  //       // } 
+
+
+  //       if (isCurrentWeek) {
+  //         const now = new Date();
+        
+  //         // End date at local midnight
+  //         const endLocal = new Date(
+  //           endDateObj.getUTCFullYear(),
+  //           endDateObj.getUTCMonth(),
+  //           endDateObj.getUTCDate()
+  //         );
+        
+  //         const isEndDateToday =
+  //           endLocal.getFullYear() === now.getFullYear() &&
+  //           endLocal.getMonth() === now.getMonth() &&
+  //           endLocal.getDate() === now.getDate();
+        
+  //         const isAfter9PM = now.getHours() >= 21;
+        
+  //         if (isEndDateToday && isAfter9PM) {
+  //           // ✅ AFTER 9 PM ON LAST DAY
+  //           setWeeklyAnalysisData([]);
+  //           setApiMessage({
+  //             message: "No weekly analysis found. Please add food to generate analysis.",
+  //           });
+  //         } else {
+  //           // ❌ BEFORE 9 PM
+  //           const analysisAvailableDate = new Date(endLocal);
+  //           analysisAvailableDate.setHours(21, 0, 0, 0);
+        
+  //           const formattedDate = formatDisplayDate(analysisAvailableDate);
+        
+  //           setWeeklyAnalysisData([]);
+  //           setApiMessage({
+  //             message: `Weekly analysis will be available after ${formattedDate}`,
+  //           });
+  //         }
+  //       }
+        
+        
+        
+  //       else {
+  //         // For past weeks, show the "Please add food" message
+  //         setWeeklyAnalysisData([]);
+  //         setApiMessage({ 
+  //           message: "No weekly analysis found. Please add food to generate analysis." 
+  //         });
+  //       }
+  //     }
+
+  //   } catch (err) {
+  //     console.error("API Error:", err);
+  //     setError(err?.message || "Failed to fetch weekly analysis");
+  //     setWeeklyAnalysisData([]);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
+const fetchWeeklyAnalysis = async (startDate, endDate, dietPlanId, days) => {
+  setLoading(true);
+  setError(null);
+  setErrorType(null);
+  setApiMessage(null);
+
+  try {
+    // 🔹 STEP 1: CHECK WEEKLY ANALYSIS
+    const checkResponse = await checkWeeklyAnalysisService(
+      clientProfile?.dietician_id,
+      clientProfile?.profile_id,
+      withStartOfDayTime(startDate),
+      withCurrentTime(endDate)
+    );
+    
+    // ✅ CHECK FOR SPECIFIC API RESPONSE: "No record found for the given date range"
+    if (checkResponse?.status === false && 
+        checkResponse?.message === "No record found for the given date range") {
+      setWeeklyAnalysisData([]);
+      // Get the week range for display
+      const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
+      const [endYear, endMonth, endDay] = endDate.split('-').map(Number);
+      
+      const startDateObj = new Date(Date.UTC(startYear, startMonth - 1, startDay));
+      const endDateObj = new Date(Date.UTC(endYear, endMonth - 1, endDay));
+      
+      setApiMessage({ 
+        message: `No data available for ${fmt(startDateObj)} and ${fmt(endDateObj)}` 
+      });
+      setLoading(false);
+      return;
+    }
+
+    // ✅ CHECK FOR FOOD_LEVEL_EVALUATION IN DATA_JSON
+    if (checkResponse?.status === true && 
+        checkResponse?.data_json?.food_level_evaluation) {
+      console.log("Using existing analysis data from check API");
+      setWeeklyAnalysisData(checkResponse.data_json.food_level_evaluation);
+      setApiMessage(null);
+      setLoading(false);
+      return;
+    }
+
+    // If we get here, there's no analysis data in checkResponse
+    // Parse end date string to Date object (treat as UTC, then convert to local)
+    const [year, month, day] = endDate.split('-').map(Number);
+    const endDateObj = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+    
+    // Get today's date at midnight (local time)
+    const today = new Date();
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    
+    // Check if this is the current week (end date is today or in the future)
+    const isCurrentWeek = endDateObj >= todayMidnight;
+    
+    // Only proceed to fetchWeeklyAnalysisComplete1 if we have days data
+    if (days && Object.keys(days).length > 0) {
+      console.log("Raw days object:", days);
+  console.log("Type of days:", typeof days);
+  console.log("Is array?", Array.isArray(days));
+      // FIX: Format the days parameter correctly for the API
+      // The API expects days to be an array of objects with day_no and items
+      // const daysArray = Object.entries(days).map(([dayIndex, items]) => ({
+      //   day_no: parseInt(dayIndex) + 1,
+      //   items: items
+      // }));
+
+
+      let daysArray = [];
+
+if (Array.isArray(days)) {
+  // already like: [{day_no: 1, items: [...]}, ...]
+  daysArray = days
+    .filter(d => d && Array.isArray(d.items) && d.items.length > 0)
+    .map(d => ({ day_no: Number(d.day_no), items: d.items }));
+} else {
+  // object like: {0: ["dosa"], 1: ["idli"]} (if ever used)
+  daysArray = Object.entries(days)
+    .map(([dayIndex, items]) => ({
+      day_no: Number(dayIndex) + 1,
+      items: Array.isArray(items) ? items : [],
+    }))
+    .filter(d => d.items.length > 0);
+}
+
+if (daysArray.length === 0) {
+  setWeeklyAnalysisData([]);
+  setApiMessage({ message: "Please add food to generate analysis." });
+  setLoading(false);
+  return;
+}
+
+       console.log("Formatted daysArray442:", daysArray);
+
+      // const requestBody = {
+      //   dietician_id: clientProfile?.dietician_id,
+      //   profile_id: clientProfile?.profile_id,
+      //   start_date: startDate,
+      //   end_date: endDate,
+      //   ...(dietPlanId && { diet_plan_id: dietPlanId }),
+      //   days: daysArray, // Send as array, not object
+      // };
+
+
+
+      // ✅ normalize days safely
+const normalizedDays = (Array.isArray(daysArray) ? daysArray : [])
+  .map(d => ({
+    day_no: Number(d.day_no),
+    items: Array.isArray(d.items) ? d.items : [],
+  }))
+  .filter(d => d.day_no >= 1 && d.day_no <= 7 && d.items.length > 0);
+
+console.log("normalizedDays463:", normalizedDays);
+
+// ✅ new request body (PHP compatible)
+const requestBody = {
+  // send both spellings (backend will use whichever it expects)
+  dietician_id: clientProfile?.dietician_id,
+  dietitian_id: clientProfile?.dietician_id,
+
+  profile_id: clientProfile?.profile_id,
+  start_date: startDate,
+  end_date: endDate,
+  ...(dietPlanId && { diet_plan_id: dietPlanId }),
+
+  // send in multiple formats (covers PHP $_POST + json_decode cases)
+  days: normalizedDays,
+  days_json: JSON.stringify(normalizedDays),
+  food_json: JSON.stringify({ days: normalizedDays }),
+};
+
+console.log("Sending request to weekly_analysis_complete1:482", requestBody);
+
+
+
+      const response = await fetchWeeklyAnalysisComplete1(requestBody);
+
+      // ✅ CHECK FOR SPECIFIC API RESPONSE IN SECOND API CALL TOO
+      if (response?.status === false && 
+          response?.message === "No record found for the given date range") {
         const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
         const [endYear, endMonth, endDay] = endDate.split('-').map(Number);
         
         const startDateObj = new Date(Date.UTC(startYear, startMonth - 1, startDay));
         const endDateObj = new Date(Date.UTC(endYear, endMonth - 1, endDay));
         
+        setWeeklyAnalysisData([]);
         setApiMessage({ 
           message: `No data available for ${fmt(startDateObj)} and ${fmt(endDateObj)}` 
         });
-        setLoading(false);
         return;
       }
 
-      // ✅ CHECK FOR FOOD_LEVEL_EVALUATION IN DATA_JSON
-      if (checkResponse?.status === true && 
-          checkResponse?.data_json?.food_level_evaluation) {
-        console.log("Using existing analysis data from check API");
-        setWeeklyAnalysisData(checkResponse.data_json.food_level_evaluation);
+      // ✅ CHECK IF RESPONSE HAS FOOD_LEVEL_EVALUATION IN API_RESPONSE
+      if (response?.api_response?.food_level_evaluation) {
+        setWeeklyAnalysisData(response.api_response.food_level_evaluation);
         setApiMessage(null);
-        setLoading(false);
-        return;
+      } 
+      // ✅ CUSTOM MESSAGE HANDLING
+      else if (response?.message?.includes("Latest test data is older than 72 hours")) {
+        setWeeklyAnalysisData([]);
+        setApiMessage({
+          message: "No test taken in last 72 hrs, so weekly analysis will not be available.",
+        });
       }
-
-      // If we get here, there's no analysis data in checkResponse
-      // Parse end date string to Date object (treat as UTC, then convert to local)
-      const [year, month, day] = endDate.split('-').map(Number);
-      const endDateObj = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+      else if (response?.message) {
+        setWeeklyAnalysisData([]);
+        setApiMessage({ message: response.message });
+      } else {
+        setWeeklyAnalysisData([]);
+        setApiMessage({ 
+          message: "No food data available for this week." 
+        });
+      }
+    } else {
+      // No days data and no existing analysis
+      if (isCurrentWeek) {
+        const now = new Date();
       
-      // Get today's date at midnight (local time)
-      const today = new Date();
-      const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        // End date at local midnight
+        const endLocal = new Date(
+          endDateObj.getUTCFullYear(),
+          endDateObj.getUTCMonth(),
+          endDateObj.getUTCDate()
+        );
       
-      // Check if this is the current week (end date is today or in the future)
-      const isCurrentWeek = endDateObj >= todayMidnight;
+        const isEndDateToday =
+          endLocal.getFullYear() === now.getFullYear() &&
+          endLocal.getMonth() === now.getMonth() &&
+          endLocal.getDate() === now.getDate();
       
-      // Only proceed to fetchWeeklyAnalysisComplete1 if we have days data
-      if (days && Object.keys(days).length > 0) {
-        const requestBody = {
-          dietician_id: clientProfile?.dietician_id,
-          profile_id: clientProfile?.profile_id,
-          start_date: startDate,
-          end_date: endDate,
-          ...(dietPlanId && { diet_plan_id: dietPlanId }),
-          days: days || {},
-        };
-
-        const response = await fetchWeeklyAnalysisComplete1(requestBody);
-
-        // ✅ CHECK FOR SPECIFIC API RESPONSE IN SECOND API CALL TOO
-        if (response?.status === false && 
-            response?.message === "No record found for the given date range") {
-          const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
-          const [endYear, endMonth, endDay] = endDate.split('-').map(Number);
-          
-          const startDateObj = new Date(Date.UTC(startYear, startMonth - 1, startDay));
-          const endDateObj = new Date(Date.UTC(endYear, endMonth - 1, endDay));
-          
+        const isAfter9PM = now.getHours() >= 21;
+      
+        if (isEndDateToday && isAfter9PM) {
+          // ✅ AFTER 9 PM ON LAST DAY
           setWeeklyAnalysisData([]);
-          setApiMessage({ 
-            message: `No data available for ${fmt(startDateObj)} and ${fmt(endDateObj)}` 
-          });
-          return;
-        }
+          // setApiMessage({
+          //   message: "No weekly analysis found. Please add food to generate analysis.",
+          // });
 
-        // ✅ CHECK IF RESPONSE HAS FOOD_LEVEL_EVALUATION IN API_RESPONSE
-        if (response?.api_response?.food_level_evaluation) {
-          setWeeklyAnalysisData(response.api_response.food_level_evaluation);
-          setApiMessage(null);
-        } 
-        // ✅ CUSTOM MESSAGE HANDLING
-        else if (response?.message?.includes("Latest test data is older than 72 hours")) {
+          setApiMessage({
+  message: MSG_NO_WEEKLY_SHORT,
+});
+
+        } else {
+          // ❌ BEFORE 9 PM
+          const analysisAvailableDate = new Date(endLocal);
+          analysisAvailableDate.setHours(21, 0, 0, 0);
+      
+          const formattedDate = formatDisplayDate(analysisAvailableDate);
+          console.log("formattedDate556:-", formattedDate);
+      
           setWeeklyAnalysisData([]);
           setApiMessage({
-            message: "No test taken in last 72 hrs, so weekly analysis will not be available.",
-          });
-        }
-        else if (response?.message) {
-          setWeeklyAnalysisData([]);
-          setApiMessage({ message: response.message });
-        } else {
-          setWeeklyAnalysisData([]);
-          setApiMessage({ 
-            message: "No food data available for this week." 
+            message: `Weekly analysis will be available after ${formattedDate}`,
           });
         }
       } else {
-        // No days data and no existing analysis
-        // if (isCurrentWeek) {
-        //   // For current week, show the "Weekly analysis will be available after" message
-        //   const analysisAvailableDate = new Date(endDateObj);
-        //   analysisAvailableDate.setHours(21, 0, 0, 0); // 9:00 PM local time
-          
-        //   const formattedDate = formatDisplayDate(analysisAvailableDate);
-        //   setWeeklyAnalysisData([]);
-        //   setApiMessage({ 
-        //     message: `Weekly analysis will be available after ${formattedDate}` 
-        //   });
-        // } 
+        // For past weeks, show the "Please add food" message
+        setWeeklyAnalysisData([]);
+        const weekIdxToUse = selectedWeekIdx === null ? currentWeekIdx : selectedWeekIdx;
+const isPreviousWeek = currentWeekIdx > 0 && weekIdxToUse === currentWeekIdx - 1;
 
+setApiMessage({
+  message: isPreviousWeek ? MSG_NO_WEEKLY_FULL : MSG_NO_WEEKLY_SHORT,
+});
 
-        if (isCurrentWeek) {
-          const now = new Date();
-        
-          // End date at local midnight
-          const endLocal = new Date(
-            endDateObj.getUTCFullYear(),
-            endDateObj.getUTCMonth(),
-            endDateObj.getUTCDate()
-          );
-        
-          const isEndDateToday =
-            endLocal.getFullYear() === now.getFullYear() &&
-            endLocal.getMonth() === now.getMonth() &&
-            endLocal.getDate() === now.getDate();
-        
-          const isAfter9PM = now.getHours() >= 21;
-        
-          if (isEndDateToday && isAfter9PM) {
-            // ✅ AFTER 9 PM ON LAST DAY
-            setWeeklyAnalysisData([]);
-            setApiMessage({
-              message: "No weekly analysis found. Please add food to generate analysis.",
-            });
-          } else {
-            // ❌ BEFORE 9 PM
-            const analysisAvailableDate = new Date(endLocal);
-            analysisAvailableDate.setHours(21, 0, 0, 0);
-        
-            const formattedDate = formatDisplayDate(analysisAvailableDate);
-        
-            setWeeklyAnalysisData([]);
-            setApiMessage({
-              message: `Weekly analysis will be available after ${formattedDate}`,
-            });
-          }
-        }
-        
-        
-        
-        else {
-          // For past weeks, show the "Please add food" message
-          setWeeklyAnalysisData([]);
-          setApiMessage({ 
-            message: "No weekly analysis found. Please add food to generate analysis." 
-          });
-        }
       }
-
-    } catch (err) {
-      console.error("API Error:", err);
-      setError(err?.message || "Failed to fetch weekly analysis");
-      setWeeklyAnalysisData([]);
-    } finally {
-      setLoading(false);
     }
-  };
+
+  } catch (err) {
+    console.error("API Error:", err);
+    setError(err?.message || "Failed to fetch weekly analysis");
+    setWeeklyAnalysisData([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
+
+
+
 
   useEffect(() => {
     const activePlan = clientProfile?.plans_summary?.active?.[0];
@@ -443,16 +696,50 @@ export default function MealLogged() {
   const showNoDataState = !apiMessage && dataArr.length === 0 && !loading && !error;
   const showDataState = dataArr.length > 0;
 
-  const hideAddFoodButton =
+
+// which week is currently being viewed
+const effectiveWeekIdx = selectedWeekIdx === null ? currentWeekIdx : selectedWeekIdx;
+
+// previous week index from current week
+const prevWeekIdx = currentWeekIdx > 0 ? currentWeekIdx - 1 : null;
+
+// check exact message
+const messageNoWeeklyAnalysis =
+  apiMessage?.message?.includes("No weekly analysis found.");
+
+
+const isPreviousWeek = prevWeekIdx !== null && effectiveWeekIdx === prevWeekIdx;
+
+const isFullNoWeeklyMessage =
+  apiMessage?.message === MSG_NO_WEEKLY_FULL;
+
+const allowAddFoodForThisMessage =
+  isPreviousWeek && isFullNoWeeklyMessage;
+
+
+// final hide logic
+const hideAddFoodButton =
   apiMessage?.message?.includes("No test taken in last 72 hrs") ||
-  apiMessage?.message?.includes("Weekly analysis will be available after") ||
   apiMessage?.end_date ||
-  // ✅ ALSO HIDE ADD FOOD BUTTON FOR THE NEW MESSAGE
-  apiMessage?.message?.includes("No data available for");
+  apiMessage?.message?.includes("No data available for") ||
+  (messageNoWeeklyAnalysis && !allowAddFoodForThisMessage);
 
-  const showAddFoodButton = !hideAddFoodButton;
+const showAddFoodButton = !hideAddFoodButton;
 
-  const effectiveWeekIdx = selectedWeekIdx === null ? currentWeekIdx : selectedWeekIdx;
+
+
+  
+
+  // const hideAddFoodButton =
+  // apiMessage?.message?.includes("No test taken in last 72 hrs") ||
+  // // apiMessage?.message?.includes("Weekly analysis will be available after") ||
+  // apiMessage?.end_date ||
+  // // ✅ ALSO HIDE ADD FOOD BUTTON FOR THE NEW MESSAGE
+  // apiMessage?.message?.includes("No data available for");
+
+  // const showAddFoodButton = !hideAddFoodButton;
+
+  //const effectiveWeekIdx = selectedWeekIdx === null ? currentWeekIdx : selectedWeekIdx;
   const selectedWeek = weeks?.[effectiveWeekIdx] || null;
 
   const selectedWeekText = selectedWeek
@@ -550,11 +837,11 @@ export default function MealLogged() {
           </div>
         )}
 
-        {error && (
+        {/* {error && (
           <div className="px-5 py-[19px] bg-[#E1E6ED] rounded-[15px]">
             <p className="text-red-600 text-[14px] font-semibold">{error}</p>
           </div>
-        )}
+        )} */}
 
         {showDataState && (
           <div className="flex justify-between bg-[#E1E6ED] rounded-[15px] px-5 py-[19px] ml-[59px] mr-[59px]">
@@ -685,7 +972,14 @@ export default function MealLogged() {
         )}
       </div>
 
-      <CreatePlanPopUp open={isModalOpen} onClose={handlePopupClose} onUploaded={handleFoodUploaded}  selectedWeekText={selectedWeekText}/>
+      <CreatePlanPopUp 
+      open={isModalOpen} 
+      onClose={handlePopupClose} 
+      onUploaded={handleFoodUploaded}  
+      selectedWeekText={selectedWeekText}
+      dieticianId={clientProfile?.dietician_id}
+      profileId={clientProfile?.profile_id}
+      />
     </>
   );
 }
